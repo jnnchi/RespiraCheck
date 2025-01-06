@@ -1,4 +1,5 @@
 import os
+import csv
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
@@ -27,20 +28,44 @@ def save_mel_spectrogram(audio_file, output_file):
         plt.axis('off')  # Remove axes for a cleaner image
         plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
         plt.close()
-        print(f"Saved: {output_file}")
+        #print(f"Saved: {output_file}")
     except Exception as e:
         print(f"Error processing {audio_file}: {e}")
 
 
+def parse_filename(filename):
+    """
+    Function to parse the filename and extract labels.
+    """
+    parts = filename.split("_")
+    parts[1] = parts[1].split(",")
+    
+    return parts[1]
+
 def create_all_spectrograms(input_folder, output_folder):
     """
-    Function to iterate through all files and save as spectrogram image.
+    Function to iterate through all files, save as spectrogram image, and create labels CSV.
     """
-    for filename in os.listdir(input_folder):
-        if filename.endswith(".wav") or filename.endswith(".mp3"): # is audio
-            input_path = os.path.join(input_folder, filename)
-            output_path = os.path.join(output_folder, os.path.splitext(filename)[0] + ".png")
-            save_mel_spectrogram(input_path, output_path)
+    os.makedirs(output_folder, exist_ok=True)
+    csv_path = os.path.join(output_folder, "labels.csv")
+
+    with open(csv_path, mode="w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        
+        # Write header row
+        writer.writerow(["filename", "diagnosis", "sound_type", "location", "age", "gender"])
+        
+        for filename in os.listdir(input_folder):
+            if filename.endswith(".wav") or filename.endswith(".mp3"):  # is audio
+                input_path = os.path.join(input_folder, filename)
+                output_path = os.path.join(output_folder, os.path.splitext(filename)[0] + ".png")
+                
+                # Save spectrogram
+                save_mel_spectrogram(input_path, output_path)
+                
+                diagnosis, sound_type, location, age, gender = parse_filename(filename)
+                
+                writer.writerow([filename, diagnosis, sound_type, location, age, gender])
 
 if __name__=="__main__":
     input_folder = "data/split_audio"
