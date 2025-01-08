@@ -1,1 +1,7 @@
 pydub
+librosa
+numpy
+matplotlib
+torch
+torchvision
+pandas

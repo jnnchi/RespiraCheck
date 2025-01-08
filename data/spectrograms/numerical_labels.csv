@@ -1,0 +1,661 @@
+filepath,diagnosis,sound_type,loc_P/A,loc_R/L,loc_U/M/L,age,gender
+"data/spectrograms/EP9_Asthma,E W,P R L ,59,M_split_2.png",0,0,0,0,0,50,0
+"data/spectrograms/DP51_N,N,P L M,30,M_split_1.png",0,0,0,0,0,70,1
+"data/spectrograms/BP98_N,N,P L L,53,M_split_2.png",1,1,0,0,1,24,0
+"data/spectrograms/DP46_asthma,E W,P L U,41,F_split_1.png",2,2,0,1,2,76,0
+"data/spectrograms/BP9_Asthma,E W,P R L ,59,M_split_2.png",3,2,0,0,0,20,0
+"data/spectrograms/DP26_Lung Fibrosis,Crep,P,90,F_split_1.png",3,2,0,0,0,72,1
+"data/spectrograms/DP5_Heart Failure + COPD,I C E W,P L R ,71,M_split_1.png",0,0,0,1,2,41,0
+"data/spectrograms/BP82_N,N,P L U,38,M_split_2.png",4,1,0,1,2,83,1
+"data/spectrograms/BP61_COPD,E W,P R L ,53,M_split_1.png",2,2,0,0,2,63,0
+"data/spectrograms/BP69_pneumonia,Bronchial,P R L ,64,M_split_1.png",0,0,1,1,1,31,0
+"data/spectrograms/EP6_Plueral Effusion,I C B,P L R,81,M_split_2.png",0,0,0,1,0,18,0
+"data/spectrograms/DP70_N,N,P L U,52,F_split_2.png",3,2,0,0,0,53,1
+"data/spectrograms/EP94_N,N,P L L,24,M_split_2.png",2,2,0,1,0,53,0
+"data/spectrograms/EP81_N,N,P L U,33,M_split_1.png",5,3,1,0,0,90,0
+"data/spectrograms/EP45_heart failure,Crep,P R L ,30,M_split_1.png",3,2,0,0,1,24,0
+"data/spectrograms/EP80_asthma,E W,A L U,38,M_split_1.png",4,1,0,1,2,57,0
+"data/spectrograms/DP93_N,N,P R M,75,M_split_2.png",2,2,0,0,2,53,0
+"data/spectrograms/EP85_N,N,A R U,33,M_split_2.png",3,2,0,0,0,72,1
+"data/spectrograms/DP105_Lung Fibrosis,Crep,A U R,44,M_split_1.png",3,2,0,0,2,21,1
+"data/spectrograms/EP89_N,N,P L M,70,M_split_1.png",0,0,0,1,2,43,0
+"data/spectrograms/BP80_asthma,E W,A L U,38,M_split_1.png",3,2,0,0,0,20,0
+"data/spectrograms/BP75_N,N,P L U,73,F_split_1.png",3,2,0,0,1,72,1
+"data/spectrograms/BP90_heart failure,Crep,P L M,74,F_split_1.png",3,2,0,1,0,40,0
+"data/spectrograms/EP67_heart failure,Crep,P R L ,24,F_split_1.png",0,0,0,1,1,31,0
+"data/spectrograms/EP84_N,N,A R U,65,F_split_2.png",3,2,0,1,1,60,0
+"data/spectrograms/BP88_N,N,A R U,29,M_split_2.png",0,0,0,0,1,24,1
+"data/spectrograms/EP9_Asthma,E W,P R L ,59,M_split_1.png",3,2,0,0,0,38,0
+"data/spectrograms/BP98_N,N,P L L,53,M_split_1.png",6,4,0,1,2,70,0
+"data/spectrograms/DP46_asthma,E W,P L U,41,F_split_2.png",0,0,0,0,0,74,0
+"data/spectrograms/DP26_Lung Fibrosis,Crep,P,90,F_split_2.png",0,0,0,0,0,70,1
+"data/spectrograms/BP9_Asthma,E W,P R L ,59,M_split_1.png",3,5,0,1,2,50,1
+"data/spectrograms/BP82_N,N,P L U,38,M_split_1.png",3,2,0,0,1,43,1
+"data/spectrograms/DP5_Heart Failure + COPD,I C E W,P L R ,71,M_split_2.png",3,2,0,0,2,21,1
+data/spectrograms/labels.csv,4,1,0,0,0,78,1
+"data/spectrograms/BP61_COPD,E W,P R L ,53,M_split_2.png",3,2,0,0,1,59,0
+"data/spectrograms/EP6_Plueral Effusion,I C B,P L R,81,M_split_1.png",3,2,0,1,0,60,0
+"data/spectrograms/BP69_pneumonia,Bronchial,P R L ,64,M_split_2.png",3,2,0,1,0,15,0
+"data/spectrograms/EP81_N,N,P L U,33,M_split_2.png",3,2,0,1,1,60,0
+"data/spectrograms/EP94_N,N,P L L,24,M_split_1.png",0,0,1,0,2,30,0
+"data/spectrograms/DP70_N,N,P L U,52,F_split_1.png",3,2,0,0,1,72,1
+"data/spectrograms/EP45_heart failure,Crep,P R L ,30,M_split_2.png",0,0,0,0,0,21,0
+"data/spectrograms/EP80_asthma,E W,A L U,38,M_split_2.png",3,2,0,1,0,40,0
+"data/spectrograms/DP93_N,N,P R M,75,M_split_1.png",8,1,1,0,2,70,1
+"data/spectrograms/EP85_N,N,A R U,33,M_split_1.png",3,2,0,0,1,59,0
+"data/spectrograms/DP105_Lung Fibrosis,Crep,A U R,44,M_split_2.png",3,2,0,1,0,60,0
+"data/spectrograms/DP56_asthma,E W,P R M,56,F_split_1.png",2,2,0,0,2,58,1
+"data/spectrograms/EP89_N,N,P L M,70,M_split_2.png",4,1,1,0,0,26,0
+"data/spectrograms/BP90_heart failure,Crep,P L M,74,F_split_2.png",3,2,0,0,2,21,1
+"data/spectrograms/BP80_asthma,E W,A L U,38,M_split_2.png",3,2,0,0,1,43,1
+"data/spectrograms/BP75_N,N,P L U,73,F_split_2.png",4,1,0,0,2,83,1
+"data/spectrograms/EP67_heart failure,Crep,P R L ,24,F_split_2.png",0,0,0,0,0,50,0
+"data/spectrograms/BP88_N,N,A R U,29,M_split_1.png",2,2,0,1,2,76,0
+"data/spectrograms/EP84_N,N,A R U,65,F_split_1.png",1,1,0,0,1,24,0
+"data/spectrograms/BP59_heart failure,Crep,P R L ,83,F_split_2.png",0,0,0,0,0,70,1
+"data/spectrograms/BP4_Heart Failure + Lung Fibrosis ,I C,P L R,72,F_split_2.png",3,2,0,0,0,20,0
+"data/spectrograms/BP52_Lung Fibrosis,Crep,P L L,76,F_split_1.png",3,2,0,0,0,72,1
+"data/spectrograms/DP80_asthma,E W,A L U,38,M_split_1.png",4,1,0,1,2,83,1
+"data/spectrograms/EP40_heart failure,Crep,A R M,26,M_split_2.png",0,0,0,1,2,41,0
+"data/spectrograms/BP56_asthma,E W,P R M,56,F_split_2.png",2,2,0,0,2,63,0
+"data/spectrograms/EP17_COPD,E W,A R M,57,M_split_2.png",0,0,1,1,1,31,0
+"data/spectrograms/EP98_N,N,P L L,53,M_split_2.png",0,0,0,1,0,18,0
+"data/spectrograms/EP28_BRON,Crep,P L U,68,F_split_1.png",3,2,0,0,0,53,1
+"data/spectrograms/EP103_N,N,P R U,81,F_split_2.png",2,2,0,1,0,53,0
+"data/spectrograms/DP30_N,N,P R M,18,F_split_1.png",2,2,0,0,2,53,0
+"data/spectrograms/EP82_N,N,P L U,38,M_split_2.png",4,1,0,1,2,57,0
+"data/spectrograms/EP41_pneumonia,Crep,P R M,51,M_split_2.png",3,2,0,0,1,24,0
+"data/spectrograms/EP112_N,N,P L M,30,M_split_1.png",5,3,1,0,0,90,0
+"data/spectrograms/DP34_heart failure,Crep,P R M,78,F_split_1.png",0,0,0,1,2,43,0
+"data/spectrograms/DP31_N,N,P L M,27,F_split_2.png",3,2,0,0,2,21,1
+"data/spectrograms/DP6_Plueral Effusion,I C B,P L R,81,M_split_2.png",3,2,0,0,0,72,1
+"data/spectrograms/EP56_asthma,E W,P R M,56,F_split_2.png",3,2,0,0,0,20,0
+"data/spectrograms/BP85_N,N,A R U,33,M_split_2.png",3,2,0,1,0,40,0
+"data/spectrograms/DP9_Asthma,E W,P R L ,59,M_split_2.png",3,2,0,0,1,72,1
+"data/spectrograms/DP57_COPD,E W,P R L ,42,M_split_1.png",0,0,0,0,1,24,1
+"data/spectrograms/BP46_asthma,E W,P L U,41,F_split_1.png",0,0,0,1,1,31,0
+"data/spectrograms/BP89_N,N,P L M,70,M_split_1.png",3,2,0,1,1,60,0
+"data/spectrograms/EP88_N,N,A R U,29,M_split_2.png",3,2,0,0,0,38,0
+"data/spectrograms/BP84_N,N,A R U,65,F_split_2.png",0,0,0,0,0,74,0
+"data/spectrograms/DP71_N,N,P R U,36,M_split_1.png",6,4,0,1,2,70,0
+"data/spectrograms/DP67_heart failure,Crep,P R L ,24,F_split_1.png",0,0,0,0,0,70,1
+"data/spectrograms/BP42_heart failure,Crep,P L L,56,M_split_1.png",4,1,0,0,0,78,1
+"data/spectrograms/EP36_pneumonia,Crep,P R M,36,F_split_1.png",3,2,0,0,1,43,1
+"data/spectrograms/EP46_asthma,E W,P L U,41,F_split_1.png",3,2,0,0,2,21,1
+"data/spectrograms/DP45_heart failure,Crep,P R L ,30,M_split_1.png",3,5,0,1,2,50,1
+"data/spectrograms/BP81_N,N,P L U,33,M_split_1.png",3,2,0,1,0,60,0
+"data/spectrograms/BP94_N,N,P L L,24,M_split_2.png",3,2,0,0,1,59,0
+"data/spectrograms/DP83_N,N,A R U,18,F_split_1.png",3,2,0,1,0,15,0
+"data/spectrograms/EP20_Asthma and lung fibrosis,C,A R M,90,M_split_1.png",3,2,0,1,1,60,0
+"data/spectrograms/BP5_Heart Failure + COPD,I C E W,P L R ,71,M_split_1.png",0,0,1,0,2,30,0
+"data/spectrograms/BP4_Heart Failure + Lung Fibrosis ,I C,P L R,72,F_split_1.png",3,2,0,1,0,40,0
+"data/spectrograms/BP59_heart failure,Crep,P R L ,83,F_split_1.png",0,0,0,0,0,21,0
+"data/spectrograms/BP52_Lung Fibrosis,Crep,P L L,76,F_split_2.png",3,2,0,0,1,72,1
+"data/spectrograms/EP40_heart failure,Crep,A R M,26,M_split_1.png",8,1,1,0,2,70,1
+"data/spectrograms/DP80_asthma,E W,A L U,38,M_split_2.png",4,1,1,0,0,26,0
+"data/spectrograms/EP98_N,N,P L L,53,M_split_1.png",2,2,0,0,2,58,1
+"data/spectrograms/EP28_BRON,Crep,P L U,68,F_split_2.png",3,2,0,1,0,60,0
+"data/spectrograms/BP56_asthma,E W,P R M,56,F_split_1.png",3,2,0,0,1,59,0
+"data/spectrograms/EP17_COPD,E W,A R M,57,M_split_1.png",3,2,0,0,1,43,1
+"data/spectrograms/EP103_N,N,P R U,81,F_split_1.png",3,2,0,0,2,21,1
+"data/spectrograms/DP30_N,N,P R M,18,F_split_2.png",4,1,0,0,2,83,1
+"data/spectrograms/EP41_pneumonia,Crep,P R M,51,M_split_1.png",0,0,0,0,2,66,1
+"data/spectrograms/EP82_N,N,P L U,38,M_split_1.png",0,0,0,0,0,72,0
+"data/spectrograms/DP34_heart failure,Crep,P R M,78,F_split_2.png",4,1,0,0,2,24,1
+"data/spectrograms/EP112_N,N,P L M,30,M_split_2.png",0,0,1,1,1,31,0
+"data/spectrograms/DP31_N,N,P L M,27,F_split_1.png",3,2,0,1,0,60,0
+"data/spectrograms/DP6_Plueral Effusion,I C B,P L R,81,M_split_1.png",0,0,0,1,0,18,0
+"data/spectrograms/EP56_asthma,E W,P R M,56,F_split_1.png",3,2,0,1,0,40,0
+"data/spectrograms/EP105_Lung Fibrosis,Crep,A U R,44,M_split_2.png",3,2,0,1,0,15,0
+"data/spectrograms/DP9_Asthma,E W,P R L ,59,M_split_1.png",0,0,0,1,0,26,0
+"data/spectrograms/BP85_N,N,A R U,33,M_split_1.png",3,2,0,0,0,38,0
+"data/spectrograms/BP46_asthma,E W,P L U,41,F_split_2.png",3,2,0,0,1,59,0
+"data/spectrograms/DP57_COPD,E W,P R L ,42,M_split_2.png",4,1,0,0,2,30,0
+"data/spectrograms/BP89_N,N,P L M,70,M_split_2.png",3,2,0,0,1,43,1
+"data/spectrograms/EP75_N,N,P L U,73,F_split_2.png",3,2,0,1,0,15,0
+"data/spectrograms/BP84_N,N,A R U,65,F_split_1.png",3,5,0,1,2,70,0
+"data/spectrograms/EP88_N,N,A R U,29,M_split_1.png",3,2,0,0,0,38,0
+"data/spectrograms/BP42_heart failure,Crep,P L L,56,M_split_2.png",3,2,0,1,1,60,0
+"data/spectrograms/DP67_heart failure,Crep,P R L ,24,F_split_2.png",6,4,0,1,2,70,0
+"data/spectrograms/DP71_N,N,P R U,36,M_split_2.png",3,2,0,0,1,72,1
+"data/spectrograms/EP46_asthma,E W,P L U,41,F_split_2.png",0,0,0,1,2,32,0
+"data/spectrograms/EP36_pneumonia,Crep,P R M,36,F_split_2.png",5,3,1,0,0,90,0
+"data/spectrograms/DP83_N,N,A R U,18,F_split_2.png",0,0,0,0,1,68,1
+"data/spectrograms/BP94_N,N,P L L,24,M_split_1.png",0,0,0,1,0,26,0
+"data/spectrograms/BP81_N,N,P L U,33,M_split_2.png",3,2,0,0,0,72,1
+"data/spectrograms/DP45_heart failure,Crep,P R L ,30,M_split_2.png",0,0,1,0,2,30,0
+"data/spectrograms/EP20_Asthma and lung fibrosis,C,A R M,90,M_split_2.png",3,2,0,0,1,24,0
+"data/spectrograms/BP5_Heart Failure + COPD,I C E W,P L R ,71,M_split_2.png",0,0,0,0,0,21,0
+"data/spectrograms/EP93_N,N,P R M,75,M_split_1.png",0,0,0,0,2,27,0
+"data/spectrograms/DP85_N,N,A R U,33,M_split_1.png",9,6,0,1,3,65,0
+"data/spectrograms/DP89_N,N,P L M,70,M_split_2.png",3,2,0,0,0,53,1
+"data/spectrograms/EP7_Heart Failure + COPD,I C E W,P L R,65,M_split_2.png",4,1,0,0,2,83,1
+"data/spectrograms/BP11_Heart Failure,C,P L L,53,M_split_1.png",3,5,0,1,2,70,0
+"data/spectrograms/EP54_heart failure,Crep,P R L ,73,F_split_1.png",10,7,0,1,3,72,1
+"data/spectrograms/DP16_heart failure,C,P R U,56,M_split_1.png",0,0,0,0,2,66,1
+"data/spectrograms/DP84_N,N,A R U,65,F_split_1.png",2,2,0,0,2,63,0
+"data/spectrograms/EP13_Heart Failure,C,P L L,55,M_split_2.png",1,1,0,1,1,68,1
+"data/spectrograms/BP71_N,N,P R U,36,M_split_2.png",0,0,0,0,1,24,1
+"data/spectrograms/EP5_Heart Failure + COPD,I C E W,P L R ,71,M_split_1.png",0,0,0,1,1,31,0
+"data/spectrograms/EP65_asthma,E W,P R L ,60,F_split_2.png",2,2,0,1,2,76,0
+"data/spectrograms/EP63_COPD,E W,P R L ,58,F_split_2.png",3,2,0,0,1,24,0
+"data/spectrograms/DP12_Asthma,E W,P L L,50,F_split_2.png",0,0,0,0,0,74,0
+"data/spectrograms/DP19_heart failure,C,P R U,70,F_split_1.png",3,2,0,0,0,20,0
+"data/spectrograms/BP36_pneumonia,Crep,P R M,36,F_split_2.png",2,2,0,1,2,62,0
+"data/spectrograms/DP81_N,N,P L U,33,M_split_2.png",2,2,0,0,2,63,0
+"data/spectrograms/DP94_N,N,P L L,24,M_split_1.png",3,5,0,1,2,70,0
+"data/spectrograms/BP23_Lung Fibrosis,Crep,P R L ,50,M_split_2.png",3,2,0,0,0,53,1
+"data/spectrograms/BP83_N,N,A R U,18,F_split_2.png",0,0,0,0,0,72,0
+"data/spectrograms/EP70_N,N,P L U,52,F_split_1.png",0,0,0,0,2,66,1
+"data/spectrograms/DP65_asthma,E W,P R L ,60,F_split_2.png",3,2,0,1,0,60,0
+"data/spectrograms/EP51_N,N,P L M,30,M_split_2.png",0,0,1,1,1,31,0
+"data/spectrograms/EP39_heart failure,Crep,P R L ,67,M_split_1.png",4,1,0,0,2,24,1
+"data/spectrograms/EP33_Asthma,E W,P R M,43,F_split_2.png",0,0,0,1,0,18,0
+"data/spectrograms/EP16_heart failure,C,P R U,56,M_split_2.png",3,2,0,1,0,40,0
+"data/spectrograms/BP41_pneumonia,Crep,P R M,51,M_split_1.png",3,2,0,0,0,38,0
+"data/spectrograms/EP22_BRON,Crep,P R U,24,M_split_1.png",0,0,0,1,0,26,0
+"data/spectrograms/BP30_N,N,P R M,18,F_split_2.png",3,2,0,1,0,15,0
+"data/spectrograms/DP13_Heart Failure,C,P L L,55,M_split_1.png",3,2,0,0,1,59,0
+"data/spectrograms/BP65_asthma,E W,P R L ,60,F_split_1.png",4,1,0,0,2,30,0
+"data/spectrograms/DP24_heart failure,Crep,P R L ,76,F_split_1.png",3,2,0,0,1,43,1
+"data/spectrograms/BP33_Asthma,E W,P R M,43,F_split_2.png",3,2,0,0,0,38,0
+"data/spectrograms/DP61_COPD,E W,P R L ,53,M_split_1.png",3,5,0,1,2,70,0
+"data/spectrograms/BP17_COPD,E W,A R M,57,M_split_1.png",3,2,0,1,0,15,0
+"data/spectrograms/EP19_heart failure,C,P R U,70,F_split_2.png",3,2,0,1,1,60,0
+"data/spectrograms/BP31_N,N,P L M,27,F_split_1.png",6,4,0,1,2,70,0
+"data/spectrograms/EP69_pneumonia,Bronchial,P R L ,64,M_split_1.png",3,2,0,0,1,72,1
+"data/spectrograms/EP90_heart failure,Crep,P L M,74,F_split_1.png",0,0,0,0,1,68,1
+"data/spectrograms/EP93_N,N,P R M,75,M_split_2.png",0,0,0,1,0,26,0
+"data/spectrograms/DP85_N,N,A R U,33,M_split_2.png",5,3,1,0,0,90,0
+"data/spectrograms/EP7_Heart Failure + COPD,I C E W,P L R,65,M_split_1.png",0,0,0,1,2,32,0
+"data/spectrograms/DP89_N,N,P L M,70,M_split_1.png",3,2,0,0,0,72,1
+"data/spectrograms/BP11_Heart Failure,C,P L L,53,M_split_2.png",3,2,0,0,1,24,0
+"data/spectrograms/EP54_heart failure,Crep,P R L ,73,F_split_2.png",0,0,1,0,2,30,0
+"data/spectrograms/DP16_heart failure,C,P R U,56,M_split_2.png",0,0,0,0,0,21,0
+"data/spectrograms/DP84_N,N,A R U,65,F_split_2.png",0,0,0,0,2,27,0
+"data/spectrograms/BP71_N,N,P R U,36,M_split_1.png",3,2,0,0,0,53,1
+"data/spectrograms/EP5_Heart Failure + COPD,I C E W,P L R ,71,M_split_2.png",9,6,0,1,3,65,0
+"data/spectrograms/EP65_asthma,E W,P R L ,60,F_split_1.png",4,1,0,0,2,83,1
+"data/spectrograms/EP13_Heart Failure,C,P L L,55,M_split_1.png",3,5,0,1,2,70,0
+"data/spectrograms/DP12_Asthma,E W,P L L,50,F_split_1.png",10,7,0,1,3,72,1
+"data/spectrograms/EP63_COPD,E W,P R L ,58,F_split_1.png",0,0,0,0,2,66,1
+"data/spectrograms/BP36_pneumonia,Crep,P R M,36,F_split_1.png",2,2,0,0,2,63,0
+"data/spectrograms/DP19_heart failure,C,P R U,70,F_split_2.png",1,1,0,1,1,68,1
+"data/spectrograms/DP65_asthma,E W,P R L ,60,F_split_1.png",3,2,0,0,1,24,0
+"data/spectrograms/BP23_Lung Fibrosis,Crep,P R L ,50,M_split_1.png",2,2,0,1,2,76,0
+"data/spectrograms/BP83_N,N,A R U,18,F_split_1.png",0,0,0,1,1,31,0
+"data/spectrograms/EP70_N,N,P L U,52,F_split_2.png",0,0,0,0,1,24,1
+"data/spectrograms/DP94_N,N,P L L,24,M_split_2.png",3,2,0,0,0,20,0
+"data/spectrograms/DP81_N,N,P L U,33,M_split_1.png",0,0,0,0,0,74,0
+"data/spectrograms/EP51_N,N,P L M,30,M_split_1.png",2,2,0,1,2,62,0
+"data/spectrograms/EP39_heart failure,Crep,P R L ,67,M_split_2.png",2,2,0,0,2,63,0
+"data/spectrograms/EP33_Asthma,E W,P R M,43,F_split_1.png",3,5,0,1,2,70,0
+"data/spectrograms/EP16_heart failure,C,P R U,56,M_split_1.png",3,2,0,0,0,53,1
+"data/spectrograms/BP41_pneumonia,Crep,P R M,51,M_split_2.png",0,0,0,0,1,68,1
+"data/spectrograms/BP30_N,N,P R M,18,F_split_1.png",0,0,0,1,2,32,0
+"data/spectrograms/EP22_BRON,Crep,P R U,24,M_split_2.png",4,1,0,0,2,76,1
+"data/spectrograms/DP24_heart failure,Crep,P R L ,76,F_split_2.png",0,0,0,0,0,70,1
+"data/spectrograms/BP65_asthma,E W,P R L ,60,F_split_2.png",0,0,1,0,2,30,0
+"data/spectrograms/DP13_Heart Failure,C,P L L,55,M_split_2.png",3,2,1,0,2,38,0
+"data/spectrograms/BP33_Asthma,E W,P R M,43,F_split_1.png",3,5,0,1,2,50,1
+"data/spectrograms/DP61_COPD,E W,P R L ,53,M_split_2.png",4,1,0,1,2,83,1
+"data/spectrograms/EP19_heart failure,C,P R U,70,F_split_1.png",0,0,0,1,2,41,0
+"data/spectrograms/BP17_COPD,E W,A R M,57,M_split_2.png",3,2,0,1,1,45,1
+"data/spectrograms/BP31_N,N,P L M,27,F_split_2.png",1,1,0,0,2,20,0
+"data/spectrograms/EP69_pneumonia,Bronchial,P R L ,64,M_split_2.png",2,2,0,1,0,53,0
+"data/spectrograms/EP90_heart failure,Crep,P L M,74,F_split_2.png",8,1,0,0,0,51,0
+"data/spectrograms/DP17_COPD,E W,A R M,57,M_split_2.png",1,1,0,0,1,24,0
+"data/spectrograms/BP40_heart failure,Crep,A R M,26,M_split_2.png",4,1,0,1,2,56,0
+"data/spectrograms/BP6_Plueral Effusion,I C B,P L R,81,M_split_1.png",3,2,0,1,1,45,1
+"data/spectrograms/DP11_Heart Failure,C,P L L,53,M_split_2.png",0,0,0,1,2,43,0
+"data/spectrograms/EP52_Lung Fibrosis,Crep,P L L,76,F_split_1.png",4,1,0,1,2,57,0
+"data/spectrograms/BP16_heart failure,C,P R U,56,M_split_2.png",3,2,0,0,1,49,1
+"data/spectrograms/BP70_N,N,P L U,52,F_split_1.png",3,2,1,0,2,38,0
+"data/spectrograms/EP83_N,N,A R U,18,F_split_2.png",0,0,0,1,2,41,0
+"data/spectrograms/BP103_N,N,P R U,81,F_split_2.png",3,2,0,0,1,40,0
+"data/spectrograms/DP33_Asthma,E W,P R M,43,F_split_2.png",3,2,1,0,1,46,0
+"data/spectrograms/BP66_heart failure,Crep,P R L ,43,M_split_2.png",0,0,0,0,0,72,0
+"data/spectrograms/EP110_COPD,E W,P L L,62,M_split_1.png",4,3,1,0,0,54,0
+"data/spectrograms/BP93_N,N,P R M,75,M_split_1.png",3,2,1,0,2,40,0
+"data/spectrograms/BP112_N,N,P L M,30,M_split_1.png",0,0,0,1,0,18,0
+"data/spectrograms/DP75_N,N,P L U,73,F_split_2.png",2,2,0,0,2,58,1
+"data/spectrograms/BP19_heart failure,C,P R U,70,F_split_2.png",2,2,0,0,2,51,0
+"data/spectrograms/BP107_Asthma,E W,P L U,59,F_split_2.png",4,1,0,0,0,78,1
+"data/spectrograms/DP54_heart failure,Crep,P R L ,73,F_split_1.png",8,1,0,0,0,36,1
+"data/spectrograms/DP88_N,N,A R U,29,M_split_1.png",0,0,0,0,0,50,0
+"data/spectrograms/EP71_N,N,P R U,36,M_split_2.png",4,1,0,0,2,43,0
+"data/spectrograms/DP29_heart failure,Crep,P L L,57,M_split_2.png",0,0,0,1,2,43,0
+"data/spectrograms/BP13_Heart Failure,C,P L L,55,M_split_2.png",3,5,0,1,2,50,1
+"data/spectrograms/DP37_pneumonia,Crep,A R L,70,F_split_2.png",9,6,0,1,3,65,0
+"data/spectrograms/EP11_Heart Failure,C,P L L,53,M_split_1.png",7,1,0,0,2,50,0
+"data/spectrograms/DP103_N,N,P R U,81,F_split_2.png",3,2,0,0,1,40,0
+"data/spectrograms/EP42_heart failure,Crep,P L L,56,M_split_1.png",3,2,0,1,1,45,1
+"data/spectrograms/DP107_Asthma,E W,P L U,59,F_split_1.png",7,1,0,1,2,76,1
+"data/spectrograms/EP31_N,N,P L M,27,F_split_1.png",6,4,0,1,2,70,0
+"data/spectrograms/BP12_Asthma,E W,P L L,50,F_split_2.png",0,0,0,1,2,32,0
+"data/spectrograms/BP51_N,N,P L M,30,M_split_2.png",0,0,0,0,1,68,1
+"data/spectrograms/BP57_COPD,E W,P R L ,42,M_split_1.png",0,0,1,0,2,30,0
+"data/spectrograms/DP60_heart failure,Crep,P L L,83,F_split_1.png",0,0,0,0,0,70,1
+"data/spectrograms/DP39_heart failure,Crep,P R L ,67,M_split_1.png",4,1,0,0,2,76,1
+"data/spectrograms/DP98_N,N,P L L,53,M_split_1.png",3,2,1,0,2,38,0
+"data/spectrograms/DP112_N,N,P L M,30,M_split_1.png",4,1,0,1,2,83,1
+"data/spectrograms/EP24_heart failure,Crep,P R L ,76,F_split_1.png",3,5,0,1,2,50,1
+"data/spectrograms/EP12_Asthma,E W,P L L,50,F_split_2.png",0,0,0,1,2,41,0
+"data/spectrograms/EP30_N,N,P R M,18,F_split_2.png",3,2,0,1,1,45,1
+"data/spectrograms/EP107_Asthma,E W,P L U,59,F_split_1.png",1,1,0,0,2,20,0
+"data/spectrograms/DP82_N,N,P L U,38,M_split_1.png",2,2,0,1,0,53,0
+"data/spectrograms/BP40_heart failure,Crep,A R M,26,M_split_1.png",8,1,0,0,0,51,0
+"data/spectrograms/DP17_COPD,E W,A R M,57,M_split_1.png",4,1,0,1,2,56,0
+"data/spectrograms/BP6_Plueral Effusion,I C B,P L R,81,M_split_2.png",1,1,0,0,1,24,0
+"data/spectrograms/DP11_Heart Failure,C,P L L,53,M_split_1.png",3,2,0,1,1,45,1
+"data/spectrograms/EP52_Lung Fibrosis,Crep,P L L,76,F_split_2.png",4,1,0,1,2,57,0
+"data/spectrograms/BP16_heart failure,C,P R U,56,M_split_1.png",0,0,0,1,2,43,0
+"data/spectrograms/BP70_N,N,P L U,52,F_split_2.png",3,2,1,0,2,38,0
+"data/spectrograms/EP83_N,N,A R U,18,F_split_1.png",3,2,0,0,1,49,1
+"data/spectrograms/BP103_N,N,P R U,81,F_split_1.png",3,2,0,0,1,40,0
+"data/spectrograms/DP33_Asthma,E W,P R M,43,F_split_1.png",0,0,0,1,2,41,0
+"data/spectrograms/BP66_heart failure,Crep,P R L ,43,M_split_1.png",3,2,1,0,1,46,0
+"data/spectrograms/BP93_N,N,P R M,75,M_split_2.png",0,0,0,0,0,72,0
+"data/spectrograms/EP110_COPD,E W,P L L,62,M_split_2.png",3,2,1,0,2,40,0
+"data/spectrograms/BP112_N,N,P L M,30,M_split_2.png",0,0,0,1,0,18,0
+"data/spectrograms/DP75_N,N,P L U,73,F_split_1.png",4,3,1,0,0,54,0
+"data/spectrograms/BP19_heart failure,C,P R U,70,F_split_1.png",2,2,0,0,2,58,1
+"data/spectrograms/DP88_N,N,A R U,29,M_split_2.png",4,1,0,0,0,78,1
+"data/spectrograms/DP54_heart failure,Crep,P R L ,73,F_split_2.png",2,2,0,0,2,51,0
+"data/spectrograms/BP107_Asthma,E W,P L U,59,F_split_1.png",8,1,0,0,0,36,1
+"data/spectrograms/EP71_N,N,P R U,36,M_split_1.png",0,0,0,1,2,43,0
+"data/spectrograms/DP29_heart failure,Crep,P L L,57,M_split_1.png",3,5,0,1,2,50,1
+"data/spectrograms/BP13_Heart Failure,C,P L L,55,M_split_1.png",0,0,0,0,0,50,0
+"data/spectrograms/EP11_Heart Failure,C,P L L,53,M_split_2.png",4,1,0,0,2,43,0
+"data/spectrograms/DP37_pneumonia,Crep,A R L,70,F_split_1.png",7,1,0,0,2,50,0
+"data/spectrograms/DP103_N,N,P R U,81,F_split_1.png",9,6,0,1,3,65,0
+"data/spectrograms/EP42_heart failure,Crep,P L L,56,M_split_2.png",3,2,0,0,1,40,0
+"data/spectrograms/EP31_N,N,P L M,27,F_split_2.png",7,1,0,1,2,76,1
+"data/spectrograms/DP107_Asthma,E W,P L U,59,F_split_2.png",6,4,0,1,2,70,0
+"data/spectrograms/BP12_Asthma,E W,P L L,50,F_split_1.png",3,2,0,1,1,45,1
+"data/spectrograms/BP57_COPD,E W,P R L ,42,M_split_2.png",0,0,0,1,1,31,0
+"data/spectrograms/DP60_heart failure,Crep,P L L,83,F_split_2.png",0,0,0,0,1,24,1
+"data/spectrograms/DP39_heart failure,Crep,P R L ,67,M_split_2.png",4,1,0,1,0,74,1
+"data/spectrograms/DP98_N,N,P L L,53,M_split_2.png",0,0,0,0,2,66,1
+"data/spectrograms/EP24_heart failure,Crep,P R L ,76,F_split_2.png",2,2,0,0,2,51,0
+"data/spectrograms/EP12_Asthma,E W,P L L,50,F_split_1.png",0,0,0,0,2,27,0
+"data/spectrograms/DP112_N,N,P L M,30,M_split_2.png",8,8,0,0,2,64,0
+"data/spectrograms/EP30_N,N,P R M,18,F_split_1.png",0,0,0,0,0,74,0
+"data/spectrograms/EP107_Asthma,E W,P L U,59,F_split_2.png",3,2,0,1,2,52,1
+"data/spectrograms/DP82_N,N,P L U,38,M_split_2.png",4,3,1,0,0,54,0
+"data/spectrograms/DP41_pneumonia,Crep,P R M,51,M_split_1.png",3,2,1,0,1,46,0
+"data/spectrograms/DP21_BRON,Crep,P R L ,20,M_split_2.png",3,2,0,1,1,45,1
+"data/spectrograms/DP62_COPD,E W,P L M,53,M_split_2.png",0,0,0,1,0,26,0
+"data/spectrograms/DP42_heart failure,Crep,P L L,56,M_split_1.png",2,2,0,0,2,42,0
+"data/spectrograms/BP22_BRON,Crep,P R U,24,M_split_1.png",3,2,1,0,2,40,0
+"data/spectrograms/EP104_Asthma,E W,P L U,45,F_split_1.png",0,0,0,1,2,32,0
+"data/spectrograms/BP35_Asthma,E W,A R L,38,M_split_2.png",0,0,0,0,1,68,1
+"data/spectrograms/DP15_Asthma,E W,P R U,49,F_split_1.png",2,2,0,0,2,51,0
+"data/spectrograms/EP29_heart failure,Crep,P L L,57,M_split_2.png",8,3,0,0,1,57,0
+"data/spectrograms/BP92_N,N,P L L ,43,M_split_2.png",0,0,0,0,0,21,0
+"data/spectrograms/BP73_N,N,P L L,32,M_split_1.png",10,7,0,1,3,72,1
+"data/spectrograms/BP86_N,N,P R U,68,F_split_2.png",3,2,1,0,2,40,0
+"data/spectrograms/DP32_N,N,A R L,30,M_split_1.png",3,2,0,1,0,12,1
+"data/spectrograms/EP100_N,N,P R M,70,F_split_2.png",8,1,1,0,2,70,1
+"data/spectrograms/BP24_heart failure,Crep,P R L ,76,F_split_2.png",4,1,0,0,2,67,0
+"data/spectrograms/EP60_heart failure,Crep,P L L,83,F_split_1.png",3,2,1,0,1,46,0
+"data/spectrograms/EP3_Asthma,I E W,P L L R,50,F_split_2.png",3,2,0,0,1,40,0
+"data/spectrograms/EP35_Asthma,E W,A R L,38,M_split_2.png",3,2,1,0,2,38,0
+"data/spectrograms/DP104_Asthma,E W,P L U,45,F_split_1.png",1,1,0,1,1,68,1
+"data/spectrograms/BP102_N,N,P L L,41,M_split_1.png",3,2,0,0,1,49,1
+"data/spectrograms/DP23_Lung Fibrosis,Crep,P R L ,50,M_split_1.png",0,0,0,0,0,50,0
+"data/spectrograms/DP7_Heart Failure + COPD,I C E W,P L R,65,M_split_2.png",4,1,0,0,2,43,0
+"data/spectrograms/DP92_N,N,P L L ,43,M_split_2.png",8,3,0,0,1,57,0
+"data/spectrograms/DP3_Asthma,I E W,P L L R,50,F_split_1.png",2,2,0,1,0,53,0
+"data/spectrograms/EP99_N,N,P R M,50,M_split_1.png",7,1,0,0,2,50,0
+"data/spectrograms/EP66_heart failure,Crep,P R L ,43,M_split_1.png",3,2,0,1,2,52,1
+"data/spectrograms/EP44_asthma,E W,P R U,40,M_split_1.png",2,2,0,1,2,62,0
+"data/spectrograms/DP52_Lung Fibrosis,Crep,P L L,76,F_split_1.png",0,0,0,0,2,27,0
+"data/spectrograms/BP8_Plueral Effusion,I C B,P L L,70,M_split_1.png",4,3,1,0,0,54,0
+"data/spectrograms/BP104_Asthma,E W,P L U,45,F_split_2.png",3,2,0,1,0,12,1
+"data/spectrograms/DP79_asthma,E W,A R U,46,M_split_1.png",3,2,0,1,1,45,1
+"data/spectrograms/BP87_N,N,P R M,72,M_split_2.png",1,1,0,0,2,20,0
+"data/spectrograms/BP44_asthma,E W,P R U,40,M_split_1.png",0,0,0,0,0,72,0
+"data/spectrograms/DP102_N,N,P L L,41,M_split_1.png",8,3,0,0,1,57,0
+"data/spectrograms/DP77_Asthma,E W,A R L,40,M_split_1.png",0,0,1,1,1,31,0
+"data/spectrograms/DP95_N,N,P L M,18,M_split_1.png",3,2,0,0,1,49,1
+"data/spectrograms/BP14_Heart Failure,C,A R M,54,M_split_2.png",4,1,0,0,2,73,1
+"data/spectrograms/BP63_COPD,E W,P R L ,58,F_split_2.png",1,1,0,0,2,20,0
+"data/spectrograms/DP36_pneumonia,Crep,P R M,36,F_split_2.png",3,2,0,1,1,45,1
+"data/spectrograms/BP34_heart failure,Crep,P R M,78,F_split_1.png",3,2,0,1,0,12,1
+"data/spectrograms/DP111_COPD,E W,P R L ,51,M_split_1.png",2,2,0,1,2,76,0
+"data/spectrograms/DP41_pneumonia,Crep,P R M,51,M_split_2.png",3,2,0,1,2,52,1
+"data/spectrograms/DP62_COPD,E W,P L M,53,M_split_1.png",0,0,0,0,2,66,1
+"data/spectrograms/BP22_BRON,Crep,P R U,24,M_split_2.png",0,0,0,0,1,24,1
+"data/spectrograms/DP42_heart failure,Crep,P L L,56,M_split_2.png",4,1,0,1,0,74,1
+"data/spectrograms/EP104_Asthma,E W,P L U,45,F_split_2.png",0,0,0,1,1,31,0
+"data/spectrograms/DP15_Asthma,E W,P R U,49,F_split_2.png",8,8,0,0,2,64,0
+"data/spectrograms/BP35_Asthma,E W,A R L,38,M_split_1.png",0,0,0,0,2,27,0
+"data/spectrograms/BP92_N,N,P L L ,43,M_split_1.png",2,2,0,0,2,51,0
+"data/spectrograms/EP29_heart failure,Crep,P L L,57,M_split_1.png",0,0,0,0,0,74,0
+"data/spectrograms/BP86_N,N,P R U,68,F_split_1.png",3,2,0,1,2,52,1
+"data/spectrograms/BP73_N,N,P L L,32,M_split_2.png",3,2,1,0,1,46,0
+"data/spectrograms/BP24_heart failure,Crep,P R L ,76,F_split_1.png",4,3,1,0,0,54,0
+"data/spectrograms/EP100_N,N,P R M,70,F_split_1.png",2,2,0,0,2,42,0
+"data/spectrograms/DP32_N,N,A R L,30,M_split_2.png",0,0,0,1,0,26,0
+"data/spectrograms/EP3_Asthma,I E W,P L L R,50,F_split_1.png",3,2,0,1,1,45,1
+"data/spectrograms/EP60_heart failure,Crep,P L L,83,F_split_2.png",3,2,1,0,2,40,0
+"data/spectrograms/EP35_Asthma,E W,A R L,38,M_split_1.png",0,0,0,0,1,68,1
+"data/spectrograms/DP104_Asthma,E W,P L U,45,F_split_2.png",0,0,0,1,2,32,0
+"data/spectrograms/BP102_N,N,P L L,41,M_split_2.png",8,3,0,0,1,57,0
+"data/spectrograms/DP7_Heart Failure + COPD,I C E W,P L R,65,M_split_1.png",2,2,0,0,2,51,0
+"data/spectrograms/DP23_Lung Fibrosis,Crep,P R L ,50,M_split_2.png",0,0,0,0,0,21,0
+"data/spectrograms/EP99_N,N,P R M,50,M_split_2.png",3,2,1,0,2,40,0
+"data/spectrograms/EP66_heart failure,Crep,P R L ,43,M_split_2.png",10,7,0,1,3,72,1
+"data/spectrograms/DP92_N,N,P L L ,43,M_split_1.png",3,2,0,1,0,12,1
+"data/spectrograms/DP3_Asthma,I E W,P L L R,50,F_split_2.png",4,1,0,0,2,67,0
+"data/spectrograms/EP44_asthma,E W,P R U,40,M_split_2.png",3,2,1,0,1,46,0
+"data/spectrograms/BP104_Asthma,E W,P L U,45,F_split_1.png",8,1,1,0,2,70,1
+"data/spectrograms/DP52_Lung Fibrosis,Crep,P L L,76,F_split_2.png",3,2,0,0,1,40,0
+"data/spectrograms/BP8_Plueral Effusion,I C B,P L L,70,M_split_2.png",0,0,0,0,0,50,0
+"data/spectrograms/DP79_asthma,E W,A R U,46,M_split_2.png",3,2,0,0,1,49,1
+"data/spectrograms/BP87_N,N,P R M,72,M_split_1.png",3,2,1,0,2,38,0
+"data/spectrograms/DP102_N,N,P L L,41,M_split_2.png",1,1,0,1,1,68,1
+"data/spectrograms/BP44_asthma,E W,P R U,40,M_split_2.png",8,3,0,0,1,57,0
+"data/spectrograms/BP14_Heart Failure,C,A R M,54,M_split_1.png",4,1,0,0,2,43,0
+"data/spectrograms/DP77_Asthma,E W,A R L,40,M_split_2.png",7,1,0,0,2,50,0
+"data/spectrograms/DP95_N,N,P L M,18,M_split_2.png",2,2,0,1,0,53,0
+"data/spectrograms/BP63_COPD,E W,P R L ,58,F_split_1.png",0,0,0,0,2,27,0
+"data/spectrograms/DP36_pneumonia,Crep,P R M,36,F_split_1.png",3,2,0,1,2,52,1
+"data/spectrograms/DP111_COPD,E W,P R L ,51,M_split_2.png",2,2,0,1,2,62,0
+"data/spectrograms/BP34_heart failure,Crep,P R M,78,F_split_2.png",4,3,1,0,0,54,0
+"data/spectrograms/BP18_pneumonia,C,P R U,57,M_split_2.png",3,2,0,1,1,45,1
+"data/spectrograms/BP111_COPD,E W,P R L ,51,M_split_1.png",3,2,0,1,0,12,1
+"data/spectrograms/EP86_N,N,P R U,68,F_split_2.png",1,1,0,0,2,20,0
+"data/spectrograms/EP73_N,N,P L L,32,M_split_1.png",8,3,0,0,1,57,0
+"data/spectrograms/DP49_N,N,P R M,21,M_split_2.png",0,0,0,0,0,72,0
+"data/spectrograms/BP101_Asthma,E W,P L M,12,F_split_2.png",0,0,1,1,1,31,0
+"data/spectrograms/BP77_Asthma,E W,A R L,40,M_split_1.png",4,1,0,0,2,73,1
+"data/spectrograms/EP4_Heart Failure + Lung Fibrosis ,I C,P L R,72,F_split_2.png",3,2,0,0,1,49,1
+"data/spectrograms/DP44_asthma,E W,P R U,40,M_split_1.png",1,1,0,0,2,20,0
+"data/spectrograms/BP39_heart failure,Crep,P R L ,67,M_split_2.png",2,2,0,1,2,76,0
+"data/spectrograms/BP79_asthma,E W,A R U,46,M_split_1.png",3,2,0,1,0,12,1
+"data/spectrograms/BP37_pneumonia,Crep,A R L,70,F_split_2.png",3,2,0,1,1,45,1
+"data/spectrograms/EP96_N,N,P R L ,66,F_split_2.png",3,2,0,1,2,52,1
+"data/spectrograms/DP72_N,N,P R U,24,F_split_2.png",3,2,0,1,2,50,1
+"data/spectrograms/DP90_heart failure,Crep,P L M,74,F_split_1.png",2,2,0,0,2,58,1
+"data/spectrograms/DP48_N,N,P L U,31,M_split_2.png",8,1,0,0,0,36,1
+"data/spectrograms/EP26_Lung Fibrosis,Crep,P,90,F_split_2.png",4,3,0,0,1,70,1
+"data/spectrograms/DP74_N,N,P R M,74,M_split_1.png",3,2,0,0,2,60,1
+"data/spectrograms/DP69_pneumonia,Bronchial,P R L ,64,M_split_1.png",7,1,0,0,2,50,0
+"data/spectrograms/DP50_N,N,P R L ,27,M_split_1.png",0,0,1,0,1,18,1
+"data/spectrograms/EP111_COPD,E W,P R L ,51,M_split_1.png",0,0,0,1,1,52,1
+"data/spectrograms/EP79_asthma,E W,A R U,46,M_split_1.png",0,0,0,1,1,33,0
+"data/spectrograms/EP14_Heart Failure,C,A R M,54,M_split_2.png",0,0,0,1,2,24,0
+"data/spectrograms/BP2_Asthma,E W,P L L R,52,F_split_1.png",0,0,1,0,1,33,0
+"data/spectrograms/EP77_Asthma,E W,A R L,40,M_split_1.png",0,0,0,0,0,75,0
+"data/spectrograms/EP57_COPD,E W,P R L ,42,M_split_1.png",9,6,0,1,3,65,0
+"data/spectrograms/EP109_N,N,P L M,26,M_split_1.png",0,0,0,1,0,70,0
+"data/spectrograms/BP106_Asthma,E W,P L U,45,F_split_1.png",4,3,0,0,1,56,0
+"data/spectrograms/EP18_pneumonia,C,P R U,57,M_split_1.png",4,3,0,1,2,53,0
+"data/spectrograms/EP87_N,N,P R M,72,M_split_2.png",4,1,0,0,2,73,1
+"data/spectrograms/BP54_heart failure,Crep,P R L ,73,F_split_2.png",9,6,0,1,3,71,0
+"data/spectrograms/EP15_Asthma,E W,P R U,49,F_split_1.png",0,0,0,0,1,36,0
+"data/spectrograms/DP76_N,N,A L U,31,M_split_1.png",3,2,0,0,2,60,1
+"data/spectrograms/EP25_copd,E W,P L L,76,M_split_2.png",4,3,0,1,2,55,0
+"data/spectrograms/EP101_Asthma,E W,P L M,12,F_split_1.png",0,0,1,0,1,65,1
+"data/spectrograms/DP106_Asthma,E W,P L U,45,F_split_2.png",2,2,0,0,2,53,0
+"data/spectrograms/EP21_BRON,Crep,P R L ,20,M_split_2.png",3,2,0,0,0,43,1
+"data/spectrograms/DP2_Asthma,E W,P L L R,52,F_split_2.png",4,3,0,0,1,70,1
+"data/spectrograms/BP99_N,N,P R M,50,M_split_1.png",2,2,1,0,0,57,0
+"data/spectrograms/BP15_Asthma,E W,P R U,49,F_split_1.png",0,0,0,1,0,27,1
+"data/spectrograms/DP35_Asthma,E W,A R L,38,M_split_2.png",4,1,0,1,0,74,1
+"data/spectrograms/DP28_BRON,Crep,P L U,68,F_split_1.png",8,8,0,0,2,64,0
+"data/spectrograms/EP23_Lung Fibrosis,Crep,P R L ,50,M_split_1.png",4,1,0,0,2,67,0
+"data/spectrograms/BP62_COPD,E W,P L M,53,M_split_1.png",0,0,0,1,0,30,0
+"data/spectrograms/DP18_pneumonia,C,P R U,57,M_split_1.png",3,2,0,0,0,43,1
+"data/spectrograms/DP66_heart failure,Crep,P R L ,43,M_split_1.png",4,3,0,0,1,56,0
+"data/spectrograms/DP14_Heart Failure,C,A R M,54,M_split_1.png",8,1,0,0,0,51,0
+"data/spectrograms/BP50_N,N,P R L ,27,M_split_1.png",4,1,0,0,2,76,1
+"data/spectrograms/BP110_COPD,E W,P L L,62,M_split_1.png",3,2,0,0,2,60,1
+"data/spectrograms/EP2_Asthma,E W,P L L R,52,F_split_2.png",4,3,0,1,2,55,0
+"data/spectrograms/BP21_BRON,Crep,P R L ,20,M_split_2.png",0,0,0,0,0,18,1
+"data/spectrograms/EP106_Asthma,E W,P L U,45,F_split_2.png",1,1,0,0,1,24,0
+"data/spectrograms/DP101_Asthma,E W,P L M,12,F_split_1.png",2,2,0,0,2,58,1
+"data/spectrograms/BP111_COPD,E W,P R L ,51,M_split_2.png",3,2,0,1,2,50,1
+"data/spectrograms/BP18_pneumonia,C,P R U,57,M_split_1.png",4,3,0,0,1,70,1
+"data/spectrograms/EP73_N,N,P L L,32,M_split_2.png",8,1,0,0,0,36,1
+"data/spectrograms/EP86_N,N,P R U,68,F_split_1.png",0,0,0,1,2,24,0
+"data/spectrograms/DP49_N,N,P R M,21,M_split_1.png",0,0,0,1,1,33,0
+"data/spectrograms/BP101_Asthma,E W,P L M,12,F_split_1.png",7,1,0,0,2,50,0
+"data/spectrograms/EP4_Heart Failure + Lung Fibrosis ,I C,P L R,72,F_split_1.png",0,0,1,0,1,18,1
+"data/spectrograms/BP77_Asthma,E W,A R L,40,M_split_2.png",0,0,0,1,1,52,1
+"data/spectrograms/DP44_asthma,E W,P R U,40,M_split_2.png",3,2,0,0,2,60,1
+"data/spectrograms/BP37_pneumonia,Crep,A R L,70,F_split_1.png",0,0,1,0,1,33,0
+"data/spectrograms/BP39_heart failure,Crep,P R L ,67,M_split_1.png",0,0,0,0,0,75,0
+"data/spectrograms/BP79_asthma,E W,A R U,46,M_split_2.png",0,0,0,1,0,70,0
+"data/spectrograms/DP48_N,N,P L U,31,M_split_1.png",9,6,0,1,3,65,0
+"data/spectrograms/DP72_N,N,P R U,24,F_split_1.png",4,3,0,0,1,56,0
+"data/spectrograms/DP90_heart failure,Crep,P L M,74,F_split_2.png",4,3,0,1,2,53,0
+"data/spectrograms/EP96_N,N,P R L ,66,F_split_1.png",4,1,0,0,2,73,1
+"data/spectrograms/EP26_Lung Fibrosis,Crep,P,90,F_split_1.png",4,3,0,1,2,55,0
+"data/spectrograms/DP74_N,N,P R M,74,M_split_2.png",9,6,0,1,3,71,0
+"data/spectrograms/EP111_COPD,E W,P R L ,51,M_split_2.png",0,0,0,0,1,36,0
+"data/spectrograms/DP50_N,N,P R L ,27,M_split_2.png",3,2,0,0,2,60,1
+"data/spectrograms/DP69_pneumonia,Bronchial,P R L ,64,M_split_2.png",0,0,1,0,1,65,1
+"data/spectrograms/EP14_Heart Failure,C,A R M,54,M_split_1.png",2,2,0,0,2,53,0
+"data/spectrograms/EP79_asthma,E W,A R U,46,M_split_2.png",3,2,0,0,0,43,1
+"data/spectrograms/BP2_Asthma,E W,P L L R,52,F_split_2.png",2,2,1,0,0,57,0
+"data/spectrograms/EP77_Asthma,E W,A R L,40,M_split_2.png",4,3,0,0,1,70,1
+"data/spectrograms/BP106_Asthma,E W,P L U,45,F_split_2.png",0,0,0,1,0,27,1
+"data/spectrograms/EP109_N,N,P L M,26,M_split_2.png",4,1,0,1,0,74,1
+"data/spectrograms/EP57_COPD,E W,P R L ,42,M_split_2.png",8,8,0,0,2,64,0
+"data/spectrograms/EP87_N,N,P R M,72,M_split_1.png",4,1,0,0,2,67,0
+"data/spectrograms/EP18_pneumonia,C,P R U,57,M_split_2.png",0,0,0,1,0,30,0
+"data/spectrograms/EP15_Asthma,E W,P R U,49,F_split_2.png",3,2,0,0,0,43,1
+"data/spectrograms/BP54_heart failure,Crep,P R L ,73,F_split_1.png",4,3,0,0,1,56,0
+"data/spectrograms/DP76_N,N,A L U,31,M_split_2.png",8,1,0,0,0,51,0
+"data/spectrograms/DP106_Asthma,E W,P L U,45,F_split_1.png",4,3,0,1,2,55,0
+"data/spectrograms/EP101_Asthma,E W,P L M,12,F_split_2.png",3,2,0,0,2,60,1
+"data/spectrograms/EP25_copd,E W,P L L,76,M_split_1.png",4,1,0,0,2,76,1
+"data/spectrograms/EP21_BRON,Crep,P R L ,20,M_split_1.png",1,1,0,0,1,24,0
+"data/spectrograms/DP2_Asthma,E W,P L L R,52,F_split_1.png",0,0,0,0,0,18,1
+"data/spectrograms/DP35_Asthma,E W,A R L,38,M_split_1.png",0,0,0,0,0,75,0
+"data/spectrograms/DP28_BRON,Crep,P L U,68,F_split_2.png",2,2,0,1,2,62,0
+"data/spectrograms/BP15_Asthma,E W,P R U,49,F_split_2.png",0,0,0,1,0,30,0
+"data/spectrograms/BP99_N,N,P R M,50,M_split_2.png",4,3,0,0,1,70,1
+"data/spectrograms/BP62_COPD,E W,P L M,53,M_split_2.png",0,0,0,1,1,73,1
+"data/spectrograms/EP23_Lung Fibrosis,Crep,P R L ,50,M_split_2.png",0,0,0,0,1,36,0
+"data/spectrograms/DP66_heart failure,Crep,P R L ,43,M_split_2.png",0,0,1,0,1,29,0
+"data/spectrograms/DP18_pneumonia,C,P R U,57,M_split_2.png",4,1,0,0,2,73,1
+"data/spectrograms/DP14_Heart Failure,C,A R M,54,M_split_2.png",3,2,0,1,1,59,1
+"data/spectrograms/BP110_COPD,E W,P L L,62,M_split_2.png",6,4,0,1,3,81,0
+"data/spectrograms/EP2_Asthma,E W,P L L R,52,F_split_1.png",4,1,1,0,0,26,0
+"data/spectrograms/BP50_N,N,P R L ,27,M_split_2.png",2,2,1,0,0,57,0
+"data/spectrograms/BP21_BRON,Crep,P R L ,20,M_split_1.png",4,3,0,0,1,56,0
+"data/spectrograms/DP101_Asthma,E W,P L M,12,F_split_2.png",4,3,0,1,2,53,0
+"data/spectrograms/EP106_Asthma,E W,P L U,45,F_split_1.png",7,1,0,1,2,76,1
+"data/spectrograms/DP108_COPD,E W,P R L ,63,M_split_2.png",0,0,0,0,1,81,1
+"data/spectrograms/EP95_N,N,P L M,18,M_split_2.png",0,0,0,1,1,52,1
+"data/spectrograms/DP27_asthma,E W,P R M,53,F_split_1.png",0,0,1,0,1,18,1
+"data/spectrograms/BP76_N,N,A L U,31,M_split_2.png",3,2,0,0,0,43,1
+"data/spectrograms/EP61_COPD,E W,P R L ,53,M_split_1.png",4,1,0,0,2,43,0
+"data/spectrograms/BP29_heart failure,Crep,P L L,57,M_split_2.png",0,0,0,1,0,30,0
+"data/spectrograms/DP97_Asthma,E W,P R U,24,M_split_1.png",4,1,0,1,2,83,1
+"data/spectrograms/BP20_Asthma and lung fibrosis,C,A R M,90,M_split_1.png",4,1,0,0,2,67,0
+"data/spectrograms/EP62_COPD,E W,P L M,53,M_split_2.png",2,2,0,0,2,42,0
+"data/spectrograms/EP78_Asthma,E W,P R M,20,M_split_1.png",4,1,0,0,2,76,1
+"data/spectrograms/BP105_Lung Fibrosis,Crep,A U R,44,M_split_2.png",3,2,0,1,2,50,1
+"data/spectrograms/EP92_N,N,P L L ,43,M_split_2.png",0,0,0,1,0,30,0
+"data/spectrograms/BP68_asthma,E W,P R L ,21,F_split_1.png",0,0,0,1,2,53,0
+"data/spectrograms/BP53_asthma,E W,P R M,72,F_split_1.png",0,0,0,1,1,38,0
+"data/spectrograms/DP99_N,N,P R M,50,M_split_2.png",0,0,0,0,0,18,1
+"data/spectrograms/BP25_copd,E W,P L L,76,M_split_1.png",3,2,0,1,1,59,1
+"data/spectrograms/DP22_BRON,Crep,P R U,24,M_split_1.png",4,3,0,1,2,55,0
+"data/spectrograms/BP100_N,N,P R M,70,F_split_2.png",4,1,0,1,2,57,0
+"data/spectrograms/EP53_asthma,E W,P R M,72,F_split_1.png",0,0,0,0,1,81,1
+"data/spectrograms/BP78_Asthma,E W,P R M,20,M_split_1.png",4,3,0,1,2,53,0
+"data/spectrograms/BP60_heart failure,Crep,P L L,83,F_split_1.png",8,1,1,0,2,70,1
+"data/spectrograms/EP102_N,N,P L L,41,M_split_1.png",0,0,0,1,0,27,1
+"data/spectrograms/DP43_asthma,E W,P L M,15,M_split_1.png",3,2,0,1,1,59,1
+"data/spectrograms/BP58_asthma,E W,P L M,40,M_split_1.png",4,1,0,1,2,56,0
+"data/spectrograms/BP49_N,N,P R M,21,M_split_1.png",3,2,0,1,2,50,1
+"data/spectrograms/EP55_asthma,E W,P R U,72,F_split_1.png",2,2,0,1,2,62,0
+"data/spectrograms/EP64_asthma,E W,P L U,60,M_split_2.png",0,0,0,0,0,75,0
+"data/spectrograms/EP32_N,N,A R L,30,M_split_2.png",0,0,0,1,0,30,0
+"data/spectrograms/DP40_heart failure,Crep,A R M,26,M_split_2.png",4,3,0,0,1,70,1
+"data/spectrograms/DP63_COPD,E W,P R L ,58,F_split_2.png",0,0,0,1,1,73,1
+"data/spectrograms/BP47_asthma,E W,P L M,60,M_split_2.png",0,0,0,0,1,36,0
+"data/spectrograms/EP10_Asthma,E W,P R U,59,M_split_1.png",3,2,0,1,1,59,1
+"data/spectrograms/EP37_pneumonia,Crep,A R L,70,F_split_1.png",4,1,0,0,2,73,1
+"data/spectrograms/EP59_heart failure,Crep,P R L ,83,F_split_1.png",0,0,1,0,1,29,0
+"data/spectrograms/EP91_asthma,E W,P R U,43,F_split_2.png",6,4,0,1,3,81,0
+"data/spectrograms/EP68_asthma,E W,P R L ,21,F_split_2.png",2,2,1,0,0,57,0
+"data/spectrograms/BP72_N,N,P R U,24,F_split_1.png",4,1,1,0,0,26,0
+"data/spectrograms/BP48_N,N,P L U,31,M_split_1.png",4,3,0,0,1,56,0
+"data/spectrograms/BP64_asthma,E W,P L U,60,M_split_2.png",4,3,0,1,2,53,0
+"data/spectrograms/EP58_asthma,E W,P L M,40,M_split_1.png",7,1,0,1,2,76,1
+"data/spectrograms/BP55_asthma,E W,P R U,72,F_split_1.png",0,0,0,0,1,81,1
+"data/spectrograms/DP8_Plueral Effusion,I C B,P L L,70,M_split_2.png",0,0,0,1,1,52,1
+"data/spectrograms/BP74_N,N,P R M,74,M_split_2.png",0,0,1,0,1,18,1
+"data/spectrograms/BP26_Lung Fibrosis,Crep,P,90,F_split_1.png",3,2,0,0,0,43,1
+"data/spectrograms/DP38_Asthma,E W,P R M,38,M_split_1.png",4,1,0,0,2,43,0
+"data/spectrograms/EP34_heart failure,Crep,P R M,78,F_split_1.png",0,0,0,1,0,30,0
+"data/spectrograms/DP68_asthma,E W,P R L ,21,F_split_2.png",4,1,0,1,2,83,1
+"data/spectrograms/BP91_asthma,E W,P R U,43,F_split_2.png",4,1,0,0,2,67,0
+"data/spectrograms/BP3_Asthma,I E W,P L L R,50,F_split_1.png",2,2,0,0,2,42,0
+"data/spectrograms/DP100_N,N,P R M,70,F_split_2.png",0,0,0,1,0,30,0
+"data/spectrograms/EP47_asthma,E W,P L M,60,M_split_2.png",4,1,0,0,2,76,1
+"data/spectrograms/BP10_Asthma,E W,P R U,59,M_split_1.png",3,2,0,1,2,50,1
+"data/spectrograms/DP108_COPD,E W,P R L ,63,M_split_1.png",0,0,0,1,2,53,0
+"data/spectrograms/EP95_N,N,P L M,18,M_split_1.png",0,0,0,1,1,38,0
+"data/spectrograms/DP27_asthma,E W,P R M,53,F_split_2.png",0,0,0,0,0,18,1
+"data/spectrograms/BP76_N,N,A L U,31,M_split_1.png",3,2,0,1,1,59,1
+"data/spectrograms/BP20_Asthma and lung fibrosis,C,A R M,90,M_split_2.png",4,3,0,1,2,55,0
+"data/spectrograms/DP97_Asthma,E W,P R U,24,M_split_2.png",4,1,0,1,2,57,0
+"data/spectrograms/BP29_heart failure,Crep,P L L,57,M_split_1.png",0,0,0,0,1,81,1
+"data/spectrograms/EP61_COPD,E W,P R L ,53,M_split_2.png",8,1,1,0,2,70,1
+"data/spectrograms/EP62_COPD,E W,P L M,53,M_split_1.png",4,3,0,1,2,53,0
+"data/spectrograms/BP105_Lung Fibrosis,Crep,A U R,44,M_split_1.png",3,2,0,1,1,59,1
+"data/spectrograms/EP78_Asthma,E W,P R M,20,M_split_2.png",0,0,0,1,0,27,1
+"data/spectrograms/BP53_asthma,E W,P R M,72,F_split_2.png",4,1,0,1,2,56,0
+"data/spectrograms/BP68_asthma,E W,P R L ,21,F_split_2.png",3,2,0,1,2,50,1
+"data/spectrograms/EP92_N,N,P L L ,43,M_split_1.png",0,0,0,1,0,30,0
+"data/spectrograms/DP99_N,N,P R M,50,M_split_1.png",3,2,0,1,1,41,1
+"data/spectrograms/BP100_N,N,P R M,70,F_split_1.png",0,0,0,1,2,53,0
+"data/spectrograms/DP22_BRON,Crep,P R U,24,M_split_2.png",0,0,0,1,1,38,0
+"data/spectrograms/BP25_copd,E W,P L L,76,M_split_2.png",9,6,0,1,3,71,0
+"data/spectrograms/BP78_Asthma,E W,P R M,20,M_split_2.png",3,2,0,0,2,59,0
+"data/spectrograms/EP102_N,N,P L L,41,M_split_2.png",3,2,0,0,2,59,0
+"data/spectrograms/BP60_heart failure,Crep,P L L,83,F_split_2.png",0,0,1,0,1,33,0
+"data/spectrograms/DP43_asthma,E W,P L M,15,M_split_2.png",0,0,0,0,0,75,0
+"data/spectrograms/EP55_asthma,E W,P R U,72,F_split_2.png",3,2,0,0,0,56,1
+"data/spectrograms/BP49_N,N,P R M,21,M_split_2.png",0,0,0,1,0,70,0
+"data/spectrograms/EP64_asthma,E W,P L U,60,M_split_1.png",4,1,0,0,2,24,1
+"data/spectrograms/EP32_N,N,A R L,30,M_split_1.png",4,1,0,1,0,74,1
+"data/spectrograms/EP10_Asthma,E W,P R U,59,M_split_2.png",3,2,1,1,1,38,0
+"data/spectrograms/BP47_asthma,E W,P L M,60,M_split_1.png",0,0,0,1,1,73,1
+"data/spectrograms/DP63_COPD,E W,P R L ,58,F_split_1.png",0,0,1,0,1,29,0
+"data/spectrograms/DP40_heart failure,Crep,A R M,26,M_split_1.png",0,0,1,0,1,65,1
+"data/spectrograms/EP37_pneumonia,Crep,A R L,70,F_split_2.png",2,2,0,0,2,53,0
+"data/spectrograms/EP59_heart failure,Crep,P R L ,83,F_split_2.png",6,4,0,1,3,81,0
+"data/spectrograms/EP68_asthma,E W,P R L ,21,F_split_1.png",8,8,0,0,2,64,0
+"data/spectrograms/EP91_asthma,E W,P R U,43,F_split_1.png",0,0,0,1,2,24,0
+"data/spectrograms/BP48_N,N,P L U,31,M_split_2.png",0,0,0,1,1,33,0
+"data/spectrograms/BP64_asthma,E W,P L U,60,M_split_1.png",0,0,0,1,1,52,1
+"data/spectrograms/BP72_N,N,P R U,24,F_split_2.png",3,2,1,1,1,38,0
+"data/spectrograms/BP55_asthma,E W,P R U,72,F_split_2.png",4,1,0,0,2,30,0
+"data/spectrograms/EP58_asthma,E W,P L M,40,M_split_2.png",0,0,0,1,0,30,0
+"data/spectrograms/BP74_N,N,P R M,74,M_split_1.png",3,2,0,1,1,41,1
+"data/spectrograms/DP8_Plueral Effusion,I C B,P L L,70,M_split_1.png",0,0,0,1,2,53,0
+"data/spectrograms/DP38_Asthma,E W,P R M,38,M_split_2.png",9,6,0,1,3,71,0
+"data/spectrograms/BP26_Lung Fibrosis,Crep,P,90,F_split_2.png",0,0,0,1,1,38,0
+"data/spectrograms/BP3_Asthma,I E W,P L L R,50,F_split_2.png",3,2,0,0,2,59,0
+"data/spectrograms/BP91_asthma,E W,P R U,43,F_split_1.png",3,2,0,0,2,59,0
+"data/spectrograms/EP34_heart failure,Crep,P R M,78,F_split_2.png",0,0,1,0,1,33,0
+"data/spectrograms/DP100_N,N,P R M,70,F_split_1.png",0,0,0,0,0,75,0
+"data/spectrograms/BP10_Asthma,E W,P R U,59,M_split_2.png",0,0,0,1,0,70,0
+"data/spectrograms/EP47_asthma,E W,P L M,60,M_split_1.png",3,2,0,0,0,56,1
+"data/spectrograms/BP45_heart failure,Crep,P R L ,30,M_split_2.png",4,1,0,0,2,24,1
+"data/spectrograms/DP91_asthma,E W,P R U,43,F_split_2.png",3,2,1,1,1,38,0
+"data/spectrograms/BP38_Asthma,E W,P R M,38,M_split_1.png",0,0,0,1,1,73,1
+"data/spectrograms/BP1_Asthma,I E W,P L L,70,M_split_1.png",4,1,0,1,0,74,1
+"data/spectrograms/EP43_asthma,E W,P L M,15,M_split_1.png",0,0,1,0,1,65,1
+"data/spectrograms/DP55_asthma,E W,P R U,72,F_split_1.png",0,0,1,0,1,29,0
+"data/spectrograms/DP64_asthma,E W,P L U,60,M_split_2.png",2,2,0,0,2,53,0
+"data/spectrograms/EP8_Plueral Effusion,I C B,P L L,70,M_split_2.png",8,8,0,0,2,64,0
+"data/spectrograms/DP87_N,N,P R M,72,M_split_1.png",6,4,0,1,3,81,0
+"data/spectrograms/BP96_N,N,P R L ,66,F_split_2.png",0,0,0,1,1,52,1
+"data/spectrograms/BP95_N,N,P L M,18,M_split_2.png",0,0,0,1,1,33,0
+"data/spectrograms/DP47_asthma,E W,P L M,60,M_split_2.png",0,0,0,1,2,24,0
+"data/spectrograms/EP76_N,N,A L U,31,M_split_2.png",3,2,1,1,1,38,0
+"data/spectrograms/BP67_heart failure,Crep,P R L ,24,F_split_2.png",4,1,0,0,2,30,0
+"data/spectrograms/DP58_asthma,E W,P L M,40,M_split_1.png",4,1,0,0,0,78,1
+"data/spectrograms/EP38_Asthma,E W,P R M,38,M_split_1.png",0,0,0,1,0,30,0
+"data/spectrograms/BP109_N,N,P L M,26,M_split_1.png",0,0,0,1,0,27,1
+"data/spectrograms/BP43_asthma,E W,P L M,15,M_split_1.png",3,2,0,0,0,56,1
+"data/spectrograms/EP97_Asthma,E W,P R U,24,M_split_1.png",6,4,0,1,3,81,0
+"data/spectrograms/DP25_copd,E W,P L L,76,M_split_2.png",7,1,0,1,2,76,1
+"data/spectrograms/EP48_N,N,P L U,31,M_split_1.png",10,7,0,1,3,72,1
+"data/spectrograms/EP72_N,N,P R U,24,F_split_1.png",4,1,0,0,2,83,1
+"data/spectrograms/BP28_BRON,Crep,P L U,68,F_split_1.png",4,1,1,0,0,26,0
+"data/spectrograms/DP78_Asthma,E W,P R M,20,M_split_1.png",3,2,1,1,1,38,0
+"data/spectrograms/EP74_N,N,P R M,74,M_split_2.png",0,0,0,0,1,81,1
+"data/spectrograms/EP1_Asthma,I E W,P L L,70,M_split_2.png",0,0,0,1,2,53,0
+"data/spectrograms/DP110_COPD,E W,P L L,62,M_split_1.png",1,1,0,1,1,68,1
+"data/spectrograms/EP108_COPD,E W,P R L ,63,M_split_2.png",3,2,0,0,0,56,1
+"data/spectrograms/EP27_asthma,E W,P R M,53,F_split_1.png",2,2,1,0,0,57,0
+"data/spectrograms/DP53_asthma,E W,P R M,72,F_split_1.png",8,1,0,0,0,51,0
+"data/spectrograms/DP109_N,N,P L M,26,M_split_1.png",0,0,0,1,1,38,0
+"data/spectrograms/DP86_N,N,P R U,68,F_split_1.png",0,0,0,0,0,18,1
+"data/spectrograms/DP20_Asthma and lung fibrosis,C,A R M,90,M_split_2.png",3,2,0,1,1,41,1
+"data/spectrograms/DP73_N,N,P L L,32,M_split_2.png",8,1,0,0,0,36,1
+"data/spectrograms/EP49_N,N,P R M,21,M_split_1.png",5,3,1,0,0,90,0
+"data/spectrograms/BP97_Asthma,E W,P R U,24,M_split_1.png",0,0,1,0,1,18,1
+"data/spectrograms/BP32_N,N,A R L,30,M_split_2.png",0,0,0,1,1,33,0
+"data/spectrograms/DP59_heart failure,Crep,P R L ,83,F_split_1.png",0,0,0,1,2,24,0
+"data/spectrograms/BP7_Heart Failure + COPD,I C E W,P L R,65,M_split_2.png",4,1,0,0,2,30,0
+"data/spectrograms/BP27_asthma,E W,P R M,53,F_split_1.png",9,6,0,1,3,71,0
+"data/spectrograms/EP50_N,N,P R L ,27,M_split_1.png",3,2,0,0,2,59,0
+"data/spectrograms/BP108_COPD,E W,P R L ,63,M_split_2.png",0,0,1,0,1,33,0
+"data/spectrograms/DP4_Heart Failure + Lung Fibrosis ,I C,P L R,72,F_split_2.png",0,0,0,1,0,70,0
+"data/spectrograms/DP1_Asthma,I E W,P L L,70,M_split_2.png",3,2,0,1,1,41,1
+"data/spectrograms/DP10_Asthma,E W,P R U,59,M_split_2.png",2,2,0,0,2,42,0
+"data/spectrograms/BP45_heart failure,Crep,P R L ,30,M_split_1.png",0,0,0,1,1,73,1
+"data/spectrograms/DP91_asthma,E W,P R U,43,F_split_1.png",4,1,0,1,2,56,0
+"data/spectrograms/EP43_asthma,E W,P L M,15,M_split_2.png",4,1,0,0,2,24,1
+"data/spectrograms/BP1_Asthma,I E W,P L L,70,M_split_2.png",0,0,0,0,1,36,0
+"data/spectrograms/BP38_Asthma,E W,P R M,38,M_split_2.png",0,0,1,0,1,65,1
+"data/spectrograms/DP55_asthma,E W,P R U,72,F_split_2.png",0,0,1,0,1,29,0
+"data/spectrograms/DP64_asthma,E W,P L U,60,M_split_1.png",0,0,0,1,0,30,0
+"data/spectrograms/EP8_Plueral Effusion,I C B,P L L,70,M_split_1.png",4,1,0,0,0,78,1
+"data/spectrograms/BP96_N,N,P R L ,66,F_split_1.png",0,0,0,1,0,27,1
+"data/spectrograms/DP87_N,N,P R M,72,M_split_2.png",3,2,0,0,0,56,1
+"data/spectrograms/BP95_N,N,P L M,18,M_split_1.png",6,4,0,1,3,81,0
+"data/spectrograms/BP67_heart failure,Crep,P R L ,24,F_split_1.png",7,1,0,1,2,76,1
+"data/spectrograms/EP76_N,N,A L U,31,M_split_1.png",4,1,0,0,2,83,1
+"data/spectrograms/DP47_asthma,E W,P L M,60,M_split_1.png",10,7,0,1,3,72,1
+"data/spectrograms/DP58_asthma,E W,P L M,40,M_split_2.png",3,2,1,1,1,38,0
+"data/spectrograms/BP43_asthma,E W,P L M,15,M_split_2.png",4,1,1,0,0,26,0
+"data/spectrograms/BP109_N,N,P L M,26,M_split_2.png",0,0,0,0,1,81,1
+"data/spectrograms/EP38_Asthma,E W,P R M,38,M_split_2.png",3,2,0,0,0,56,1
+"data/spectrograms/EP72_N,N,P R U,24,F_split_2.png",2,2,1,0,0,57,0
+"data/spectrograms/EP48_N,N,P L U,31,M_split_2.png",0,0,0,1,2,53,0
+"data/spectrograms/DP25_copd,E W,P L L,76,M_split_1.png",1,1,0,1,1,68,1
+"data/spectrograms/EP97_Asthma,E W,P R U,24,M_split_2.png",0,0,0,1,1,38,0
+"data/spectrograms/BP28_BRON,Crep,P L U,68,F_split_2.png",8,1,0,0,0,51,0
+"data/spectrograms/EP74_N,N,P R M,74,M_split_1.png",0,0,0,0,0,18,1
+"data/spectrograms/DP78_Asthma,E W,P R M,20,M_split_2.png",8,1,0,0,0,36,1
+"data/spectrograms/EP1_Asthma,I E W,P L L,70,M_split_1.png",3,2,0,1,1,41,1
+"data/spectrograms/DP110_COPD,E W,P L L,62,M_split_2.png",5,3,1,0,0,90,0
+"data/spectrograms/EP108_COPD,E W,P R L ,63,M_split_1.png",4,1,0,0,2,30,0
+"data/spectrograms/EP27_asthma,E W,P R M,53,F_split_2.png",0,0,0,1,2,24,0
+"data/spectrograms/DP53_asthma,E W,P R M,72,F_split_2.png",0,0,0,1,1,33,0
+"data/spectrograms/DP73_N,N,P L L,32,M_split_1.png",0,0,1,0,1,18,1
+"data/spectrograms/DP20_Asthma and lung fibrosis,C,A R M,90,M_split_1.png",9,6,0,1,3,71,0
+"data/spectrograms/DP109_N,N,P L M,26,M_split_2.png",0,0,1,0,1,33,0
+"data/spectrograms/DP86_N,N,P R U,68,F_split_2.png",3,2,0,0,2,59,0
+"data/spectrograms/BP32_N,N,A R L,30,M_split_1.png",0,0,0,1,0,70,0
+"data/spectrograms/BP97_Asthma,E W,P R U,24,M_split_2.png",2,2,0,0,2,42,0
+"data/spectrograms/DP59_heart failure,Crep,P R L ,83,F_split_2.png",3,2,0,1,1,41,1
+"data/spectrograms/BP27_asthma,E W,P R M,53,F_split_2.png",0,0,0,1,1,73,1
+"data/spectrograms/BP7_Heart Failure + COPD,I C E W,P L R,65,M_split_1.png",0,0,0,0,1,36,0
+"data/spectrograms/EP50_N,N,P R L ,27,M_split_2.png",4,1,0,0,2,24,1
+"data/spectrograms/BP108_COPD,E W,P R L ,63,M_split_1.png",4,1,0,1,2,56,0
+"data/spectrograms/DP96_N,N,P R L ,66,F_split_1.png",0,0,1,0,1,29,0
+"data/spectrograms/DP4_Heart Failure + Lung Fibrosis ,I C,P L R,72,F_split_1.png",0,0,1,0,1,65,1
