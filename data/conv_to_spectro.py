@@ -23,9 +23,8 @@ def save_mel_spectrogram(audio_file, output_file):
         plt.figure(figsize=(10, 4))
         librosa.display.specshow(mel_spec_decibel, sr=sr, x_axis='time', y_axis='mel', cmap='viridis')
         plt.colorbar(format='%+2.0f dB')
-        plt.title('Mel Spectrogram')
         plt.tight_layout()
-        plt.axis('off')  # Remove axes for a cleaner image
+        plt.axis('off')
         plt.savefig(output_file, bbox_inches='tight', pad_inches=0)
         plt.close()
         #print(f"Saved: {output_file}")
