@@ -32,7 +32,6 @@ filepath,diagnosis,sound_type,loc_P/A,loc_R/L,loc_U/M/L,age,gender
 "data/spectrograms/BP9_Asthma,E W,P R L ,59,M_split_1.png",3,5,0,1,2,50,1
 "data/spectrograms/BP82_N,N,P L U,38,M_split_1.png",3,2,0,0,1,43,1
 "data/spectrograms/DP5_Heart Failure + COPD,I C E W,P L R ,71,M_split_2.png",3,2,0,0,2,21,1
-data/spectrograms/labels.csv,4,1,0,0,0,78,1
 "data/spectrograms/BP61_COPD,E W,P R L ,53,M_split_2.png",3,2,0,0,1,59,0
 "data/spectrograms/EP6_Plueral Effusion,I C B,P L R,81,M_split_1.png",3,2,0,1,0,60,0
 "data/spectrograms/BP69_pneumonia,Bronchial,P R L ,64,M_split_2.png",3,2,0,1,0,15,0
