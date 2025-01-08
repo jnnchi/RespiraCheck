@@ -1,8 +1,8 @@
-pydub
-librosa
-numpy
-matplotlib
-torch
-torchvision
-pandas
-scikit
+librosa==0.10.2.post1
+matplotlib==3.10.0
+mpmath==1.3.0
+numpy==2.0.2
+pandas==2.2.3
+scikit-learn==1.6.0
+torch==2.5.1
+torchvision==0.20.1

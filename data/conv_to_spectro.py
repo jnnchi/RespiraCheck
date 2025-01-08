@@ -1,3 +1,16 @@
+"""
+conv_to_spectro.py
+
+Run this file to convert all audio .mp3 files within the data/split_audio/ folder
+into spectrogram images and save the images to the data/spectrograms/ folder.
+
+Functions:
+- save_mel_spectrogram(): saves a single audio file as a mel spectrogram.
+- parse_filename(): parses data labels, such as diagnosis, from audio file names.
+- create_all_spectrograms(): iterates through all audio files to save all of 
+them as spectrograms; creates the labels.csv file using the file names.
+"""
+
 import os
 import csv
 import librosa

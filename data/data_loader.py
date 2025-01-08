@@ -1,5 +1,5 @@
 """
-dataloader.py
+data_loader.py
 
 Provides the `ImageData` class for loading images and features from a Pandas 
 DataFrame. The DataFrame must include image file paths and additional features 
