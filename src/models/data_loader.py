@@ -46,7 +46,6 @@ testing_features = testing_set.drop(["filepath", "diagnosis"], axis=1)
 # Numerical target datasets - specify that they're dataframes otherwise it will be a Series
 training_target = pd.DataFrame(training_set["diagnosis"])
 testing_target = pd.DataFrame(testing_set["diagnosis"])
-
 # Make a np array of training images
 
 img_list = []
