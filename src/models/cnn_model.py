@@ -61,11 +61,12 @@ class CNNModel(nn.Module):
         Returns:
             A PyTorch tensor containing class scores for each image in the batch.
         """
+        x = x.permute(0, 3, 1, 2)
         x = torch.relu(self.conv1(x))
         x = torch.max_pool2d(x, 2)
         x = torch.relu(self.conv2(x))
         x = torch.max_pool2d(x, 2)
-        x = x.view(x.size(0), -1)  # Flatten the tensor
+        x = x.reshape(x.size(0), -1)  # Flatten the tensor (using reshape because memory is non-contiguous)
         x = torch.relu(self.fc1(x))
         x = self.fc2(x)
         return x
@@ -137,6 +138,7 @@ def train_model(model, train_dataloader, val_dataloader, criterion, optimizer, e
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
+
         print(f"Epoch {epoch+1}, Training Loss: {running_loss / len(train_dataloader)}")
 
         # Validation Phase
