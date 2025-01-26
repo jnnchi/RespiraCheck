@@ -4,5 +4,6 @@ env
 
 data/spectrograms/
 data/split_audio/
+data/original_audio/
 
 *.DS_Store
