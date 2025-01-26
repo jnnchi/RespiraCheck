@@ -2,8 +2,8 @@ venv
 env
 *__pycache__
 
-data/spectrograms/
-data/split_audio/
-data/original_audio/
+ml/data/spectrograms/
+ml/data/split_audio/
+ml/data/original_audio/
 
 *.DS_Store
