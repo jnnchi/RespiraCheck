@@ -51,6 +51,7 @@ def parse_filename(filename):
     """
     parts = filename.split("_")
     parts[1] = parts[1].split(",")
+    parts[1][0] = parts[1][0].lower().strip()
     
     return parts[1]
 
@@ -70,12 +71,17 @@ def create_all_spectrograms(input_folder, output_folder):
         for filename in os.listdir(input_folder):
             if filename.endswith(".wav") or filename.endswith(".mp3"):  # is audio
                 input_path = os.path.join(input_folder, filename)
-                output_path = os.path.join(output_folder, os.path.splitext(filename)[0] + ".png")
-                
+
+                diagnosis, sound_type, location, age, gender = parse_filename(filename)
+
+                # Construct output directory and path
+                diagnosis_folder = os.path.join(output_folder, diagnosis)  # Relative path
+                os.makedirs(diagnosis_folder, exist_ok=True)  # Ensure the directory exists
+
+                output_path = os.path.join(diagnosis_folder, os.path.splitext(filename)[0] + ".png")
+
                 # Save spectrogram
                 save_mel_spectrogram(input_path, output_path)
-                
-                diagnosis, sound_type, location, age, gender = parse_filename(filename)
                 
                 writer.writerow([filename, diagnosis, sound_type, location, age, gender])
 
