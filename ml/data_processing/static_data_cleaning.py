@@ -94,14 +94,15 @@ def copy_audio_with_status(src_dir: str, dest_dir: str):
 
 if __name__ == "__main__":
     # Ensure the output directory exists
-    output_path = "data/split_audio/"
+    output_path = "ml/data/stethoscope_data/split_audio"
     os.makedirs(output_path, exist_ok=True)
+    input_path = "ml/data/stethoscope_data/original_audio"
 
     # Iterate through files in the original_audio folder
-    for filename in os.listdir("data/original_audio"):
+    for filename in os.listdir(input_path):
         if filename.endswith(".wav") or filename.endswith(".mp3"):
             try:
-                input_path = f"data/original_audio/{filename}"
+                input_path = f"{input_path}/{filename}"
 
                 # Trim beginning of the clip, continue to save in original_audio
                 trim_beginning(input_path)
@@ -113,5 +114,5 @@ if __name__ == "__main__":
                 print(f"Error processing {filename}: {e}")
                 break
 
-    # Call to copy_audio_with_status. Assumes that ml/data/cough is uncleaned dataset
-    copy_audio_with_status(src_dir="ml/data/cough/", dest_dir="ml/data/cough/covid")
+    # Call to copy_audio_with_status. Assumes that ml/data/cough_data/original_audio is uncleaned dataset
+    copy_audio_with_status(src_dir="ml/data/cough_data/original_audio", dest_dir="ml/data/cough_data/covid")
