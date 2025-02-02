@@ -179,6 +179,7 @@ def evaluate_model(model, test_dataloader):
 
 
 if __name__ == "__main__":
+    print("hello")
     num_classes = 10
     model, test_dataloader = initialize_and_train(train_dataloader, num_classes=num_classes, epochs=10)
 

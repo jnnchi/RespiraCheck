@@ -88,7 +88,7 @@ def create_all_spectrograms(input_folder, output_folder):
 if __name__=="__main__":
     input_folder = "data/split_audio"
     output_folder = "data/spectrograms"
-
+    
     # Create the output folder if it doesn't exist
     os.makedirs(output_folder, exist_ok=True)
     create_all_spectrograms(input_folder, output_folder)

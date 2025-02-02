@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server:/app
+    depends_on:
+      - ml
+  ml:
+    build: ./ml
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./ml/data/original_audio:/ml/data/original_audio
+      - ./ml/data/spectrograms:/ml/data/spectrograms
+      - ./ml/data/split_audio:/ml/data/split_audio
