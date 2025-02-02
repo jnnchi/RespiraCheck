@@ -52,7 +52,7 @@ def split_audio(input_file_path: str, output_folder_path: str) -> None:
     split_2.export(split_2_path, "mp3")
 
 
-def copy_json_with_status(src_dir: str, dest_dir: str):
+def copy_audio_with_status(src_dir: str, dest_dir: str):
     """
     Reads all .json files in the specified directory, checks if they contain a "status" key, 
     and copies them to the destination directory if they do. Additionally, associated .webm 
@@ -111,3 +111,6 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
                 break
+
+    # Call to copy_audio_with_status. Assumes that ml/data/cough is uncleaned dataset
+    copy_audio_with_status(src_dir="ml/data/cough/", dest_dir="ml/data/cough/covid")
