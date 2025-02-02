@@ -1,5 +1,9 @@
 """Processing cough data, including trimming beginning of clips, splititing all clips in two, and removing background noise"""
+
 import os
+import shutil
+import json
+
 from pydub import AudioSegment
 
 def trim_beginning(file_path: str) -> None:
@@ -46,6 +50,45 @@ def split_audio(input_file_path: str, output_folder_path: str) -> None:
 
     split_1.export(split_1_path, "mp3")
     split_2.export(split_2_path, "mp3")
+
+
+def copy_json_with_status(src_dir: str, dest_dir: str):
+    """
+    Reads all .json files in the specified directory, checks if they contain a "status" key, 
+    and copies them to the destination directory if they do. Additionally, associated .webm 
+    files are converted to .mp3 and copied if the corresponding JSON file is kept.
+
+    Args:
+        src_dir: A string representing the path to the source directory containing .json and .webm files.
+        dest_dir: A string representing the path to the destination directory where valid files will be copied.
+        
+    Returns:
+        None. The function will copy the .json and converted .mp3 files to the destination directory.
+    """
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+    
+    for filename in os.listdir(src_dir):
+        if filename.endswith(".json"):
+            file_path = os.path.join(src_dir, filename)
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    
+                if "status" in data:
+                    shutil.copy(file_path, os.path.join(dest_dir, filename))
+                    
+                    # Copy and convert the associated .webm file
+                    webm_filename = os.path.splitext(filename)[0] + ".webm"
+                    webm_path = os.path.join(src_dir, webm_filename)
+                    if os.path.exists(webm_path):
+                        mp3_filename = os.path.splitext(filename)[0] + ".mp3"
+                        mp3_path = os.path.join(dest_dir, mp3_filename)
+                        
+                        audio = AudioSegment.from_file(webm_path, format="webm")
+                        audio.export(mp3_path, format="mp3")
+            except (json.JSONDecodeError, OSError) as e:
+                print(f"Skipping {filename}: {e}")
 
 
 if __name__ == "__main__":
