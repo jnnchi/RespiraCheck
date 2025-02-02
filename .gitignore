@@ -2,8 +2,7 @@ venv
 env
 *__pycache__
 
-ml/data/spectrograms/
-ml/data/split_audio/
-ml/data/original_audio/
+ml/data/stethoscope_data
+ml/data/cough_data
 
 *.DS_Store

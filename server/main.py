@@ -12,4 +12,4 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello world"}
+    return {"verification message": "This is respiracheck. No other endpoints currently available."}
