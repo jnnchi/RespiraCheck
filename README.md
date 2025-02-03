@@ -34,3 +34,8 @@
 5. To open the FastAPI backend, visit: http://localhost:8000
 
 6. To open the ML folder in Jupyter in your browser, visit: http://localhost:8888/login?next=%2Ftree%3F and paste the token you found from Docker logs in **Step 4** in as a password. Alternatively, simply follow the URL you found in **Step 4**.
+
+7. When you're done with the Docker containers, run:
+    ```sh
+    docker-compose down
+    ```
