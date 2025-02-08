@@ -10,11 +10,10 @@ Dependencies:
 TODO: - Implement actual dataset processing logic.
       - Include error handling for file operations.
 """
-from audio_processor import AudioProcessor
-from spectrogram_processor import SpectrogramProcessor
+from .audio_processor import AudioProcessor
+from .spectrogram_processor import SpectrogramProcessor
 
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 import torch
 from torch.utils.data import DataLoader, TensorDataset

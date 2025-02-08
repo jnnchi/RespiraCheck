@@ -30,7 +30,8 @@ class CNNModel(nn.Module):
         """Initializes the CNNModel.
 
         Args:
-            pretrained (bool): Whether to use a pretrained ResNet model. Defaults to True.
+            input_folder (str): Path to the input folder containing spectrograms.
+            output_folder (str): Path to the folder where model outputs will be saved.
         """
         super(CNNModel, self).__init__()
         self.input_folder = input_folder

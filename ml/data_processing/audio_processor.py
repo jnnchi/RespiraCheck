@@ -7,7 +7,7 @@ Dependencies:
     - pandas
     - pydub
 
-TODO: - Implement actual audio processing logic.
+TODO: - Implement audio processing logic.
       - Include error handling for file operations.
 """
 

@@ -4,6 +4,7 @@ env
 
 ml/data/stethoscope_data
 ml/data/cough_data
+ml/data
 *spectrograms
 
 *.DS_Store
