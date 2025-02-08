@@ -43,10 +43,16 @@ class AudioProcessor:
 
     def process_all_audio(self) -> None:
         """Processes all audio files in a given directory."""
+        # for audio path in (paths in self.input_folder)
+        #    self.process_single_audio(audio_path)
         pass
 
-    def process_single_audio(self) -> AudioSegment:
-        """Processes a single audio file."""
+    def process_single_audio(self, audio_path) -> AudioSegment:
+        """Processes a single audio file. (Does same thing as process_all_audio but on a single audio file)"""
+        self.conv_to_wav(audio_path)
+        self.remove_silences(audio_path)
+        self.reduce_noise(audio_path)
+        self.remove_no_cough(audio_path)
         pass
 
     def conv_to_wav(self, audio_path) -> None:
