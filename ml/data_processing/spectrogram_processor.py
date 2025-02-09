@@ -60,10 +60,20 @@ class SpectrogramProcessor:
         Returns:
             np.ndarray: The spectrogram of the audio file.
         """
-        pass
+        # Load the audio file with original sample rate 
+        # (assumes sample rate already standardized by AudioProcessor)
+        y, sr = librosa.load(audio_path, sr=None)
+
+        # Convert to log scaled mel spectrogram
+        spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
+
+        # Convert to decibels
+        spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
+
+        return spectrogram_db
 
     def normalize_spectrogram(self, spectrogram: np.ndarray) -> np.ndarray:
-        """Normalizes a spectrogram to a range between 0 and 1.
+        """Normalize to 0-1 range using Min-Max Scaling
 
         Args:
             spectrogram (np.ndarray): The spectrogram to normalize.
@@ -71,7 +81,9 @@ class SpectrogramProcessor:
         Returns:
             np.ndarray: The normalized spectrogram.
         """
-        pass
+        spectrogram_norm = (spectrogram - spectrogram.min()) / (spectrogram.max() - spectrogram.min())
+
+        return spectrogram_norm
 
     def extract_features(self, audio_path: str, extracted_features: dict) -> None:
         """Extracts features from a given audio file's spectrogram.
