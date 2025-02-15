@@ -1,6 +1,6 @@
 """Audio Processing Module.
 
-This module provides the `AudioProcessor` class for processing audio files, 
+This module provides the `AudioProcessor` class for processing audio files,
 including noise reduction, silence removal, and format conversion.
 
 Dependencies:
@@ -11,13 +11,14 @@ TODO: - Implement audio processing logic.
       - Include error handling for file operations.
 """
 
+import os
 import pandas as pd
-from pydub import AudioSegment
+from pydub import AudioSegment, silence
 
 class AudioProcessor:
     """Processes audio files, including noise reduction and silence removal.
 
-    This class provides methods for processing multiple audio files, 
+    This class provides methods for processing multiple audio files,
     converting audio formats, and applying preprocessing techniques.
 
     Attributes:
@@ -61,7 +62,11 @@ class AudioProcessor:
         Args:
             audio_path (str): Path to the audio file.
         """
-        pass
+
+        audio = AudioSegment.from_file(audio_path)
+        wav_path = os.path.splitext(audio_path)[0] + ".wav"
+        audio.export(wav_path, format="wav")
+        print(f"Converted {audio_path} to {wav_path}")
 
     def remove_silences(self, audio_path) -> None:
         """Removes silences from an audio file.
@@ -69,7 +74,16 @@ class AudioProcessor:
         Args:
             audio_path (str): Path to the audio file.
         """
-        pass
+
+        audio = AudioSegment.from_file(audio_path)
+        non_silent_chunks = silence.split_on_silence(audio, min_silence_len=700, silence_thresh=-40)
+
+        if non_silent_chunks:
+            processed_audio = sum(non_silent_chunks)
+            processed_audio.export(audio_path, format="wav")
+            print(f"Removed silence from {audio_path}")
+        else:
+            print(f"No non-silent chunks found in {audio_path}, skipping.")
 
     def reduce_noise(self, audio_path) -> None:
         """Reduces background noise in an audio file.
