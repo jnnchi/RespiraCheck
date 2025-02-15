@@ -23,22 +23,41 @@ class SpectrogramProcessor:
     normalizing spectrograms, and extracting features for further analysis.
 
     Attributes:
+        audio-dir (str): Path to directory containing processed audio files
         features_filepath (str): Path to the directory where extracted features will be saved.
         extracted_features (dict): Dictionary mapping filenames to their extracted features (as numpy arrays).
+        extracted_spectograms (dict): Dictionary mapping filenames to extracted spectograms (as numpy arrays).
     """
 
-    def __init__(self, features_filepath: str):
+    def __init__(self, features_filepath: str, audio_dir: str):
         """Initializes the SpectrogramProcessor.
 
         Args:
             features_filepath (str): Path to the directory where extracted features will be saved.
+            audio_dir (str): Path to the directory with processed audio files in wav
         """
-        self.features_filepath = features_filepath
-        self.extracted_features = {}
+        self.audio_dir = audio_dir # directory containing processed audio files
+        self.features_filepath = features_filepath # path to store extracted features from spectograms
+        self.extracted_spectograms = {} # dictionary to store processed spectograms
+        self.extracted_features = {} # store extracted features from spectograms
+        os.makedirs(self.features_filepath, exist_ok=True) # create directory in case it does not exist
 
     def process_all_spectrograms(self) -> None:
         """Processes all spectrograms in the given directory."""
-        pass
+        # Loop through all audio files
+        for filename in os.listdir(self.audio_dir):
+          if filename.endswith(".wav"):
+            # Get path for audio file
+            audio_path = os.path.join(self.audio_dir, filename)
+
+            # Process file to generate spectogram using helper function
+            spectogram = self.process_single_spectrogram(audio_path)
+
+            # Store spectogram into dictionary
+            self.extracted_spectograms[filename] = spectogram
+
+            # # Store extracted features 
+            # self.extract_features(audio_path, self.extracted_features)
 
     def process_single_spectrogram(self, audio_path: str) -> np.ndarray:
         """Processes a single audio file to generate its spectrogram.
@@ -49,7 +68,13 @@ class SpectrogramProcessor:
         Returns:
             np.ndarray: The generated spectrogram as a numpy array.
         """
-        pass
+        # Create spectogram using helper function
+        spectogram = self.conv_to_spectrogram(audio_path)
+
+        # Normalize generated spectogram using helper function
+        spectogram_norm = self.normalize_spectrogram(spectogram)
+
+        return spectogram_norm
 
     def conv_to_spectrogram(self, audio_path: str) -> np.ndarray:
         """Converts an audio file to its spectrogram representation.
