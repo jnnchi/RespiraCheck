@@ -19,22 +19,6 @@ import librosa
 import os
 import matplotlib.pyplot as plt
 
-# Helper functions
-def plot_spectrogram(filename, spectrogram) -> None:
-  """Plots the spectrogram using Matplotlib
-
-  Args:
-    filename: File name of the audio
-    spectrogram: Spectrogram data extracted from the audio
-  """
-  plt.figure(figsize=(10, 4))
-  plt.imshow(spectrogram, aspect='auto', origin='lower', cmap='inferno')
-  plt.colorbar(label='Amplitude (dB)')
-  plt.title(f"Spectrogram: {filename}")
-  plt.xlabel("Time")
-  plt.ylabel("Frequency")
-  plt.tight_layout()
-
 class SpectrogramProcessor:
     """Processes and extracts features from audio spectrograms.
 
@@ -59,7 +43,7 @@ class SpectrogramProcessor:
         self.features_filepath = features_filepath # path to store extracted features from spectrograms
         self.extracted_spectrograms = {} # dictionary to store processed spectrograms
         self.extracted_features = {} # store extracted features from spectrograms
-        os.makedirs(self.features_filepath, exist_ok=True) # create directory in case it does not exist
+        # os.makedirs(self.features_filepath, exist_ok=True) # create directory in case it does not exist
 
     def process_all_spectrograms(self) -> None:
         """Processes all spectrograms in the given directory.
@@ -165,3 +149,18 @@ class SpectrogramProcessor:
       log_spectro = librosa.amplitude_to_db(audio_stft)  
 
       return log_spectro
+    
+    def plot_spectrogram(self, filename, spectrogram) -> None:
+        """Plots the spectrogram using Matplotlib
+
+        Args:
+            filename: File name of the audio
+            spectrogram: Spectrogram data extracted from the audio
+        """
+        plt.figure(figsize=(10, 4))
+        plt.imshow(spectrogram, aspect='auto', origin='lower', cmap='inferno')
+        plt.colorbar(label='Amplitude (dB)')
+        plt.title(f"Spectrogram: {filename}")
+        plt.xlabel("Time")
+        plt.ylabel("Frequency")
+        plt.tight_layout()
