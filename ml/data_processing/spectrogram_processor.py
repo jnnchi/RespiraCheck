@@ -20,15 +20,15 @@ import os
 import matplotlib.pyplot as plt
 
 # Helper functions
-def plot_spectogram(filename, spectogram) -> None:
-  """Plots the spectogram using Matplotlib
+def plot_spectrogram(filename, spectrogram) -> None:
+  """Plots the spectrogram using Matplotlib
 
   Args:
     filename: File name of the audio
-    spectogram: Spectogram data extracted from the audio
+    spectrogram: Spectrogram data extracted from the audio
   """
   plt.figure(figsize=(10, 4))
-  plt.imshow(spectogram, aspect='auto', origin='lower', cmap='inferno')
+  plt.imshow(spectrogram, aspect='auto', origin='lower', cmap='inferno')
   plt.colorbar(label='Amplitude (dB)')
   plt.title(f"Spectrogram: {filename}")
   plt.xlabel("Time")
@@ -45,7 +45,7 @@ class SpectrogramProcessor:
         audio_dir (str): Path to directory containing processed audio files
         features_filepath (str): Path to the directory where extracted features will be saved.
         extracted_features (dict): Dictionary mapping filenames to their extracted features (as numpy arrays).
-        extracted_spectograms (dict): Dictionary mapping filenames to their extracted spectograms (as numpy arrays).
+        extracted_spectrograms (dict): Dictionary mapping filenames to their extracted spectrograms (as numpy arrays).
     """
 
     def __init__(self, features_filepath: str, audio_dir: str):
@@ -56,9 +56,9 @@ class SpectrogramProcessor:
             audio_dir (str): Path to the directory with processed audio files in wav
         """
         self.audio_dir = audio_dir # directory containing processed audio files
-        self.features_filepath = features_filepath # path to store extracted features from spectograms
-        self.extracted_spectograms = {} # dictionary to store processed spectograms
-        self.extracted_features = {} # store extracted features from spectograms
+        self.features_filepath = features_filepath # path to store extracted features from spectrograms
+        self.extracted_spectrograms = {} # dictionary to store processed spectrograms
+        self.extracted_features = {} # store extracted features from spectrograms
         os.makedirs(self.features_filepath, exist_ok=True) # create directory in case it does not exist
 
     def process_all_spectrograms(self) -> None:
@@ -73,11 +73,11 @@ class SpectrogramProcessor:
             # Get path for audio file
             audio_path = os.path.join(self.audio_dir, filename)
 
-            # Process file to generate spectogram using helper function
-            spectogram = self.process_single_spectrogram(audio_path)
+            # Process file to generate spectrogram using helper function
+            spectrogram = self.process_single_spectrogram(audio_path)
 
-            # Store spectogram into dictionary
-            self.extracted_spectograms[filename] = spectogram
+            # Store spectrogram into dictionary
+            self.extracted_spectrograms[filename] = spectrogram
 
             # # Store extracted features 
             # self.extract_features(audio_path, self.extracted_features)
@@ -92,13 +92,13 @@ class SpectrogramProcessor:
         Returns:
             np.ndarray: The generated spectrogram as a numpy array.
         """
-        # Create spectogram using helper function
-        spectogram = self.conv_to_spectrogram(audio_path)
+        # Create spectrogram using helper function
+        spectrogram = self.conv_to_spectrogram(audio_path)
 
-        # Normalize generated spectogram using helper function
-        spectogram_norm = self.normalize_spectrogram(spectogram)
+        # Normalize generated spectrogram using helper function
+        spectrogram_norm = self.normalize_spectrogram(spectrogram)
 
-        return spectogram_norm
+        return spectrogram_norm
 
     def conv_to_spectrogram(self, audio_path: str) -> np.ndarray:
         """Converts an audio file to its spectrogram representation.
@@ -144,7 +144,7 @@ class SpectrogramProcessor:
         pass
 
     def apply_stft(self, audio_path: str) -> np.ndarray:
-      """Applies STFT Filter with a Hanning Window to a Audio File and then extracts Mel Spectogram
+      """Applies STFT Filter with a Hanning Window to a Audio File
 
       Args:
         audio_path (str): Path to the audio file
