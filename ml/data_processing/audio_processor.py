@@ -1,6 +1,6 @@
 """Audio Processing Module.
 
-This module provides the `AudioProcessor` class for processing audio files, 
+This module provides the `AudioProcessor` class for processing audio files,
 including noise reduction, silence removal, and format conversion.
 
 Dependencies:
@@ -11,13 +11,22 @@ TODO: - Implement audio processing logic.
       - Include error handling for file operations.
 """
 
+import os
 import pandas as pd
-from pydub import AudioSegment
+import numpy as np
+from pydub import AudioSegment, silence
+import noisereduce as nr
+from pydub.silence import detect_nonsilent
+import librosa
+import librosa.display
+from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
+
 
 class AudioProcessor:
     """Processes audio files, including noise reduction and silence removal.
 
-    This class provides methods for processing multiple audio files, 
+    This class provides methods for processing multiple audio files,
     converting audio formats, and applying preprocessing techniques.
 
     Attributes:
@@ -61,7 +70,11 @@ class AudioProcessor:
         Args:
             audio_path (str): Path to the audio file.
         """
-        pass
+
+        audio = AudioSegment.from_file(audio_path)
+        wav_path = os.path.splitext(audio_path)[0] + ".wav"
+        audio.export(wav_path, format="wav")
+        print(f"Converted {audio_path} to {wav_path}")
 
     def remove_silences(self, audio_path) -> None:
         """Removes silences from an audio file.
@@ -69,7 +82,16 @@ class AudioProcessor:
         Args:
             audio_path (str): Path to the audio file.
         """
-        pass
+
+        audio = AudioSegment.from_file(audio_path)
+        non_silent_chunks = silence.split_on_silence(audio, min_silence_len=700, silence_thresh=-40)
+
+        if non_silent_chunks:
+            processed_audio = sum(non_silent_chunks)
+            processed_audio.export(audio_path, format="wav")
+            print(f"Removed silence from {audio_path}")
+        else:
+            print(f"No non-silent chunks found in {audio_path}, skipping.")
 
     def reduce_noise(self, audio_path) -> None:
         """Reduces background noise in an audio file.
@@ -77,7 +99,29 @@ class AudioProcessor:
         Args:
             audio_path (str): Path to the audio file.
         """
-        pass
+        samples = np.array(audio_path.get_array_of_samples(), dtype=np.float32)
+
+        samples /= np.max(np.abs(samples))
+
+        # Reduce noise using noisereduce
+        #reduced_noise = nr.reduce_noise(
+        #    y=samples,
+        #    sr=audio_path.frame_rate,
+        #    stationary=True  # Set to False if the noise is non-stationary
+        #)
+
+        reduced_noise = nr.reduce_noise(
+        y=samples,
+        sr=audio_path.frame_rate,
+        stationary=False,
+        prop_decrease=0.8 
+        )
+
+        normalized_reduced_noise = reduced_noise.astype(np.float32)
+        normalized_reduced_noise /= np.max(np.abs(normalized_reduced_noise))
+
+        return normalized_reduced_noise
+    
 
     def remove_no_cough(self, audio_path) -> None:
         """Removes non-cough segments from an audio file.
@@ -85,4 +129,75 @@ class AudioProcessor:
         Args:
             audio_path (str): Path to the audio file.
         """
-        pass
+            
+            
+        audio = AudioSegment.from_wav(audio_path)
+
+        min_silence_len = 500  
+        silence_thresh = -30   
+    
+        
+        non_silent_chunks = detect_nonsilent(audio, min_silence_len, silence_thresh)
+
+        
+        if not non_silent_chunks:
+            print(f" no cough detected.")
+            
+        else:
+            print(f"Cough detected in {audio_path}, keeping the file.")
+        return non_silent_chunks
+        
+    def fbank(audio_path, samplerate=16000, winlen=0.025, winstep=0.01,
+          nfilt=40, nfft=512, lowfreq=0, highfreq=None, preemph=0.97, 
+          wintype='hamming', grayscale=False, save_image=False, image_path="fbank_image.png"):
+        """Compute Mel-filterbank energy features and optionally convert to a grayscale image.
+        
+        :param audio_path: Path to the audio file.
+        :param samplerate: Sample rate of the signal.
+        :param winlen: Window length in seconds.
+        :param winstep: Step size between windows in seconds.
+        :param nfilt: Number of Mel filters.
+        :param nfft: FFT size.
+        :param lowfreq: Lowest frequency in Mel filters.
+        :param highfreq: Highest frequency in Mel filters.
+        :param preemph: Pre-emphasis factor.
+        :param wintype: Window function type.
+        :param grayscale: Whether to convert the filterbank to a grayscale image.
+        :param save_image: Whether to save the grayscale image.
+        :param image_path: File path to save the image.
+        :return: Filterbank features (2D numpy array).
+            """
+        signal, samplerate = librosa.load(audio_path, sr=samplerate)
+        
+        highfreq = highfreq or samplerate / 2
+        
+        signal = np.append(signal[0], signal[1:] - preemph * signal[:-1])
+        
+        frame_length = int(winlen * samplerate)
+        frame_step = int(winstep * samplerate)
+        frames = librosa.util.frame(signal, frame_length=frame_length, hop_length=frame_step).T
+        
+        if wintype == 'hamming':
+            window = np.hamming(frame_length)
+        elif wintype == 'hann':
+            window = np.hanning(frame_length)
+        else:
+            window = np.ones(frame_length) 
+        frames *= window
+        
+        mag_frames = np.abs(np.fft.rfft(frames, n=nfft))
+        pow_frames = (1.0 / nfft) * (mag_frames ** 2)
+        
+        mel_filters = librosa.filters.mel(sr=samplerate, n_fft=nfft, n_mels=nfilt, fmin=lowfreq, fmax=highfreq)
+        fbank_features = np.dot(pow_frames, mel_filters.T)
+        fbank_features = np.where(fbank_features == 0, np.finfo(float).eps, fbank_features)
+        
+        if grayscale or save_image:
+            plt.figure(figsize=(4, 4))
+            plt.imshow(fbank_features.T, cmap='gray', origin='lower', aspect='auto')
+            plt.axis('off')
+            if save_image:
+                plt.savefig(image_path, bbox_inches='tight', pad_inches=0)
+            plt.close()
+        
+        return fbank_features
