@@ -9,13 +9,13 @@ const steps = [
 
 const Steps = () => {
   return (
-    <Box sx={{ position: "relative", width: 565, height: 431 }}>
+    <Box sx={{ position: "relative", width: 565, height: 300, verticalAlign: "center"}}>
       {steps.map((step, index) => (
         <Box
           key={index}
           sx={{
             position: "absolute",
-            top: index * 186,
+            top: index * 150,
             left: 81,
             display: "flex",
             alignItems: "center",

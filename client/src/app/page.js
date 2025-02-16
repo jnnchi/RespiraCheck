@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, Stack } from "@mui/material";
 
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme/theme";
@@ -13,13 +13,14 @@ export default function Home() {
   return (
     <ThemeProvider theme={theme}>
       <Navbar></Navbar>
-        <Box sx={{width: '50%'}}>
-            <UploadButton></UploadButton>
-            <Typography>Upload Audio</Typography>
-        </Box>
-        <Box sx={{width: '50%'}}>
+        <Stack width= "100%" direction ="row" alignItems="center" sx={{ justifyContent: "center" }} >
+            <Box sx={{width: "30%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+                <UploadButton></UploadButton>
+                <Typography sx={{fontSize: "30px"}}>Upload Audio</Typography>
+            </Box>
             <Steps></Steps>
-        </Box>
+
+        </Stack>
     </ThemeProvider>
   );
 }

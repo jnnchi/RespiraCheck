@@ -4,18 +4,19 @@ import { Box, Typography } from "@mui/material";
 import React from "react";
 
 
-const Button = () => {
+const Navbar = () => {
   return (
     <Box
       sx={{
         position: "relative",
         width: "100%",
-        height: "154px",
+        height: "80px",
         backgroundColor: "white",
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
         padding: "0 63px",
+        gap: 15,
+        justifyContent: "right",
       }}
     >
       <Box
@@ -31,7 +32,7 @@ const Button = () => {
 
       <Typography
         sx={{
-          fontSize: "35px",
+          fontSize: "25px",
           color: "black",
           lineHeight: "52.5px",
         }}
@@ -41,7 +42,7 @@ const Button = () => {
 
       <Typography
         sx={{
-          fontSize: "35px",
+          fontSize: "25px",
           color: "black",
           lineHeight: "52.5px",
         }}
@@ -51,7 +52,7 @@ const Button = () => {
 
       <Typography
         sx={{
-          fontSize: "35px",
+          fontSize: "25px",
           color: "#3d70ec",
           lineHeight: "52.5px",
         }}
@@ -62,4 +63,4 @@ const Button = () => {
   );
 };
 
-export default Button;
+export default Navbar;
