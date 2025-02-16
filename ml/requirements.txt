@@ -1,3 +1,4 @@
+ffmpeg-python==0.2.0
 jupyter==1.1.1
 jupyter-console==6.6.3
 jupyter-events==0.11.0
@@ -12,6 +13,7 @@ jupyterlab_server==2.27.3
 jupyterlab_widgets==3.0.13
 librosa==0.10.2.post1
 matplotlib==3.9.4
+noisereduce==3.0.3
 numpy==2.0.2
 pandas==2.2.3
 pydub==0.25.1
