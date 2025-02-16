@@ -4,10 +4,13 @@ import Navbar from '../components/navbar';
 import UploadButton from '../components/upload-button';
 import Steps from '../components/steps';
 
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "../theme/theme";
+
 export default function Action() {
     return (
       <ThemeProvider theme={theme}>
-        <Navbar></Navbar>
+        {/* <Navbar></Navbar> */}
         <Stack width= "100%" direction ="row" alignItems="center" sx={{ justifyContent: "center" }} >
             <Box sx={{width: "30%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
                 <UploadButton></UploadButton>

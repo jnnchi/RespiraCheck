@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from 'react-router-dom';
 import { Box, Typography } from "@mui/material";
 import React from "react";
 import Image from "next/image";
@@ -28,7 +29,10 @@ const Navbar = () => {
               lineHeight: "52.5px",
             }}
           >
-            Home
+            <Link to="/home" style={{ textDecoration: "none", color: "black" }}>
+              Home
+            </Link>
+            
           </Typography>
 
           <Typography
@@ -38,7 +42,10 @@ const Navbar = () => {
               lineHeight: "52.5px",
             }}
           >
-            Info
+            <Link to="/info" style={{ textDecoration: "none", color: "black" }}>
+              Info
+            </Link>
+            
           </Typography>
 
           <Typography
@@ -48,7 +55,10 @@ const Navbar = () => {
               lineHeight: "52.5px",
             }}
           >
-            RespiraChecker
+            <Link to="/action" style={{ textDecoration: "none", color: "black" }}>
+              RespiraChecker
+            </Link>
+            
           </Typography>
 
         </Box>
