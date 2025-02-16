@@ -13,14 +13,17 @@ export default function Home() {
   return (
     <ThemeProvider theme={theme}>
       <Navbar></Navbar>
-        <Stack width= "100%" direction ="row" alignItems="center" sx={{ justifyContent: "center" }} >
-            <Box sx={{width: "30%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+
+        <Stack width= "100%" direction ="row" alignItems="center" sx={{ paddingTop: "60px", justifyContent: "center" }} >
+            <Box sx={{gap : 7,width: "30%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
                 <UploadButton></UploadButton>
-                <Typography sx={{fontSize: "30px"}}>Upload Audio</Typography>
+                
+                <Typography sx={{fontSize: "25px"}}>Upload Audio</Typography>
             </Box>
             <Steps></Steps>
 
         </Stack>
+        
     </ThemeProvider>
   );
 }

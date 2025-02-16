@@ -1,9 +1,9 @@
-import ArrowCircleUpIcon from '@mui/icons-material/ArrowCircleUp';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import React from "react";
 
 const UploadButton = () => {
     return (
-       <ArrowCircleUpIcon sx = {{color: 'white', fontSize: '500px'}}></ArrowCircleUpIcon>
+       <ArrowUpwardIcon sx = {{fill: "white", backgroundColor: '#3D70EC', borderRadius: "50%", fontSize: '350px'}}></ArrowUpwardIcon>
     )
 }
 
