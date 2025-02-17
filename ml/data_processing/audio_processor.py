@@ -105,10 +105,8 @@ class AudioProcessor:
         if wav_path == "none":
             # delete this audio
             os.remove(input_audio_path)
-            os.remove(self.input_folder + filename + ".json")
         else: 
             # process and save the audio
-            print(f"WAV PATH {wav_path}")
             wav_path = os.path.join(wav_path, filename + ".wav")
 
             # convert to wav if it isn't already

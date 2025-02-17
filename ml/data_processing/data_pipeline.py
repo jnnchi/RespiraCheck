@@ -14,9 +14,11 @@ from .audio_processor import AudioProcessor
 from .spectrogram_processor import SpectrogramProcessor
 
 import pandas as pd
+from PIL import Image
 
 import torch
 from torch.utils.data import DataLoader, TensorDataset
+from torchvision import transforms
 
 class DataPipeline:
     """Processes datasets, including loading, splitting, and preparing for inference.
@@ -38,7 +40,7 @@ class DataPipeline:
                 metadata_path: str, input_path="data/cough_data/original_data", output_path="data/cough_data"):
         """Initializes the DatasetProcessor.
 
-        Args:
+        Args: 
             data_path (str): Path to the dataset file.
             test_size (float): Proportion of the dataset to include in the test split.
             audio_processor (AudioProcessor): Instance for handling audio processing.
@@ -57,12 +59,34 @@ class DataPipeline:
 
     def process_all(self) -> None:
         """Processes the entire dataset for training or analysis. 
-        Should go through the data/cough_data/spectrograms/positive and /negative folders
-        and put everything into tensors for training?
+        Creates folders of labeled audio and spectrograms
         """
+        self.audio_processor.process_all_audio()
+        self.spectrogram_processor.process_all_spectrograms()
         
+    def load_dataset(self) -> TensorDataset:
+        """Loads the dataset from the specified file path into a DataFrame."""
         pass
 
+
+    def spectrogram_to_tensor(self, image_path: str) -> torch.Tensor:
+        """Converts a spectrogram image to a PyTorch tensor.
+
+        Args:
+            image_path (str): Path to the spectrogram image file.
+
+        Returns:
+            torch.Tensor: The PyTorch tensor representation of the image.
+        """
+        transform = transforms.Compose([
+            transforms.Resize((224, 224)),  # Resize to ResNet18 input size
+            transforms.ToTensor(),  # Convert image to tensor
+        ])
+
+        image = Image.open(image_path).convert("RGB")
+        tensor_image = transform(image)
+
+        return tensor_image  # Shape: (3, 224, 224)
 
     def process_single_for_inference(self, instance) -> torch.Tensor:
         """Processes a single instance for inference.
