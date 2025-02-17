@@ -14,6 +14,7 @@ from .audio_processor import AudioProcessor
 from .spectrogram_processor import SpectrogramProcessor
 
 import pandas as pd
+import os
 from PIL import Image
 
 import torch
@@ -66,7 +67,25 @@ class DataPipeline:
         
     def load_dataset(self) -> TensorDataset:
         """Loads the dataset from the specified file path into a DataFrame."""
-        pass
+        tensors = []
+        labels = []  
+
+        for label_folder, label_value in zip(["positive", "negative"], [1, 0]): 
+            spectrogram_dir = os.path.join(self.spectrograms_folder, label_folder)
+
+            for image_name in os.listdir(spectrogram_dir):
+                image_path = os.path.join(spectrogram_dir, image_name)
+                spectrogram_tensor = self.spectrogram_to_tensor(image_path)
+                
+                tensors.append(spectrogram_tensor)
+                labels.append(label_value)
+
+        # Tensor of all features (N x D) - N is number of samples, D is feature dimension
+        X = torch.stack(tensors)  
+        # Tensor of all labels (N x 1)
+        y = torch.tensor(labels, dtype=torch.long) 
+
+        return TensorDataset(X, y)
 
 
     def spectrogram_to_tensor(self, image_path: str) -> torch.Tensor:
@@ -83,10 +102,10 @@ class DataPipeline:
             transforms.ToTensor(),  # Convert image to tensor
         ])
 
-        image = Image.open(image_path).convert("RGB")
+        image = Image.open(image_path).convert("RGB") # Convert from RGBA to RGB
         tensor_image = transform(image)
 
-        return tensor_image  # Shape: (3, 224, 224)
+        return tensor_image  # shape will be 3, 224, 224
 
     def process_single_for_inference(self, instance) -> torch.Tensor:
         """Processes a single instance for inference.
