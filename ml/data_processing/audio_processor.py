@@ -22,6 +22,9 @@ import librosa.display
 from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
+import json
+import shutil
+
 
 class AudioProcessor:
     """Processes audio files, including noise reduction and silence removal.
@@ -72,7 +75,7 @@ class AudioProcessor:
         # Create output folder if it doesn't exist
         os.makedirs(self.output_folder, exist_ok=True)
 
-        for filename in os.listdir(self.input_folder):
+        for filename in os.listdir(self.input_folder)[:1000]:
             if filename.endswith((".wav", ".mp3")):
                 audio_path = os.path.join(self.input_folder, filename)
                 processed_audio = self.process_single_audio(audio_path)
@@ -97,33 +100,81 @@ class AudioProcessor:
             os.makedirs(self.output_folder, exist_ok=True)
 
         filename = os.path.splitext(os.path.basename(input_audio_path))[0]
-        wav_path = os.path.join(self.output_folder, filename + ".wav")
+        wav_path = self.get_labeled_path(filename)
+        if wav_path == "none":
+            # delete this audio
+            os.remove(input_audio_path)
+            os.remove(self.input_folder + filename + ".json")
+        else: 
+            # process and save the audio
+            print(f"WAV PATH {wav_path}")
+            wav_path = os.path.join(wav_path, filename + ".wav")
 
-        if input_audio_path.endswith(".mp3"):
-            self.conv_to_wav(input_audio_path, wav_path)
+            # convert to wav if it isn't already
+            if input_audio_path.endswith(".mp3"):
+                self.conv_to_wav(input_audio_path, wav_path)
 
-        self.reduce_noise(wav_path)
-        non_silent_chunks = self.remove_no_cough(wav_path)
-        # may pass in nonsilent chunks into remove_silences
-        self.remove_silences(wav_path)
 
-        # Save metadata for this processed audio
-        y, sr = librosa.load(wav_path, sr=None)
-        duration = librosa.get_duration(y=y, sr=sr)
-        channels = 1
-        fbank_features = self.fbank(wav_path) if fbank else None
-        new_row = pd.DataFrame(
-            [[filename, duration, sr, channels, fbank_features]],
-            columns=[
-                "filename",
-                "duration",
-                "sample_rate",
-                "channels",
-                "fbank_features",
-            ],
-        )
-        self.metadata_df = pd.concat([self.metadata_df, new_row], ignore_index=True)
+            # reduce noise
+            self.reduce_noise(wav_path)
+            # remove sections of no coughs
+            non_silent_chunks = self.remove_no_cough(wav_path)
+            # remove silences (may pass in non_silent_chunks into remove_silences)
+            self.remove_silences(wav_path)
 
+            # Save metadata for this processed audio
+            y, sr = librosa.load(wav_path, sr=None)
+            duration = librosa.get_duration(y=y, sr=sr)
+            channels = 1
+            fbank_features = self.fbank(wav_path) if fbank else None
+            new_row = pd.DataFrame(
+                [[filename, duration, sr, channels, fbank_features]],
+                columns=[
+                    "filename",
+                    "duration",
+                    "sample_rate",
+                    "channels",
+                    "fbank_features",
+                ],
+            )
+            self.metadata_df = pd.concat([self.metadata_df, new_row], ignore_index=True)
+
+
+    def get_labeled_path(self, filename: str) -> str:
+        """
+        Sorts audio files into positive or negative depending on their json annotation. 
+
+        Args:
+            filename (str): Name of the audio file (ex: 49f7f1de-5199-4291-b906-f058a8dc74d9)
+       
+        Returns:
+            str: Path to the output folder (data/cough_data/processed_audio/positive or negative)
+        """
+        
+        positive_folder = os.path.join(self.output_folder, "positive")
+        negative_folder = os.path.join(self.output_folder, "negative")
+        os.makedirs(positive_folder, exist_ok=True)
+        os.makedirs(negative_folder, exist_ok=True)
+
+        json_path = f"{self.input_folder}/{filename}.json"
+        
+        if os.path.exists(json_path):
+            with open(json_path, "r") as f:
+                try:
+                    data = json.load(f)
+                    status = data.get("status", "").lower()
+                    
+                    if status == "covid-19":
+                        return positive_folder
+                    elif status == "healthy":
+                        return negative_folder
+                    else: return "none"
+                except json.JSONDecodeError:
+                    print(f"Error reading JSON file: {json_path}")
+                    return "none"
+        else:
+            return "none"
+        
 
     def conv_to_wav(self, audio_path: str, wav_path: str) -> None:
         """Converts an audio file to WAV format.

@@ -14,9 +14,6 @@ from .audio_processor import AudioProcessor
 from .spectrogram_processor import SpectrogramProcessor
 
 import pandas as pd
-import os
-import json
-import shutil
 
 import torch
 from torch.utils.data import DataLoader, TensorDataset
@@ -84,42 +81,3 @@ class DataPipeline:
             tuple: (train_df, test_df) - The training and testing DataFrames.
         """
         pass
-
-    def sort_wav_files(self, source_folder, destination_folder):
-        """
-        Reads .wav files and their corresponding .json files from the source folder.
-        Copies them into a 'positive' or 'negative' subfolder inside the destination folder
-        based on the 'status' field in the JSON file. The copied JSON file contains only the status field.
-
-        Args:
-            source_folder (str): Path to the folder containing .wav and .json files.
-            destination_folder (str): Path to the output directory where sorted files will be stored.
-        """
-        positive_folder = os.path.join(destination_folder, "positive")
-        negative_folder = os.path.join(destination_folder, "negative")
-        os.makedirs(positive_folder, exist_ok=True)
-        os.makedirs(negative_folder, exist_ok=True)
-        
-        for file in os.listdir(source_folder):
-            if file.endswith(".wav"):
-                wav_path = os.path.join(source_folder, file)
-                json_path = os.path.join(source_folder, file.replace(".wav", ".json"))
-                
-                if os.path.exists(json_path):
-                    with open(json_path, "r") as f:
-                        try:
-                            data = json.load(f)
-                            status = data.get("status", "").lower()
-                            
-                            if status == "covid-19":
-                                target_folder = positive_folder
-                            elif status == "healthy":
-                                target_folder = negative_folder
-                            else:
-                                continue
-                            
-                            shutil.copy(wav_path, target_folder)
-                            
-                        except json.JSONDecodeError:
-                            print(f"Error reading JSON file: {json_path}")
-                            continue
