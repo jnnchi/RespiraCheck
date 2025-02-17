@@ -116,12 +116,20 @@ class AudioProcessor:
                 self.conv_to_wav(input_audio_path, wav_path)
 
 
+            # remove sections of no coughs
+            status = self.remove_no_cough(wav_path)
+            if status == 1:
+                print("No cough detected. Skipping.")
+                return
+            
+            # remove silences (may pass in non_silent_chunks into remove_silences)
+            status = self.remove_silences(wav_path)
+            if status == 1:
+                print("Clip is silent. Skipping.")
+                return
+
             # reduce noise
             self.reduce_noise(wav_path)
-            # remove sections of no coughs
-            non_silent_chunks = self.remove_no_cough(wav_path)
-            # remove silences (may pass in non_silent_chunks into remove_silences)
-            self.remove_silences(wav_path)
 
             # Save metadata for this processed audio
             y, sr = librosa.load(wav_path, sr=None)
@@ -190,11 +198,14 @@ class AudioProcessor:
         print(f"Converted {audio_path} to {wav_path}")
 
 
-    def remove_silences(self, audio_path: str) -> None:
+    def remove_silences(self, audio_path: str) -> int:
         """Removes silences from an audio file.
 
         Args:
             audio_path (str): Path to the audio file.
+
+        Returns:
+            0 if non-silent chunks are found, 1 otherwise. When it returns 1, we should skip rest of data processing
         """
 
         audio = AudioSegment.from_file(audio_path)
@@ -205,9 +216,11 @@ class AudioProcessor:
         if non_silent_chunks:
             processed_audio = sum(non_silent_chunks)
             processed_audio.export(audio_path, format="wav")
-            print(f"Removed silence from {audio_path}")
+            return 0
         else:
+            os.remove(audio_path)
             print(f"No non-silent chunks found in {audio_path}, skipping.")
+            return 1
 
 
     def reduce_noise(self, audio_path) -> None:
@@ -265,9 +278,9 @@ class AudioProcessor:
         if not non_silent_chunks:
             print(f"No cough detected. Removing file...")
             os.remove(audio_path)
-
+            return 1
         else:
-            print(f"Cough detected in {audio_path}, keeping the file.")
+            return 0
 
 
     def fbank(
