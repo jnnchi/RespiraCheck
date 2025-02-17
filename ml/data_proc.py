@@ -19,4 +19,4 @@ spectroproc = SpectrogramProcessor()
 
 datapipe = DataPipeline(test_size=0.2, val_size=0.3, audio_processor=audio_proc, spectrogram_processor=spectroproc, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
 
-train, val, test = datapipe.create_dataloaders(batch_size=32)
+train_loader, val_loader, test_loader = datapipe.create_dataloaders(batch_size=32)
