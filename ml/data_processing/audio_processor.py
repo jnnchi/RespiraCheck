@@ -36,8 +36,13 @@ class AudioProcessor:
         metadata_df (pd.DataFrame): DataFrame containing metadata for the audio files.
     """
 
-    def __init__(self, target_sample_rate: float, target_duration: float,
-                 input_folder="data/cough_data/original_data", output_folder="data/cough_data/processed_audio"):
+    def __init__(
+        self,
+        target_sample_rate: float,
+        target_duration: float,
+        input_folder="ml/data/cough_data/original_data",
+        output_folder="ml/data/cough_data/processed_audio",
+    ):
         """Initializes the AudioProcessor.
 
         Args:
@@ -50,15 +55,23 @@ class AudioProcessor:
         self.output_folder = output_folder
         self.target_sample_rate = target_sample_rate
         self.target_duration = target_duration
-        self.metadata_df = pd.DataFrame() 
-        self.metadata_df.columns = ["filename", "duration", "sample_rate", "channels", "fbank_features"]
 
+        # create metadata dataframe
+        self.metadata_df = pd.DataFrame(
+            columns=[
+                "filename",
+                "duration",
+                "sample_rate",
+                "channels",
+                "fbank_features",
+            ]
+        )
 
     def process_all_audio(self) -> None:
         """Processes all audio files in a given directory."""
         # Create output folder if it doesn't exist
-        os.makedirs(self.output_folder, exist_ok=True)  
-        
+        os.makedirs(self.output_folder, exist_ok=True)
+
         for filename in os.listdir(self.input_folder):
             if filename.endswith((".wav", ".mp3")):
                 audio_path = os.path.join(self.input_folder, filename)
@@ -66,9 +79,16 @@ class AudioProcessor:
 
                 # Save the processed audio
                 if processed_audio:
-                    output_path = os.path.join(self.output_folder, f"{os.path.splitext(filename)[0]}_processed.wav")
+                    output_path = os.path.join(
+                        self.output_folder,
+                        f"{os.path.splitext(filename)[0]}_processed.wav",
+                    )
                     processed_audio.export(output_path, format="wav")
                     print(f"Processed and saved: {output_path}")
+
+        # Save metadata to a CSV file
+        metadata_path = os.path.join(self.output_folder, "metadata.csv")
+        self.metadata_df.to_csv(metadata_path, index=False)
 
 
     def process_single_audio(self, input_audio_path, fbank=False) -> None:
@@ -88,13 +108,19 @@ class AudioProcessor:
         self.remove_silences(wav_path)
 
         # Save metadata for this processed audio
-        y, sr = librosa.load(wav_path, sr=None) 
+        y, sr = librosa.load(wav_path, sr=None)
         duration = librosa.get_duration(y=y, sr=sr)
         channels = 1
         fbank_features = self.fbank(wav_path) if fbank else None
         new_row = pd.DataFrame(
-            [[filename, duration, sr, channels, fbank_features]], 
-            columns=["filename", "duration", "sample_rate", "channels", "fbank_features"]
+            [[filename, duration, sr, channels, fbank_features]],
+            columns=[
+                "filename",
+                "duration",
+                "sample_rate",
+                "channels",
+                "fbank_features",
+            ],
         )
         self.metadata_df = pd.concat([self.metadata_df, new_row], ignore_index=True)
 
@@ -120,7 +146,9 @@ class AudioProcessor:
         """
 
         audio = AudioSegment.from_file(audio_path)
-        non_silent_chunks = silence.split_on_silence(audio, min_silence_len=700, silence_thresh=-40)
+        non_silent_chunks = silence.split_on_silence(
+            audio, min_silence_len=700, silence_thresh=-40
+        )
 
         if non_silent_chunks:
             processed_audio = sum(non_silent_chunks)
@@ -138,39 +166,36 @@ class AudioProcessor:
         """
         audio = AudioSegment.from_file(audio_path)
 
-        samples = np.array(audio_path.get_array_of_samples(), dtype=np.float32)
+        samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
 
         samples /= np.max(np.abs(samples))
 
         # Reduce noise using noisereduce
-        #reduced_noise = nr.reduce_noise(
+        # reduced_noise = nr.reduce_noise(
         #    y=samples,
         #    sr=audio_path.frame_rate,
         #    stationary=True  # Set to False if the noise is non-stationary
-        #)
+        # )
 
         reduced_noise = nr.reduce_noise(
-            y=samples,
-            sr=audio_path.frame_rate,
-            stationary=False,
-            prop_decrease=0.8 
+            y=samples, sr=audio.frame_rate, stationary=False, prop_decrease=0.8
         )
 
         normalized_reduced_noise = reduced_noise.astype(np.float32)
         normalized_reduced_noise /= np.max(np.abs(normalized_reduced_noise))
 
         processed_audio = AudioSegment(
-            reduced_noise.tobytes(), 
-            frame_rate=audio.frame_rate, 
-            sample_width=audio.sample_width, 
-            channels=audio.channels
+            reduced_noise.tobytes(),
+            frame_rate=audio.frame_rate,
+            sample_width=audio.sample_width,
+            channels=audio.channels,
         )
 
         # Overwrite the original file with the cleaned version
         processed_audio.export(audio_path, format="wav")
 
         print(f"Noise reduced and saved to {audio_path}")
-    
+
 
     def remove_no_cough(self, audio_path) -> None:
         """Removes non-cough segments from an audio file.
@@ -180,24 +205,36 @@ class AudioProcessor:
         """
         audio = AudioSegment.from_wav(audio_path)
 
-        min_silence_len = 500  
-        silence_thresh = -30   
-    
+        min_silence_len = 500
+        silence_thresh = -30
+
         non_silent_chunks = detect_nonsilent(audio, min_silence_len, silence_thresh)
 
         if not non_silent_chunks:
             print(f"No cough detected.")
-            
+
         else:
             print(f"Cough detected in {audio_path}, keeping the file.")
         return non_silent_chunks
-    
-        
-    def fbank(audio_path, samplerate=16000, winlen=0.025, winstep=0.01,
-          nfilt=40, nfft=512, lowfreq=0, highfreq=None, preemph=0.97, 
-          wintype='hamming', grayscale=False, save_image=False, image_path="fbank_image.png"):
+
+
+    def fbank(
+        audio_path,
+        samplerate=16000,
+        winlen=0.025,
+        winstep=0.01,
+        nfilt=40,
+        nfft=512,
+        lowfreq=0,
+        highfreq=None,
+        preemph=0.97,
+        wintype="hamming",
+        grayscale=False,
+        save_image=False,
+        image_path="fbank_image.png",
+    ):
         """Compute Mel-filterbank energy features and optionally convert to a grayscale image.
-        
+
         :param audio_path: Path to the audio file.
         :param samplerate: Sample rate of the signal.
         :param winlen: Window length in seconds.
@@ -212,38 +249,44 @@ class AudioProcessor:
         :param save_image: Whether to save the grayscale image.
         :param image_path: File path to save the image.
         :return: Filterbank features (2D numpy array).
-            """
+        """
         signal, samplerate = librosa.load(audio_path, sr=samplerate)
-        
+
         highfreq = highfreq or samplerate / 2
-        
+
         signal = np.append(signal[0], signal[1:] - preemph * signal[:-1])
-        
+
         frame_length = int(winlen * samplerate)
         frame_step = int(winstep * samplerate)
-        frames = librosa.util.frame(signal, frame_length=frame_length, hop_length=frame_step).T
-        
-        if wintype == 'hamming':
+        frames = librosa.util.frame(
+            signal, frame_length=frame_length, hop_length=frame_step
+        ).T
+
+        if wintype == "hamming":
             window = np.hamming(frame_length)
-        elif wintype == 'hann':
+        elif wintype == "hann":
             window = np.hanning(frame_length)
         else:
-            window = np.ones(frame_length) 
+            window = np.ones(frame_length)
         frames *= window
-        
+
         mag_frames = np.abs(np.fft.rfft(frames, n=nfft))
-        pow_frames = (1.0 / nfft) * (mag_frames ** 2)
-        
-        mel_filters = librosa.filters.mel(sr=samplerate, n_fft=nfft, n_mels=nfilt, fmin=lowfreq, fmax=highfreq)
+        pow_frames = (1.0 / nfft) * (mag_frames**2)
+
+        mel_filters = librosa.filters.mel(
+            sr=samplerate, n_fft=nfft, n_mels=nfilt, fmin=lowfreq, fmax=highfreq
+        )
         fbank_features = np.dot(pow_frames, mel_filters.T)
-        fbank_features = np.where(fbank_features == 0, np.finfo(float).eps, fbank_features)
-        
+        fbank_features = np.where(
+            fbank_features == 0, np.finfo(float).eps, fbank_features
+        )
+
         if grayscale or save_image:
             plt.figure(figsize=(4, 4))
-            plt.imshow(fbank_features.T, cmap='gray', origin='lower', aspect='auto')
-            plt.axis('off')
+            plt.imshow(fbank_features.T, cmap="gray", origin="lower", aspect="auto")
+            plt.axis("off")
             if save_image:
-                plt.savefig(image_path, bbox_inches='tight', pad_inches=0)
+                plt.savefig(image_path, bbox_inches="tight", pad_inches=0)
             plt.close()
-        
+
         return fbank_features
