@@ -127,9 +127,9 @@ class DataPipeline:
         dataset = self.load_dataset()
 
         # Calculate sizes
-        test_size = int(self.test_size * len(dataset))
-        val_size = int(self.val_size * len(dataset))
-        train_size = len(dataset) - self.test_size - self.val_size  # Remaining for training
+        test_size = round(self.test_size * len(dataset))
+        val_size = round(self.val_size * len(dataset))
+        train_size = round(len(dataset) - test_size - val_size)  # Remaining for training
 
         # Perform split
         train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
