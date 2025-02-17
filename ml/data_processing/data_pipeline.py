@@ -18,7 +18,7 @@ import os
 from PIL import Image
 
 import torch
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import random_split, DataLoader, TensorDataset
 from torchvision import transforms
 
 class DataPipeline:
@@ -36,7 +36,7 @@ class DataPipeline:
         metadata_path (str): Path to the metadata file.
     """
 
-    def __init__(self, test_size: float, audio_processor: AudioProcessor,  
+    def __init__(self, test_size: float, val_size: float, audio_processor: AudioProcessor,  
                 spectrogram_processor: SpectrogramProcessor, metadata_df: pd.DataFrame, 
                 metadata_path: str, input_path="data/cough_data/original_data", output_path="data/cough_data"):
         """Initializes the DatasetProcessor.
@@ -53,6 +53,7 @@ class DataPipeline:
         self.audio_output_path = f"{output_path}/processed_audio"
         self.spectrogram_output_path = f"{output_path}/spectrograms"
         self.test_size = test_size
+        self.val_size = val_size
         self.audio_processor = audio_processor
         self.spectrogram_processor = spectrogram_processor
         self.metadata_df = metadata_df
@@ -69,9 +70,10 @@ class DataPipeline:
         """Loads the dataset from the specified file path into a DataFrame."""
         tensors = []
         labels = []  
-
+        # TODO: add this as param
+        spectrograms_folder = "ml/data/cough_data/spectrograms"
         for label_folder, label_value in zip(["positive", "negative"], [1, 0]): 
-            spectrogram_dir = os.path.join(self.spectrograms_folder, label_folder)
+            spectrogram_dir = os.path.join(spectrograms_folder, label_folder)
 
             for image_name in os.listdir(spectrogram_dir):
                 image_path = os.path.join(spectrogram_dir, image_name)
@@ -80,9 +82,9 @@ class DataPipeline:
                 tensors.append(spectrogram_tensor)
                 labels.append(label_value)
 
-        # Tensor of all features (N x D) - N is number of samples, D is feature dimension
+        # Tensor of all features (N x D) - N is number of samples (377), D is feature dimension (3,224,224)
         X = torch.stack(tensors)  
-        # Tensor of all labels (N x 1)
+        # Tensor of all labels (N x 1) - 377x1
         y = torch.tensor(labels, dtype=torch.long) 
 
         return TensorDataset(X, y)
@@ -116,14 +118,25 @@ class DataPipeline:
         pass
 
 
-    def load_dataset(self) -> TensorDataset:
-        """Loads the dataset from the specified file path into a DataFrame."""
-        pass
-
-    def split_dataset(self) -> tuple[DataLoader, DataLoader]:
+    def create_dataloaders(self, batch_size) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Splits the dataset into training and test sets.
 
         Returns:
             tuple: (train_df, test_df) - The training and testing DataFrames.
         """
-        pass
+        dataset = self.load_dataset()
+
+        # Calculate sizes
+        test_size = int(self.test_size * len(dataset))
+        val_size = int(self.val_size * len(dataset))
+        train_size = len(dataset) - self.test_size - self.val_size  # Remaining for training
+
+        # Perform split
+        train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+
+        # Create DataLoaders
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+        test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+        return train_loader, val_loader, test_loader
