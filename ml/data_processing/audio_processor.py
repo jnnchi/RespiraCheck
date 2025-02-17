@@ -263,11 +263,11 @@ class AudioProcessor:
         non_silent_chunks = detect_nonsilent(audio, min_silence_len, silence_thresh)
 
         if not non_silent_chunks:
-            print(f"No cough detected.")
+            print(f"No cough detected. Removing file...")
+            os.remove(audio_path)
 
         else:
             print(f"Cough detected in {audio_path}, keeping the file.")
-        return non_silent_chunks
 
 
     def fbank(
