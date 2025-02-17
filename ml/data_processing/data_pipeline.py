@@ -33,8 +33,9 @@ class DataPipeline:
         metadata_path (str): Path to the metadata file.
     """
 
-    def __init__(self, data_path: str, test_size: float, audio_processor: AudioProcessor,  
-                spectrogram_processor: SpectrogramProcessor, metadata_df: pd.DataFrame, metadata_path: str):
+    def __init__(self, test_size: float, audio_processor: AudioProcessor,  
+                spectrogram_processor: SpectrogramProcessor, metadata_df: pd.DataFrame, 
+                metadata_path: str, input_path="data/cough_data/original_data", output_path="data/cough_data"):
         """Initializes the DatasetProcessor.
 
         Args:
@@ -45,12 +46,29 @@ class DataPipeline:
             metadata_df (pd.DataFrame): DataFrame containing metadata for the dataset.
             metadata_path (str): Path to the metadata file.
         """
-        self.data_path = data_path
+        self.input_path = input_path
+        self.audio_output_path = f"{output_path}/processed_audio"
+        self.spectrogram_output_path = f"{output_path}/spectrograms"
         self.test_size = test_size
         self.audio_processor = audio_processor
         self.spectrogram_processor = spectrogram_processor
         self.metadata_df = metadata_df
         self.metadata_path = metadata_path
+
+    def process_all(self) -> None:
+        """Processes the entire dataset for training or analysis."""
+        
+        pass
+
+
+    def process_single_for_inference(self, instance) -> torch.Tensor:
+        """Processes a single instance for inference.
+
+        Args:
+            instance: A single data instance to be processed.
+        """
+        pass
+
 
     def load_dataset(self) -> TensorDataset:
         """Loads the dataset from the specified file path into a DataFrame."""
@@ -61,17 +79,5 @@ class DataPipeline:
 
         Returns:
             tuple: (train_df, test_df) - The training and testing DataFrames.
-        """
-        pass
-
-    def process_all(self) -> None:
-        """Processes the entire dataset for training or analysis."""
-        pass
-
-    def process_single_for_inference(self, instance) -> torch.Tensor:
-        """Processes a single instance for inference.
-
-        Args:
-            instance: A single data instance to be processed.
         """
         pass
