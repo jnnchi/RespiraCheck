@@ -56,7 +56,10 @@ class DataPipeline:
         self.metadata_path = metadata_path
 
     def process_all(self) -> None:
-        """Processes the entire dataset for training or analysis."""
+        """Processes the entire dataset for training or analysis. 
+        Should go through the data/cough_data/spectrograms/positive and /negative folders
+        and put everything into tensors for training?
+        """
         
         pass
 
