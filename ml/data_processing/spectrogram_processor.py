@@ -26,45 +26,65 @@ class SpectrogramProcessor:
     normalizing spectrograms, and extracting features for further analysis.
 
     Attributes:
-        audio_dir (str): Path to directory containing processed audio files
+        audio_folder (str): Path to directory containing processed audio files
         features_filepath (str): Path to the directory where extracted features will be saved.
         extracted_features (dict): Dictionary mapping filenames to their extracted features (as numpy arrays).
         extracted_spectrograms (dict): Dictionary mapping filenames to their extracted spectrograms (as numpy arrays).
     """
 
-    def __init__(self, features_filepath: str, audio_dir: str):
+    def __init__(self, metadata_filepath=None, audio_folder="ml/data/cough_data/processed_audio", spectrograms_folder="ml/data/cough_data/spectrograms"):
         """Initializes the SpectrogramProcessor.
 
         Args:
+            audio_folder (str): Path to the directory with processed audio files in wav
             features_filepath (str): Path to the directory where extracted features will be saved.
-            audio_dir (str): Path to the directory with processed audio files in wav
         """
-        self.audio_dir = audio_dir # directory containing processed audio files
-        self.features_filepath = features_filepath # path to store extracted features from spectrograms
-        self.extracted_spectrograms = {} # dictionary to store processed spectrograms
-        self.extracted_features = {} # store extracted features from spectrograms
+        self.audio_folder = audio_folder # directory containing processed audio files
+        self.spectrograms_folder = spectrograms_folder 
+        self.metadata_filepath = metadata_filepath # path to store extracted features from spectrograms
         # os.makedirs(self.features_filepath, exist_ok=True) # create directory in case it does not exist
 
     def process_all_spectrograms(self) -> None:
-        """Processes all spectrograms in the given directory.
+        """Processes all spectrograms in the given directory and saves them as images.
 
-           Note: This assumes that all processed audio files are in wav format
-                 and saved in one folder(directory) who's path is in audio_dir
+        Note: This assumes that all processed audio files are in WAV format
+                and saved in one folder(directory) whose path is in self.audio_folder.
         """
-        # Loop through all audio files
-        for filename in os.listdir(self.audio_dir):
-          if filename.endswith(".wav"):
-            # Get path for audio file
-            audio_path = os.path.join(self.audio_dir, filename)
+        for label in ["positive", "negative"]: 
+            audio_dir = os.path.join(self.audio_folder, label)  # Full path to the labeled folder
+            spectrogram_dir = os.path.join(self.spectrograms_folder, label)  # Path to save spectrogram
 
-            # Process file to generate spectrogram using helper function
-            spectrogram = self.process_single_spectrogram(audio_path)
+            # Make spectrogram folder if it doesn't exist
+            os.makedirs(spectrogram_dir, exist_ok=True)
 
-            # Store spectrogram into dictionary
-            self.extracted_spectrograms[filename] = spectrogram
+            for filename in os.listdir(audio_dir):
+                if filename.endswith(".wav"):
+                    audio_path = os.path.join(audio_dir, filename)
 
-            # # Store extracted features 
-            # self.extract_features(audio_path, self.extracted_features)
+                    # Process file to generate spectrogram
+                    spectrogram = self.process_single_spectrogram(audio_path)
+
+                    # Save spectrogram image to the spectrogram folder
+                    spectrogram_path = os.path.join(spectrogram_dir, filename.replace(".wav", ".png"))
+                    self.save_spectrogram_image(spectrogram, spectrogram_path)
+
+    def save_spectrogram_image(self, spectrogram: np.ndarray, save_path: str) -> None:
+        """Saves a spectrogram array as an image.
+
+        Args:
+            spectrogram (np.ndarray): The spectrogram array.
+            save_path (str): Path where the spectrogram image should be saved.
+        """
+        plt.figure(figsize=(10, 4))
+        librosa.display.specshow(spectrogram, sr=16000, hop_length=512, x_axis='time', y_axis='mel', cmap='inferno')
+        plt.colorbar(label='Amplitude (dB)')
+        plt.title("Spectrogram")
+        plt.xlabel("Time")
+        plt.ylabel("Frequency")
+        plt.tight_layout()
+        
+        plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
+        plt.close()
 
 
     def process_single_spectrogram(self, audio_path: str) -> np.ndarray:

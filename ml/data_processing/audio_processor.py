@@ -101,6 +101,7 @@ class AudioProcessor:
 
         filename = os.path.splitext(os.path.basename(input_audio_path))[0]
         wav_path = self.get_labeled_path(filename)
+        
         if wav_path == "none":
             # delete this audio
             os.remove(input_audio_path)
@@ -150,7 +151,7 @@ class AudioProcessor:
         Returns:
             str: Path to the output folder (data/cough_data/processed_audio/positive or negative)
         """
-        
+
         positive_folder = os.path.join(self.output_folder, "positive")
         negative_folder = os.path.join(self.output_folder, "negative")
         os.makedirs(positive_folder, exist_ok=True)
