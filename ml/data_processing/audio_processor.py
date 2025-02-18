@@ -81,11 +81,11 @@ class AudioProcessor:
             os.makedirs(labeled_output_dir, exist_ok=True)
 
             for filename in os.listdir(labeled_input_dir)[:100]:
-                print(f"Processing: {filename}")
                 if filename.endswith((".wav", ".mp3")):
                     audio_path = os.path.join(labeled_input_dir, filename)
-                    output_audio_path = os.path.join(self.output_folder, label, filename + ".wav")
+                    output_audio_path = os.path.join(self.output_folder, label, filename)
             
+                    print(f"Processing: {audio_path}")
                     self.process_single_audio(audio_path, output_audio_path)
 
 
@@ -114,16 +114,16 @@ class AudioProcessor:
             return 1
         
         # remove silences (may pass in non_silent_chunks into remove_silences)
-        processed_audio = self.remove_silences(audio)
-        if not processed_audio:
+        audio = self.remove_silences(audio)
+        if not audio:
             print("Clip is silent. Skipping.")
             return 1
 
         # reduce noise
-        processed_audio = self.reduce_noise(processed_audio)
+        audio = self.reduce_noise(audio)
 
         # overwrite the original file with the cleaned version
-        processed_audio.export(output_audio_path, format="wav")
+        audio.export(output_audio_path, format="wav")
 
         # save metadata
         self.save_metadata(input_audio_path, filename, fbank)
@@ -254,12 +254,8 @@ class AudioProcessor:
             normalized_reduced_noise = reduced_noise
 
         # Need to convert back to int format (required by wav) cuz normalization turns into float
-        if audio.sample_width == 2:
-            # 16-bit audio: scale to int16 range
-            int_samples = (normalized_reduced_noise * 32767).astype(np.int16)
-        else: # audio.sample_width == 4
-            # 32-bit audio: scale to int32 range
-            int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
+        # audio.sample_width == 4 -> scale to int32 range
+        int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
         
         
         # Create a new AudioSegment with the processed audio data

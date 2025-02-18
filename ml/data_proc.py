@@ -12,7 +12,7 @@ from data_processing.data_pipeline import DataPipeline
 
 # Generate output folder of all processed audio
 audio_proc = AudioProcessor(target_sample_rate=0.5, target_duration=10)
-#audio_proc.process_all_audio()
+audio_proc.process_all_audio()
 
 spectroproc = SpectrogramProcessor()
 #spectroproc.process_all_spectrograms()
