@@ -75,12 +75,10 @@ class SpectrogramProcessor:
             spectrogram (np.ndarray): The spectrogram array.
             save_path (str): Path where the spectrogram image should be saved.
         """
+
         plt.figure(figsize=(10, 4))
-        librosa.display.specshow(spectrogram, sr=16000, hop_length=512, x_axis='time', y_axis='mel', cmap='inferno')
+        plt.imshow(spectrogram, aspect='auto', origin='lower', cmap='inferno')
         plt.colorbar(label='Amplitude (dB)')
-        plt.title("Spectrogram")
-        plt.xlabel("Time")
-        plt.ylabel("Frequency")
         plt.tight_layout()
         
         plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
