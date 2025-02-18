@@ -84,8 +84,9 @@ class AudioProcessor:
                 print(f"Processing: {filename}")
                 if filename.endswith((".wav", ".mp3")):
                     audio_path = os.path.join(labeled_input_dir, filename)
+                    output_audio_path = os.path.join(self.output_folder, label, filename + ".wav")
             
-                    self.process_single_audio(audio_path, label)
+                    self.process_single_audio(audio_path, output_audio_path)
 
 
         # Save metadata to a CSV file
@@ -93,12 +94,10 @@ class AudioProcessor:
         self.metadata_df.to_csv(metadata_path, index=False)
 
 
-    def process_single_audio(self, input_audio_path, label, fbank=False) -> None:
+    def process_single_audio(self, input_audio_path, output_audio_path, fbank=False) -> None:
         """Processes a single audio file."""
 
         filename = os.path.splitext(os.path.basename(input_audio_path))[0]
-
-        output_audio_path = os.path.join(self.output_folder, label, filename + ".wav")
 
         # convert to wav if it isn't already
         if input_audio_path.endswith(".mp3"):
@@ -106,9 +105,9 @@ class AudioProcessor:
         elif input_audio_path.endswith(".webm"):
             self.conv_to_wav(input_audio_path, input_audio_path, "webm")
 
-        # remove sections of no coughs
         audio = AudioSegment.from_file(input_audio_path)
 
+        # remove sections of no coughs
         audio = self.remove_no_cough(audio)
         if not audio:
             print("No cough detected. Skipping.")
@@ -218,7 +217,7 @@ class AudioProcessor:
             0 if non-silent chunks are found, 1 otherwise. When it returns 1, we should skip rest of data processing
         """
         non_silent_chunks = silence.split_on_silence(
-            audio, min_silence_len=700, silence_thresh=-40
+            audio, min_silence_len=800, silence_thresh=-40
         )
 
         if non_silent_chunks:
@@ -274,14 +273,12 @@ class AudioProcessor:
         return processed_audio
 
 
-    def remove_no_cough(self, audio_path) -> AudioSegment | None:
+    def remove_no_cough(self, audio: AudioSegment) -> AudioSegment | None:
         """Removes non-cough segments from an audio file.
 
         Args:
             audio_path (str): Path to the audio file.
         """
-        audio = AudioSegment.from_wav(audio_path)
-
         min_silence_len = 500
         silence_thresh = -30
 
