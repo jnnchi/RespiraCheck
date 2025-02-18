@@ -69,84 +69,86 @@ class AudioProcessor:
                 "fbank_features",
             ]
         )
+        
 
     def process_all_audio(self) -> None:
         """Processes all audio files in a given directory."""
-        # Create output folder if it doesn't exist
-        os.makedirs(self.output_folder, exist_ok=True)
+        for label in ["positive", "negative"]: 
+            labeled_input_dir = os.path.join(self.input_folder, label) 
+            labeled_output_dir = os.path.join(self.output_folder, label)
 
-        for filename in os.listdir(self.input_folder)[:1000]:
-            if filename.endswith((".wav", ".mp3")):
-                audio_path = os.path.join(self.input_folder, filename)
-                processed_audio = self.process_single_audio(audio_path)
+            # Create labeled output folder if it doesn't exist
+            os.makedirs(labeled_output_dir, exist_ok=True)
 
-                # Save the processed audio
-                if processed_audio:
-                    output_path = os.path.join(
-                        self.output_folder,
-                        f"{os.path.splitext(filename)[0]}_processed.wav",
-                    )
-                    processed_audio.export(output_path, format="wav")
-                    print(f"Processed and saved: {output_path}")
+            for filename in os.listdir(labeled_input_dir)[:100]:
+                print(f"Processing: {filename}")
+                if filename.endswith((".wav", ".mp3")):
+                    audio_path = os.path.join(labeled_input_dir, filename)
+            
+                    self.process_single_audio(audio_path, label)
+
 
         # Save metadata to a CSV file
         metadata_path = os.path.join(self.output_folder, "metadata.csv")
         self.metadata_df.to_csv(metadata_path, index=False)
 
 
-    def process_single_audio(self, input_audio_path, fbank=False) -> None:
+    def process_single_audio(self, input_audio_path, label, fbank=False) -> None:
         """Processes a single audio file."""
-        if not os.path.exists(self.output_folder):
-            os.makedirs(self.output_folder, exist_ok=True)
 
         filename = os.path.splitext(os.path.basename(input_audio_path))[0]
-        wav_path = self.get_labeled_path(filename)
+
+        output_audio_path = os.path.join(self.output_folder, label, filename + ".wav")
+
+        # convert to wav if it isn't already
+        if input_audio_path.endswith(".mp3"):
+            self.conv_to_wav(input_audio_path, input_audio_path, "mp3")
+        elif input_audio_path.endswith(".webm"):
+            self.conv_to_wav(input_audio_path, input_audio_path, "webm")
+
+        # remove sections of no coughs
+        audio = self.remove_no_cough(input_audio_path)
+        if not audio:
+            print("No cough detected. Skipping.")
+            return 1
         
-        if wav_path == "none":
-            # delete this audio
-            os.remove(input_audio_path)
-        else: 
-            # process and save the audio
-            wav_path = os.path.join(wav_path, filename + ".wav")
+        # remove silences (may pass in non_silent_chunks into remove_silences)
+        processed_audio = self.remove_silences(input_audio_path)
+        if not processed_audio:
+            print("Clip is silent. Skipping.")
+            return 1
 
-            # convert to wav if it isn't already
-            if input_audio_path.endswith(".mp3"):
-                self.conv_to_wav(input_audio_path, wav_path, "mp3")
-            elif input_audio_path.endswith(".webm"):
-                self.conv_to_wav(input_audio_path, wav_path, "webm")
+        # reduce noise
+        #processed_audio = self.reduce_noise(input_audio_path)
 
+        # overwrite the original file with the cleaned version
+        processed_audio.export(output_audio_path, format="wav")
 
-            # remove sections of no coughs
-            status = self.remove_no_cough(wav_path)
-            if status == 1:
-                print("No cough detected. Skipping.")
-                return
-            
-            # remove silences (may pass in non_silent_chunks into remove_silences)
-            status = self.remove_silences(wav_path)
-            if status == 1:
-                print("Clip is silent. Skipping.")
-                return
+        # save metadata
+        self.save_metadata(input_audio_path, filename, fbank)
+    
+        return 0
 
-            # reduce noise
-            self.reduce_noise(wav_path)
-
-            # Save metadata for this processed audio
-            y, sr = librosa.load(wav_path, sr=None)
-            duration = librosa.get_duration(y=y, sr=sr)
-            channels = 1
-            fbank_features = self.fbank(wav_path) if fbank else None
-            new_row = pd.DataFrame(
-                [[filename, duration, sr, channels, fbank_features]],
-                columns=[
-                    "filename",
-                    "duration",
-                    "sample_rate",
-                    "channels",
-                    "fbank_features",
-                ],
-            )
-            self.metadata_df = pd.concat([self.metadata_df, new_row], ignore_index=True)
+    def save_metadata(self, input_audio_path, filename, fbank) -> None:
+        """
+        Saves metadata for the processed audio file.
+        """
+        # Save metadata for this processed audio
+        y, sr = librosa.load(input_audio_path, sr=None)
+        duration = librosa.get_duration(y=y, sr=sr)
+        channels = 1
+        fbank_features = self.fbank(input_audio_path) if fbank else None
+        new_row = pd.DataFrame(
+            [[filename, duration, sr, channels, fbank_features]],
+            columns=[
+                "filename",
+                "duration",
+                "sample_rate",
+                "channels",
+                "fbank_features",
+            ],
+        )
+        self.metadata_df = pd.concat([self.metadata_df, new_row], ignore_index=True)
 
 
     def get_labeled_path(self, filename: str) -> str:
@@ -202,10 +204,9 @@ class AudioProcessor:
         
         # save wav file to output folder
         audio.export(wav_path, format="wav")
-        print(f"Converted {audio_path} to {wav_path}")
 
 
-    def remove_silences(self, audio_path: str) -> int:
+    def remove_silences(self, audio_path: str) -> AudioSegment | None:
         """Removes silences from an audio file.
 
         Args:
@@ -222,32 +223,21 @@ class AudioProcessor:
 
         if non_silent_chunks:
             processed_audio = sum(non_silent_chunks)
-            processed_audio.export(audio_path, format="wav")
-            return 0
+            return processed_audio
         else:
-            os.remove(audio_path)
-            print(f"No non-silent chunks found in {audio_path}, skipping.")
-            return 1
+            return None
 
 
-    def reduce_noise(self, audio_path) -> None:
+    def reduce_noise(self, audio: AudioSegment) -> AudioSegment:
         """Reduces background noise in an audio file.
 
         Args:
-            audio_path (str): Path to the audio file.
+            input_audio_path (str): Path to the audio file.
         """
-        audio = AudioSegment.from_file(audio_path)
 
         samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
 
         samples /= np.max(np.abs(samples))
-
-        # Reduce noise using noisereduce
-        # reduced_noise = nr.reduce_noise(
-        #    y=samples,
-        #    sr=audio_path.frame_rate,
-        #    stationary=True  # Set to False if the noise is non-stationary
-        # )
 
         reduced_noise = nr.reduce_noise(
             y=samples, sr=audio.frame_rate, stationary=False, prop_decrease=0.8
@@ -263,13 +253,10 @@ class AudioProcessor:
             channels=audio.channels,
         )
 
-        # Overwrite the original file with the cleaned version
-        processed_audio.export(audio_path, format="wav")
-
-        print(f"Noise reduced and saved to {audio_path}")
+        return processed_audio
 
 
-    def remove_no_cough(self, audio_path) -> None:
+    def remove_no_cough(self, audio_path) -> AudioSegment | None:
         """Removes non-cough segments from an audio file.
 
         Args:
@@ -282,12 +269,10 @@ class AudioProcessor:
 
         non_silent_chunks = detect_nonsilent(audio, min_silence_len, silence_thresh)
 
-        if not non_silent_chunks:
-            print(f"No cough detected. Removing file...")
-            os.remove(audio_path)
-            return 1
+        if not non_silent_chunks: # all chunks are nonsilent, no cough detected
+            return None
         else:
-            return 0
+            return audio
 
 
     def fbank(
