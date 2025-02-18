@@ -69,7 +69,7 @@ class AudioProcessor:
                 "fbank_features",
             ]
         )
-        
+
 
     def process_all_audio(self) -> None:
         """Processes all audio files in a given directory."""
@@ -107,19 +107,21 @@ class AudioProcessor:
             self.conv_to_wav(input_audio_path, input_audio_path, "webm")
 
         # remove sections of no coughs
-        audio = self.remove_no_cough(input_audio_path)
+        audio = AudioSegment.from_file(input_audio_path)
+
+        audio = self.remove_no_cough(audio)
         if not audio:
             print("No cough detected. Skipping.")
             return 1
         
         # remove silences (may pass in non_silent_chunks into remove_silences)
-        processed_audio = self.remove_silences(input_audio_path)
+        processed_audio = self.remove_silences(audio)
         if not processed_audio:
             print("Clip is silent. Skipping.")
             return 1
 
         # reduce noise
-        #processed_audio = self.reduce_noise(input_audio_path)
+        processed_audio = self.reduce_noise(processed_audio)
 
         # overwrite the original file with the cleaned version
         processed_audio.export(output_audio_path, format="wav")
@@ -206,7 +208,7 @@ class AudioProcessor:
         audio.export(wav_path, format="wav")
 
 
-    def remove_silences(self, audio_path: str) -> AudioSegment | None:
+    def remove_silences(self, audio: AudioSegment) -> AudioSegment | None:
         """Removes silences from an audio file.
 
         Args:
@@ -215,8 +217,6 @@ class AudioProcessor:
         Returns:
             0 if non-silent chunks are found, 1 otherwise. When it returns 1, we should skip rest of data processing
         """
-
-        audio = AudioSegment.from_file(audio_path)
         non_silent_chunks = silence.split_on_silence(
             audio, min_silence_len=700, silence_thresh=-40
         )
