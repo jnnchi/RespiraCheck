@@ -111,7 +111,9 @@ class AudioProcessor:
 
             # convert to wav if it isn't already
             if input_audio_path.endswith(".mp3"):
-                self.conv_to_wav(input_audio_path, wav_path)
+                self.conv_to_wav(input_audio_path, wav_path, "mp3")
+            elif input_audio_path.endswith(".webm"):
+                self.conv_to_wav(input_audio_path, wav_path, "webm")
 
 
             # remove sections of no coughs
@@ -183,14 +185,21 @@ class AudioProcessor:
             return "none"
         
 
-    def conv_to_wav(self, audio_path: str, wav_path: str) -> None:
+    def conv_to_wav(self, audio_path: str, wav_path: str, file_type: str) -> None:
         """Converts an audio file to WAV format.
 
         Args:
             audio_path (str): Path to the audio file.
         """
-        audio = AudioSegment.from_file(audio_path)
+        if file_type == "mp3":
+            audio = AudioSegment.from_file(audio_path)
+        elif file_type == "webm":
+            # Ensure ffmpeg is correctly installed and set up
+            AudioSegment.converter = "ffmpeg"  
 
+            # Load the audio file
+            audio = AudioSegment.from_file(audio_path, format="webm")
+        
         # save wav file to output folder
         audio.export(wav_path, format="wav")
         print(f"Converted {audio_path} to {wav_path}")
