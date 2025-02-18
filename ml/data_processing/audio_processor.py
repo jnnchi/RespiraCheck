@@ -236,23 +236,41 @@ class AudioProcessor:
         """
 
         samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
-
-        samples /= np.max(np.abs(samples))
-
+    
+        # Normalize samples to range [-1.0, 1.0] (standardizes input for noise reduction)
+        max_val = np.max(np.abs(samples))
+        if max_val != 0:
+            samples /= max_val
+        
+        # Perform noise reduction
         reduced_noise = nr.reduce_noise(
             y=samples, sr=audio.frame_rate, stationary=False, prop_decrease=0.8
         )
+        
+        # Normalize the noise-reduced audio to restore amplitude
+        max_reduced = np.max(np.abs(reduced_noise))
+        if max_reduced != 0:
+            normalized_reduced_noise = reduced_noise / max_reduced
+        else:
+            normalized_reduced_noise = reduced_noise
 
-        normalized_reduced_noise = reduced_noise.astype(np.float32)
-        normalized_reduced_noise /= np.max(np.abs(normalized_reduced_noise))
-
+        # Need to convert back to int format (required by wav) cuz normalization turns into float
+        if audio.sample_width == 2:
+            # 16-bit audio: scale to int16 range
+            int_samples = (normalized_reduced_noise * 32767).astype(np.int16)
+        else: # audio.sample_width == 4
+            # 32-bit audio: scale to int32 range
+            int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
+        
+        
+        # Create a new AudioSegment with the processed audio data
         processed_audio = AudioSegment(
-            reduced_noise.tobytes(),
+            int_samples.tobytes(),
             frame_rate=audio.frame_rate,
             sample_width=audio.sample_width,
             channels=audio.channels,
         )
-
+        
         return processed_audio
 
 
