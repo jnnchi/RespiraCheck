@@ -16,7 +16,7 @@ TODO:
 
 import torch
 from typing import Optional
-
+from torch.utils.data import DataLoader
 
 class ModelHandler:
     """Handles the model training, evaluation, and inference pipeline.
@@ -26,7 +26,7 @@ class ModelHandler:
         device (torch.device): The device on which the model is executed (e.g., 'cpu' or 'cuda').
     """
 
-    def __init__(self, model_path: Optional[str], device: str):
+    def __init__(self, model_path: Optional[str], device: str, train_loader: DataLoader, val_loader: DataLoader, test_loader: DataLoader):
         """Initializes the ModelHandler.
 
         Args:
