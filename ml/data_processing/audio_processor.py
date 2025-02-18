@@ -41,8 +41,8 @@ class AudioProcessor:
 
     def __init__(
         self,
-        target_sample_rate: float,
-        target_duration: float,
+        target_sample_rate=48000,
+        target_duration=5, # in seconds
         input_folder="ml/data/cough_data/original_data",
         output_folder="ml/data/cough_data/processed_audio",
     ):
@@ -121,6 +121,8 @@ class AudioProcessor:
 
         # reduce noise
         audio = self.reduce_noise(audio)
+
+        audio = self.standardize_duration(audio)
 
         # overwrite the original file with the cleaned version
         audio.export(output_audio_path, format="wav")
@@ -284,6 +286,34 @@ class AudioProcessor:
             return None
         else:
             return audio
+
+    def standardize_duration(self, audio: AudioSegment) -> AudioSegment:
+        """Standardizes the duration of an audio file to exactly 10 seconds.
+
+        - If the audio is longer than 10 seconds, it will be trimmed.
+        - If the audio is shorter than 10 seconds, it will be padded with silence.
+
+        Args:
+            audio (AudioSegment): The input audio file.
+
+        Returns:
+            AudioSegment: The standardized 10-second audio.
+        """
+        target_duration = self.target_duration * 1000  # seconds to milliseconds
+        current_duration = len(audio)  # Current duration in milliseconds
+
+        if current_duration > target_duration:
+            # Trim the audio if it's too long
+            standardized_audio = audio[:target_duration]
+        elif current_duration < target_duration:
+            # Pad with silence if it's too short
+            silence = AudioSegment.silent(duration=target_duration - current_duration)
+            standardized_audio = audio + silence
+        else:
+            # Already 10 seconds, return as is
+            standardized_audio = audio
+
+        return standardized_audio
 
 
     def fbank(
