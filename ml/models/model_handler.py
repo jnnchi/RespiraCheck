@@ -11,11 +11,11 @@ Dependencies:
 
 import numpy as np
 import torch
+
 import torch.nn as nn
 from cnn_model import CNNModel
 
 import time
-
 
 class ModelHandler:
     """Handles the model training, evaluation, and inference pipeline.
@@ -25,7 +25,7 @@ class ModelHandler:
         device (torch.device): The device on which the model is executed (e.g., 'cpu' or 'cuda').
         model_path: Path to where .plt models should be saved.
     """
-
+    
     def __init__(self, model_path: str | None):
         """Initializes the ModelHandler.
 
