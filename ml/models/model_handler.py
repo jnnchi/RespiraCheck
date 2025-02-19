@@ -37,15 +37,17 @@ class ModelHandler:
         model_path: Path to where .plt models should be saved.
     """
     
-    def __init__(self, model_path: str | None):
+    def __init__(self, model, model_path: str | None, optimizer: torch.optim.Optimizer, loss_function: nn.Module):
         """Initializes the ModelHandler.
 
         Args:
             model_path (str | None): Path to the pre-trained model file (if available).
         """
-        self.model = CNNModel(input_folder="ml/data/cough_data/spectrograms", output_folder="ml/models")
+        self.model = model
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model_path = model_path
+        self.optimizer = optimizer
+        self.loss_function = loss_function
 
     def train(self, train_loader, val_loader, epochs: int, learning_rate: float,  ) -> None:
         """Trains the model.
@@ -57,11 +59,6 @@ class ModelHandler:
         """
 
         self.model.to(self.device)
-
-        # Initalize Optimizer
-        loss_function = nn.BCEWithLogitsLoss() # Binary Cross Entropy loss function with sigmoid layer applied
-        optimizer = torch.optim.Adam(params=self.model.parameters(), lr=learning_rate, ) # Adam optimizer (Want to try SGD later)
-
 
         best_acc = -1
         for epoch in range(epochs):
@@ -75,14 +72,15 @@ class ModelHandler:
                 y_train = y_train.float().unsqueeze(1) # Make sure we have correct shape for BCE loss
                 y_prediction_train = self.model(X_train)
                 
-                loss = (y_prediction_train, y_train)
+                # need to calculate using loss function
+                loss = loss_function(y_prediction_train, y_train) 
                 train_losses_epoch.append(loss.item())
 
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
 
-            train_acc = self.evaluate(self.model, train_loader)
+            train_acc = self.evaluate(train_loader)
             train_loss = np.mean(train_losses_epoch)
             print(f'Train accuracy: {train_acc*100:.2f}% | Training loss: {train_loss:.4f}')
 
@@ -95,7 +93,7 @@ class ModelHandler:
                     loss = loss_function(y_prediction_val, y_val)
                     val_losses_epoch.append(loss.item())
 
-            val_acc = self.evaluate(self.model, train_loader)        
+            val_acc = self.evaluate(val_loader)        
             val_loss = np.mean(val_losses_epoch)
             print(f'Validation accuracy: {val_acc*100:.2f}% | Validation loss: {val_loss:.4f}')
 
@@ -107,8 +105,44 @@ class ModelHandler:
         self.model.load_state_dict(best_model_state)
         self.save_model(best_model_state, path=f"{self.model_path}/model_LR:{learning_rate}_EPOCHS:{epochs}_{time.time()}.plt")
         
+    def train_1(self, train_loader, epochs: int, learning_rate: float,  ) -> None:
+        """Trains the model.
 
-    def evaluate(self, test_loader) -> None:
+        Args:
+            train_loader: DataLoader for the training dataset.
+            val_loader: DataLoader for the validation dataset.
+            epochs (int): Number of training epochs.
+        """
+
+        self.model.to(self.device)
+
+        for _ in range(epochs):
+            train_losses_epoch = []
+
+            self.model.train()
+            for X_train, y_train, in train_loader:
+                X_train = X_train.to(self.device)
+                y_train = y_train.to(self.device)
+
+                y_train = y_train.float().unsqueeze(1) # Make sure we have correct shape for BCE loss
+                y_prediction_train = self.model(X_train)
+                
+                # need to calculate using loss function
+                loss = loss_function(y_prediction_train, y_train) 
+                train_losses_epoch.append(loss.item())
+
+                optimizer.zero_grad()
+                loss.backward()
+                optimizer.step()
+
+            train_acc = self.evaluate(train_loader)
+            train_loss = np.mean(train_losses_epoch)
+            print(f'Train accuracy: {train_acc*100:.2f}% | Training loss: {train_loss:.4f}')
+        
+        self.save_model(self.model.state_dict(), path=f"{self.model_path}/model_LR:{learning_rate}_EPOCHS:{epochs}_{time.time()}.pt")
+
+
+    def evaluate(self, test_loader) -> float:
         """Evaluates the model on the test dataset.
 
         Args:
@@ -119,8 +153,8 @@ class ModelHandler:
         batch_sizes, accs = [], []
         with torch.no_grad():
             for X_test, y_test, in test_loader:
-                X_test.to(self.device)
-                y_test.to(self.device)
+                X_test = X_test.to(self.device)
+                y_test = y_test.to(self.device)
 
                 prediction = self.model(X_test)
                 batch_sizes.append(X_test.shape[0])
@@ -129,10 +163,10 @@ class ModelHandler:
                 prediction_classes = (prediction > 0.5).float() # This converts to binary classes 0 and 1
 
                 acc = torch.mean((prediction_classes == y_test).float()).item()
-                accuracy.append(acc)
+                accs.append(acc)
 
-        # Find average accuracy
-        accuracy = np.average(accs, weights=batch_sizes)
+        # Return average accuracy
+        return 0.0 if not accs else np.average(accs, weights=batch_sizes)
 
 
     def predict(self, spectrogram: torch.Tensor, model_name: str) -> int:
@@ -152,9 +186,9 @@ class ModelHandler:
 
             probability = torch.sigmoid(logits)
 
-            prediciton = (probability > 0.5).float() # Turn probability into binary classificaiton
+            prediction = (probability > 0.5).float() # Turn probability into binary classificaiton
 
-        return prediciton.item()
+        return prediction.item()
         
 
     def save_model(self, model_name: str | None) -> None:
@@ -185,10 +219,14 @@ if __name__ == "__main__":
     
     train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
     
-    model_handler = ModelHandler(model_path="ml/models")
+    cnn_model = CNNModel()
+    loss_function = nn.BCEWithLogitsLoss() # Binary Cross Entropy loss function with sigmoid layer applied
+    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.001) # Adam optimizer (Want to try SGD later)
+    
+    model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
 
     # Run training loop
-    model_handler.train(train_loader=train_loader, val_loader=val_loader, epochs=1, learning_rate=0.001)
+    model_handler.train(train_loader=train_loader, epochs=1, learning_rate=0.001)
     test_acc = model_handler.evaluate(test_loader)
     print(f"Test accuracy: {test_acc*100:.2f}%")
     # Run single inference
