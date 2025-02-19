@@ -11,6 +11,7 @@ Dependencies:
 
 import numpy as np
 import torch
+import collections
 
 from torch.utils.data import DataLoader
 
@@ -37,7 +38,7 @@ class ModelHandler:
         model_path: Path to where .plt models should be saved.
     """
     
-    def __init__(self, model, model_path: str | None, optimizer: torch.optim.Optimizer, loss_function: nn.Module):
+    def __init__(self, model, model_path: str, optimizer: torch.optim.Optimizer, loss_function: nn.Module):
         """Initializes the ModelHandler.
 
         Args:
@@ -49,68 +50,12 @@ class ModelHandler:
         self.optimizer = optimizer
         self.loss_function = loss_function
 
-    def train(self, train_loader, val_loader, epochs: int, learning_rate: float,  ) -> None:
+ 
+    def train(self, train_loader, epochs: int, learning_rate: float, model_name: str) -> None:
         """Trains the model.
 
         Args:
             train_loader: DataLoader for the training dataset.
-            val_loader: DataLoader for the validation dataset.
-            epochs (int): Number of training epochs.
-        """
-
-        self.model.to(self.device)
-
-        best_acc = -1
-        for epoch in range(epochs):
-            train_losses_epoch, val_losses_epoch = [], []
-
-            self.model.train()
-            for X_train, y_train, in train_loader:
-                X_train = X_train.to(self.device)
-                y_train = y_train.to(self.device)
-
-                y_train = y_train.float().unsqueeze(1) # Make sure we have correct shape for BCE loss
-                y_prediction_train = self.model(X_train)
-                
-                # need to calculate using loss function
-                loss = loss_function(y_prediction_train, y_train) 
-                train_losses_epoch.append(loss.item())
-
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-
-            train_acc = self.evaluate(train_loader)
-            train_loss = np.mean(train_losses_epoch)
-            print(f'Train accuracy: {train_acc*100:.2f}% | Training loss: {train_loss:.4f}')
-
-            self.model.eval()
-            with torch.no_grad():
-                for X_val, y_val, in val_loader:
-                    X_val = X_val.to(self.device)
-                    y_val = y_val.to(self.device)
-                    y_prediction_val = self.model(X_val)
-                    loss = loss_function(y_prediction_val, y_val)
-                    val_losses_epoch.append(loss.item())
-
-            val_acc = self.evaluate(val_loader)        
-            val_loss = np.mean(val_losses_epoch)
-            print(f'Validation accuracy: {val_acc*100:.2f}% | Validation loss: {val_loss:.4f}')
-
-            # Here we check weather we have the best model, and then save it if so
-            if val_acc > best_acc:
-                best_model_state = self.model.state_dict()
-                best_acc = val_acc
-        
-        self.model.load_state_dict(best_model_state)
-        self.save_model(best_model_state, path=f"{self.model_path}/model_LR:{learning_rate}_EPOCHS:{epochs}_{time.time()}.plt")
-        
-    def train_1(self, train_loader, epochs: int, learning_rate: float,  ) -> None:
-        """Trains the model.
-
-        Args:
-            train_loader: DataLoader for the training dataset.
-            val_loader: DataLoader for the validation dataset.
             epochs (int): Number of training epochs.
         """
 
@@ -139,8 +84,63 @@ class ModelHandler:
             train_loss = np.mean(train_losses_epoch)
             print(f'Train accuracy: {train_acc*100:.2f}% | Training loss: {train_loss:.4f}')
         
-        self.save_model(self.model.state_dict(), path=f"{self.model_path}/model_LR:{learning_rate}_EPOCHS:{epochs}_{time.time()}.pt")
+        self.save_model(model_state_dict=self.model.state_dict(), model_name=model_name)
 
+
+    def validate(self, val_loader, hyperparams: dict, save_best: bool = True) -> tuple[float, float]:
+        """Validates the model on the validation dataset.
+
+        Args:
+            val_loader: DataLoader for the validation dataset.
+
+        Returns:
+            tuple: (validation accuracy, validation loss)
+        """
+        
+        self.model.to(self.device)
+        self.model.eval() 
+
+        val_losses_epoch, batch_sizes, accs = [], [], []
+        best_acc = -1
+        best_model_state = None  # Track the best model weights
+
+        with torch.no_grad(): 
+            for X_val, y_val in val_loader:
+                X_val = X_val.to(self.device)
+                y_val = y_val.to(self.device).float().unsqueeze(1)  
+
+                y_prediction_val = self.model(X_val)  # forward pass
+                loss = self.loss_function(y_prediction_val, y_val) 
+                val_losses_epoch.append(loss.item())
+
+                # Compute accuracy
+                y_prediction_val = torch.sigmoid(y_prediction_val)  # Convert logits to probabilities
+                prediction_classes = (y_prediction_val > 0.5).float()  # Convert to binary 0/1
+
+                acc = torch.mean((prediction_classes == y_val).float()).item()
+                accs.append(acc)
+                batch_sizes.append(X_val.shape[0])
+
+        # Compute final validation loss and accuracy
+        val_loss = np.mean(val_losses_epoch)
+        val_acc = np.average(accs, weights=batch_sizes)  # Weighted average accuracy
+
+        print(f'Validation accuracy: {val_acc*100:.2f}% | Validation loss: {val_loss:.4f}')
+
+        if save_best and val_acc > best_acc:
+            best_acc = val_acc
+            best_model_state = self.model.state_dict()
+
+            # Create model filename using hyperparameters
+            hyperparam_str = "_".join(f"{key}:{value}" for key, value in hyperparams.items())
+            model_filename = f"model_{hyperparam_str}_{time.time()}.pth"
+
+            # Save the best model
+            save_path = os.path.join(self.model_path, model_filename)
+            torch.save(best_model_state, save_path)
+            print(f"Best model saved at: {save_path}")
+        return val_acc, val_loss
+    
 
     def evaluate(self, test_loader) -> float:
         """Evaluates the model on the test dataset.
@@ -191,14 +191,14 @@ class ModelHandler:
         return prediction.item()
         
 
-    def save_model(self, model_name: str | None) -> None:
+    def save_model(self, model_state_dict: collections.OrderedDict, model_name: str | None) -> None:
         """Saves the model to the specified file path.
 
         Args:
             path (str): Path to save the model file.
         """
         path = self.model_path + "/" + model_name
-        torch.save(self.state_dict(), path)
+        torch.save(model_state_dict, path)
 
 
     def load_model(self, path: str) -> None:
@@ -226,7 +226,22 @@ if __name__ == "__main__":
     model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
 
     # Run training loop
-    model_handler.train(train_loader=train_loader, epochs=1, learning_rate=0.001)
+    model_handler.train(train_loader=train_loader, epochs=1, learning_rate=0.001, model_name="gabe_cnn_model")
+    
+    # Validation
+    hyperparameter_options = [
+        {"learning_rate": 0.001, "dropout": 0.3},
+        {"learning_rate": 0.0005, "dropout": 0.2},
+        {"learning_rate": 0.0001, "dropout": 0.5},
+    ]
+
+    for hyperparams in hyperparameter_options:
+        print(f"Validating model with hyperparameters: {hyperparams}")
+        best_acc, best_loss = model_handler.validate(val_loader, hyperparams)
+        print(f"Finished: Best Accuracy = {best_acc:.4f}, Best Loss = {best_loss:.4f}\n")
+
+    
+    # Testing
     test_acc = model_handler.evaluate(test_loader)
     print(f"Test accuracy: {test_acc*100:.2f}%")
     # Run single inference
