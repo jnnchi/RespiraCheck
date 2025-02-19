@@ -12,10 +12,21 @@ Dependencies:
 import numpy as np
 import torch
 
+from torch.utils.data import DataLoader
+
 import torch.nn as nn
 from cnn_model import CNNModel
 
 import time
+
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from data_processing.audio_processor import AudioProcessor 
+from data_processing.spectrogram_processor import SpectrogramProcessor
+from data_processing.data_pipeline import DataPipeline
+
 
 class ModelHandler:
     """Handles the model training, evaluation, and inference pipeline.
@@ -30,9 +41,9 @@ class ModelHandler:
         """Initializes the ModelHandler.
 
         Args:
-            model_path (Optional[str]): Path to the pre-trained model file (if available).
+            model_path (str | None): Path to the pre-trained model file (if available).
         """
-        self.model = CNNModel()
+        self.model = CNNModel(input_folder="ml/data/cough_data/spectrograms", output_folder="ml/models")
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model_path = model_path
 
@@ -165,3 +176,19 @@ class ModelHandler:
         self.model.load_state_dict(torch.load(path))
         self.model.to(self.device)
         self.model.eval()
+
+if __name__ == "__main__":
+    # Run training loop
+    audioproc = AudioProcessor()
+    spectroproc = SpectrogramProcessor()
+    datapipline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproc, spectrogram_processor=spectroproc, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
+    
+    train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
+    
+    model_handler = ModelHandler(model_path="ml/models")
+
+    # Run training loop
+    model_handler.train(train_loader=train_loader, val_loader=val_loader, epochs=1, learning_rate=0.001)
+    test_acc = model_handler.evaluate(test_loader)
+    print(f"Test accuracy: {test_acc*100:.2f}%")
+    # Run single inference
