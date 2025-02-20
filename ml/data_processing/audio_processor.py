@@ -122,6 +122,29 @@ class AudioProcessor:
     
         return 0
 
+    def process_single_audio_for_inference(self, audio: AudioSegment) -> AudioSegment:
+        """Processes a single audio file."""
+
+        # remove sections of no coughs
+        audio = self.remove_no_cough(audio)
+        if not audio:
+            print("No cough detected. Skipping.")
+            return 1
+        
+        # remove silences (may pass in non_silent_chunks into remove_silences)
+        audio = self.remove_silences(audio)
+        if not audio:
+            print("Clip is silent. Skipping.")
+            return 1
+
+        # reduce noise
+        audio = self.reduce_noise(audio)
+
+        audio = self.standardize_duration(audio)
+
+        return audio
+    
+
     def save_metadata(self, audio_path, filename) -> None:
         """
         Saves metadata for the processed audio file.

@@ -16,3 +16,6 @@ class ImageProcessor(ABC):
     def process_all_images(self):
         pass  
     
+    @abstractmethod
+    def process_single_image_for_inference(self):
+        pass

@@ -16,14 +16,14 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from .image_processor import ImageProcessor
-
+from pydub import AudioSegment
 
 class ExtractedFeaturesProcessor(ImageProcessor):
     def __init__(self, audio_folder="ml/data/cough_data/processed_audio", output_folder="ml/data/cough_data/", feature_type="fbank"):
         super().__init__(audio_folder, output_folder)
         self.feature_type = feature_type.lower()
         self.output_folder = os.path.join(output_folder, self.feature_type)
-
+    
     def process_all_images(self) -> None:
         """
         Iterates through all audios in input folder, saves image to output folder 
@@ -120,6 +120,8 @@ class ExtractedFeaturesProcessor(ImageProcessor):
         fbank_features = np.where(
             fbank_features == 0, np.finfo(float).eps, fbank_features
         )
+        # log scaling - makes differences more apparent
+        fbank_features = librosa.power_to_db(fbank_features, ref=np.max)
 
         return fbank_features
 
