@@ -118,7 +118,7 @@ class ModelHandler:
                 val_losses_epoch.append(loss.item())
 
                 # Compute accuracy
-                y_prediction_val = torch.sigmoid(y_prediction_val)  # Convert logits to probabilities
+                y_prediction_val = torch.sigmoid(self.model(X_val))
                 prediction_classes = (y_prediction_val > 0.5).float()  # Convert to binary 0/1
 
                 acc = torch.mean((prediction_classes == y_val).float()).item()
@@ -158,7 +158,7 @@ class ModelHandler:
         with torch.no_grad():
             for X_test, y_test, in test_loader:
                 X_test = X_test.to(self.device)
-                y_test = y_test.to(self.device)
+                y_test = y_test.to(self.device).float().unsqueeze(1)
 
                 prediction = self.model(X_test)
                 batch_sizes.append(X_test.shape[0])
@@ -217,17 +217,16 @@ class ModelHandler:
 
 if __name__ == "__main__":
 
-
     audioproccessor = AudioProcessor()
     spectroproccessor = SpectrogramProcessor()
-    datapipline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
+    datapipline = DataPipeline(test_size=0.10, val_size=0.10, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
     
     
-    cnn_model = CNNModel()
+    cnn_model = CNNModel(dropout=0.3)
     loss_function = nn.BCEWithLogitsLoss()
 
-    # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=0.01, momentum=0.9) ###SDG
-    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
+    optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=0.005, momentum=0.9) ###SDG
+    # optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.002, weight_decay=1e-4) ### ADAM
 
     model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
 
@@ -243,17 +242,17 @@ if __name__ == "__main__":
 
     # Hyperparameters for validation
     hyperparameter_options = [
-        {"learning_rate": 0.01},
-        {"learning_rate": 0.001},
-        {"learning_rate": 0.0001}
+        {"learning_rate": 0.001, "dropout" : 0.2},
+        {"learning_rate": 0.0005, "dropout" : 0.3},
+        {"learning_rate": 0.0001, "dropout" : 0.4}
     ]
 
     for hyperparams in hyperparameter_options:
         print(f"Validating model with hyperparameters: {hyperparams}")
 
-        cnn_model = CNNModel()
-        # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=hyperparams["learning_rate"], momentum=0.9) ###SDG
-        optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
+        cnn_model = CNNModel(dropout=hyperparams["dropout"])
+        optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=hyperparams["learning_rate"], momentum=0.9) ###SDG
+        # optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=hyperparams["learning_rate"], weight_decay=1e-4) ### ADAM
 
         # Create new ModelHandler for each hyperparameter set
         model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
