@@ -12,12 +12,12 @@ audio_proc = AudioProcessor()
 #audio_proc.process_all_audio()
 
 spectroproc = SpectrogramProcessor(stft=False)
-#spectroproc.process_all_images()
+spectroproc.process_all_images()
 
 extractproc = ExtractedFeaturesProcessor(feature_type="fbank")
-#extractproc.process_all_images()
+extractproc.process_all_images()
 
 datapipe = DataPipeline(test_size=0.2, val_size=0.3, audio_processor=audio_proc, image_processor=spectroproc)
-datapipe.process_all()
+#datapipe.process_all()
 
-train_loader, val_loader, test_loader = datapipe.create_dataloaders(batch_size=32)
+#train_loader, val_loader, test_loader = datapipe.create_dataloaders(batch_size=32)
