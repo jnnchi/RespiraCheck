@@ -2,15 +2,16 @@ import librosa
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from .image_processor import ImageProcessor
 
 
-class ExtractedFeaturesProcessor:
+class ExtractedFeaturesProcessor(ImageProcessor):
     def __init__(self, audio_folder="ml/data/cough_data/processed_audio", output_folder="ml/data/cough_data/", feature_type="fbank"):
-        self.audio_folder = audio_folder
+        super().__init__(audio_folder, output_folder)
         self.feature_type = feature_type.lower()
         self.output_folder = os.path.join(output_folder, self.feature_type)
 
-    def process_all_extracted_features(self):
+    def process_all_images(self):
         for label in ["positive", "negative"]: 
             audio_dir = os.path.join(self.audio_folder, label)  
             output_dir = os.path.join(self.output_folder, label)

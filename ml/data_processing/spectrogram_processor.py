@@ -18,8 +18,9 @@ import numpy as np
 import librosa
 import os
 import matplotlib.pyplot as plt
+from .image_processor import ImageProcessor
 
-class SpectrogramProcessor:
+class SpectrogramProcessor(ImageProcessor):
     """Processes and extracts features from audio spectrograms.
 
     This class provides methods for converting audio files to spectrograms, 
@@ -32,17 +33,16 @@ class SpectrogramProcessor:
         extracted_spectrograms (dict): Dictionary mapping filenames to their extracted spectrograms (as numpy arrays).
     """
 
-    def __init__(self, audio_folder="ml/data/cough_data/processed_audio", spectrograms_folder="ml/data/cough_data/spectrograms"):
+    def __init__(self, audio_folder="ml/data/cough_data/processed_audio", output_folder="ml/data/cough_data/spectrograms"):
         """Initializes the SpectrogramProcessor.
 
         Args:
             audio_folder (str): Path to the directory with processed audio files in wav
             features_filepath (str): Path to the directory where extracted features will be saved.
         """
-        self.audio_folder = audio_folder # directory containing processed audio files
-        self.spectrograms_folder = spectrograms_folder 
+        super().__init__(audio_folder, output_folder)
 
-    def process_all_spectrograms(self) -> None:
+    def process_all_images(self) -> None:
         """Processes all spectrograms in the given directory and saves them as images.
 
         Note: This assumes that all processed audio files are in WAV format
@@ -50,7 +50,7 @@ class SpectrogramProcessor:
         """
         for label in ["positive", "negative"]: 
             audio_dir = os.path.join(self.audio_folder, label)  # Full path to the labeled folder
-            spectrogram_dir = os.path.join(self.spectrograms_folder, label)  # Path to save spectrogram
+            spectrogram_dir = os.path.join(self.output_folder, label)  # Path to save spectrogram
 
             # Make spectrogram folder if it doesn't exist
             os.makedirs(spectrogram_dir, exist_ok=True)
@@ -134,14 +134,6 @@ class SpectrogramProcessor:
 
         return spectrogram_norm
 
-    def extract_features(self, audio_path: str, extracted_features: dict) -> None:
-        """Extracts features from a given audio file's spectrogram.
-
-        Args:
-            audio_path (str): Path to the audio file.
-            extracted_features (dict): A dictionary mapping filename to features that were extracted.
-        """
-        pass
 
     def apply_stft(self, audio_path: str) -> np.ndarray:
       """Applies STFT Filter with a Hanning Window to a Audio File
