@@ -120,6 +120,8 @@ class ExtractedFeaturesProcessor(ImageProcessor):
         fbank_features = np.where(
             fbank_features == 0, np.finfo(float).eps, fbank_features
         )
+        # log scaling - makes differences more apparent
+        fbank_features = librosa.power_to_db(fbank_features, ref=np.max)
 
         return fbank_features
 
