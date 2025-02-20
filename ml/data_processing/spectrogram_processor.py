@@ -33,7 +33,7 @@ class SpectrogramProcessor(ImageProcessor):
         extracted_spectrograms (dict): Dictionary mapping filenames to their extracted spectrograms (as numpy arrays).
     """
 
-    def __init__(self, audio_folder="ml/data/cough_data/processed_audio", output_folder="ml/data/cough_data/spectrograms"):
+    def __init__(self, stft=False, audio_folder="ml/data/cough_data/processed_audio", output_folder="ml/data/cough_data/spectrograms"):
         """Initializes the SpectrogramProcessor.
 
         Args:
@@ -41,6 +41,7 @@ class SpectrogramProcessor(ImageProcessor):
             features_filepath (str): Path to the directory where extracted features will be saved.
         """
         super().__init__(audio_folder, output_folder)
+        self.stft = stft
 
     def process_all_images(self) -> None:
         """Processes all spectrograms in the given directory and saves them as images.
@@ -64,6 +65,7 @@ class SpectrogramProcessor(ImageProcessor):
 
                     # Save spectrogram image to the spectrogram folder
                     spectrogram_path = os.path.join(spectrogram_dir, filename.replace(".wav", ".png"))
+                    
                     self.save_spectrogram_image(spectrogram, spectrogram_path)
 
     def save_spectrogram_image(self, spectrogram: np.ndarray, save_path: str) -> None:
@@ -93,10 +95,14 @@ class SpectrogramProcessor(ImageProcessor):
             np.ndarray: The generated spectrogram as a numpy array.
         """
         # Create spectrogram using helper function
-        spectrogram = self.conv_to_spectrogram(audio_path)
+        if self.stft:
+            spectrogram = self.apply_stft(audio_path)
+        else:
+            spectrogram = self.conv_to_spectrogram(audio_path)
 
         # Normalize generated spectrogram using helper function
         spectrogram_norm = self.normalize_spectrogram(spectrogram)
+
 
         return spectrogram_norm
 
@@ -142,7 +148,7 @@ class SpectrogramProcessor(ImageProcessor):
         audio_path (str): Path to the audio file
 
       Returns:
-        np.ndarray: Features exxtracted by STFT on Audio   
+        np.ndarray: Features extracted by STFT on Audio   
       """
       # Reference Code: https://importchris.medium.com/how-to-create-understand-mel-spectrograms-ff7634991056
       # Load the audio file with original sample rate
