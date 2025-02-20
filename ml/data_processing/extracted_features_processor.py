@@ -23,6 +23,12 @@ class ExtractedFeaturesProcessor(ImageProcessor):
         super().__init__(audio_folder, output_folder)
         self.feature_type = feature_type.lower()
         self.output_folder = os.path.join(output_folder, self.feature_type)
+
+    def process_single_image_for_inference(self):
+        """
+        to be implemented
+        """
+        return None
     
     def process_all_images(self) -> None:
         """
