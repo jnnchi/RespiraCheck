@@ -10,18 +10,17 @@ Dependencies:
 """
 
 import numpy as np
-import torch
 import collections
-
-from torch.utils.data import DataLoader
-
-import torch.nn as nn
-from cnn_model import CNNModel
-
 import time
-
 import sys
 import os
+
+import torch
+from torch.utils.data import DataLoader
+import torch.nn as nn
+
+from cnn_model import CNNModel
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from data_processing.audio_processor import AudioProcessor 
@@ -51,40 +50,45 @@ class ModelHandler:
         self.loss_function = loss_function
 
  
-    def train(self, train_loader, epochs: int, learning_rate: float, model_name: str) -> None:
-        """Trains the model.
+    import numpy as np
+
+    def train(self, train_loader, epochs: int, model_name: str) -> None:
+        """Trains the model
 
         Args:
             train_loader: DataLoader for the training dataset.
             epochs (int): Number of training epochs.
+            model_name (str): Name to save the trained model.
         """
 
         self.model.to(self.device)
 
-        for _ in range(epochs):
+        for epoch in range(epochs):
             train_losses_epoch = []
 
             self.model.train()
-            for X_train, y_train, in train_loader:
+            for X_train, y_train in train_loader:
                 X_train = X_train.to(self.device)
                 y_train = y_train.to(self.device)
 
-                y_train = y_train.float().unsqueeze(1) # Make sure we have correct shape for BCE loss
+                y_train = y_train.float().unsqueeze(1)  # Ensure correct shape for BCE loss
                 y_prediction_train = self.model(X_train)
                 
-                # need to calculate using loss function
-                loss = loss_function(y_prediction_train, y_train) 
+                # Compute loss
+                loss = self.loss_function(y_prediction_train, y_train) 
                 train_losses_epoch.append(loss.item())
 
-                optimizer.zero_grad()
+                self.optimizer.zero_grad()
                 loss.backward()
-                optimizer.step()
+                self.optimizer.step()
 
+            # Evaluate model after each epoch
             train_acc = self.evaluate(train_loader)
             train_loss = np.mean(train_losses_epoch)
-            print(f'Train accuracy: {train_acc*100:.2f}% | Training loss: {train_loss:.4f}')
+            print(f'Epoch {epoch+1}/{epochs} - Train Accuracy: {train_acc*100:.2f}% | Training Loss: {train_loss:.4f} | LR: {self.optimizer.param_groups[0]["lr"]:.6f}')
         
         self.save_model(model_state_dict=self.model.state_dict(), model_name=model_name)
+
 
 
     def validate(self, val_loader, hyperparams: dict, save_best: bool = True) -> tuple[float, float]:
@@ -212,36 +216,59 @@ class ModelHandler:
         self.model.eval()
 
 if __name__ == "__main__":
-    # Run training loop
-    audioproc = AudioProcessor()
-    spectroproc = SpectrogramProcessor()
-    datapipline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproc, spectrogram_processor=spectroproc, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
+
+
+    audioproccessor = AudioProcessor()
+    spectroproccessor = SpectrogramProcessor()
+    datapipline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
     
-    train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
     
     cnn_model = CNNModel()
-    loss_function = nn.BCEWithLogitsLoss() # Binary Cross Entropy loss function with sigmoid layer applied
-    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.001) # Adam optimizer (Want to try SGD later)
-    
+    loss_function = nn.BCEWithLogitsLoss()
+
+    # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=0.01, momentum=0.9) ###SDG
+    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
+
     model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
 
-    # Run training loop
-    model_handler.train(train_loader=train_loader, epochs=1, learning_rate=0.001, model_name="gabe_cnn_model")
-    
-    # Validation
+    train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
+
+    # Train the model
+    epochs = 1
+
+    model_handler.train(train_loader=train_loader, epochs=epochs, model_name="g1_model")
+
+    best_model = None
+    best_acc = 0.0
+
+    # Hyperparameters for validation
     hyperparameter_options = [
-        {"learning_rate": 0.001, "dropout": 0.3},
-        {"learning_rate": 0.0005, "dropout": 0.2},
-        {"learning_rate": 0.0001, "dropout": 0.5},
+        {"learning_rate": 0.01},
+        {"learning_rate": 0.001},
+        {"learning_rate": 0.0001}
     ]
 
     for hyperparams in hyperparameter_options:
         print(f"Validating model with hyperparameters: {hyperparams}")
-        best_acc, best_loss = model_handler.validate(val_loader, hyperparams)
-        print(f"Finished: Best Accuracy = {best_acc:.4f}, Best Loss = {best_loss:.4f}\n")
 
-    
-    # Testing
-    test_acc = model_handler.evaluate(test_loader)
-    print(f"Test accuracy: {test_acc*100:.2f}%")
-    # Run single inference
+        cnn_model = CNNModel()
+        # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=hyperparams["learning_rate"], momentum=0.9) ###SDG
+        optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
+
+        # Create new ModelHandler for each hyperparameter set
+        model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
+        
+        # Perform validation
+        val_acc, val_loss = model_handler.validate(val_loader, hyperparams)
+
+        # Save the best model based on accuracy
+        if val_acc > best_acc:
+            best_acc = val_acc
+            best_model = model_handler
+
+        print(f"Validation accuracy: {val_acc*100:.2f}% | Validation loss: {val_loss:.4f}")
+
+    # Final testing with the best model
+    if best_model:
+        test_acc = best_model.evaluate(test_loader)
+        print(f"Test accuracy: {test_acc*100:.2f}%. Awesome!")
