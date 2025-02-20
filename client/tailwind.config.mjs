@@ -11,7 +11,12 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        spartan: ['Spartan', 'sans-serif'],
+      },
     },
   },
   plugins: [],
+
+  
 };
