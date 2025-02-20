@@ -10,12 +10,23 @@ Dependencies:
 """
 
 import numpy as np
-import torch
+import collections
+import time
+import sys
+import os
 
+import torch
+from torch.utils.data import DataLoader
 import torch.nn as nn
+
 from cnn_model import CNNModel
 
-import time
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from data_processing.audio_processor import AudioProcessor 
+from data_processing.spectrogram_processor import SpectrogramProcessor
+from data_processing.data_pipeline import DataPipeline
+
 
 class ModelHandler:
     """Handles the model training, evaluation, and inference pipeline.
@@ -26,78 +37,116 @@ class ModelHandler:
         model_path: Path to where .plt models should be saved.
     """
     
-    def __init__(self, model_path: str | None):
+    def __init__(self, model, model_path: str, optimizer: torch.optim.Optimizer, loss_function: nn.Module):
         """Initializes the ModelHandler.
 
         Args:
-            model_path (Optional[str]): Path to the pre-trained model file (if available).
+            model_path (str | None): Path to the pre-trained model file (if available).
         """
-        self.model = CNNModel()
+        self.model = model
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model_path = model_path
+        self.optimizer = optimizer
+        self.loss_function = loss_function
 
-    def train(self, train_loader, val_loader, epochs: int, learning_rate: float,  ) -> None:
-        """Trains the model.
+ 
+    import numpy as np
+
+    def train(self, train_loader, epochs: int, model_name: str) -> None:
+        """Trains the model
 
         Args:
             train_loader: DataLoader for the training dataset.
-            val_loader: DataLoader for the validation dataset.
             epochs (int): Number of training epochs.
+            model_name (str): Name to save the trained model.
         """
 
         self.model.to(self.device)
 
-        # Initalize Optimizer
-        loss_function = nn.BCEWithLogitsLoss() # Binary Cross Entropy loss function with sigmoid layer applied
-        optimizer = torch.optim.Adam(params=self.model.parameters(), lr=learning_rate, ) # Adam optimizer (Want to try SGD later)
-
-
-        best_acc = -1
         for epoch in range(epochs):
-            train_losses_epoch, val_losses_epoch = [], []
+            train_losses_epoch = []
 
             self.model.train()
-            for X_train, y_train, in train_loader:
+            for X_train, y_train in train_loader:
                 X_train = X_train.to(self.device)
                 y_train = y_train.to(self.device)
 
-                y_train = y_train.float().unsqueeze(1) # Make sure we have correct shape for BCE loss
+                y_train = y_train.float().unsqueeze(1)  # Ensure correct shape for BCE loss
                 y_prediction_train = self.model(X_train)
                 
-                loss = (y_prediction_train, y_train)
+                # Compute loss
+                loss = self.loss_function(y_prediction_train, y_train) 
                 train_losses_epoch.append(loss.item())
 
-                optimizer.zero_grad()
+                self.optimizer.zero_grad()
                 loss.backward()
-                optimizer.step()
+                self.optimizer.step()
 
-            train_acc = self.evaluate(self.model, train_loader)
+            # Evaluate model after each epoch
+            train_acc = self.evaluate(train_loader)
             train_loss = np.mean(train_losses_epoch)
-            print(f'Train accuracy: {train_acc*100:.2f}% | Training loss: {train_loss:.4f}')
-
-            self.model.eval()
-            with torch.no_grad():
-                for X_val, y_val, in val_loader:
-                    X_val = X_val.to(self.device)
-                    y_val = y_val.to(self.device)
-                    y_prediction_val = self.model(X_val)
-                    loss = loss_function(y_prediction_val, y_val)
-                    val_losses_epoch.append(loss.item())
-
-            val_acc = self.evaluate(self.model, train_loader)        
-            val_loss = np.mean(val_losses_epoch)
-            print(f'Validation accuracy: {val_acc*100:.2f}% | Validation loss: {val_loss:.4f}')
-
-            # Here we check weather we have the best model, and then save it if so
-            if val_acc > best_acc:
-                best_model_state = self.model.state_dict()
-                best_acc = val_acc
+            print(f'Epoch {epoch+1}/{epochs} - Train Accuracy: {train_acc*100:.2f}% | Training Loss: {train_loss:.4f} | LR: {self.optimizer.param_groups[0]["lr"]:.6f}')
         
-        self.model.load_state_dict(best_model_state)
-        self.save_model(best_model_state, path=f"{self.model_path}/model_LR:{learning_rate}_EPOCHS:{epochs}_{time.time()}.plt")
-        
+        self.save_model(model_state_dict=self.model.state_dict(), model_name=model_name)
 
-    def evaluate(self, test_loader) -> None:
+
+
+    def validate(self, val_loader, hyperparams: dict, save_best: bool = True) -> tuple[float, float]:
+        """Validates the model on the validation dataset.
+
+        Args:
+            val_loader: DataLoader for the validation dataset.
+
+        Returns:
+            tuple: (validation accuracy, validation loss)
+        """
+        
+        self.model.to(self.device)
+        self.model.eval() 
+
+        val_losses_epoch, batch_sizes, accs = [], [], []
+        best_acc = -1
+        best_model_state = None  # Track the best model weights
+
+        with torch.no_grad(): 
+            for X_val, y_val in val_loader:
+                X_val = X_val.to(self.device)
+                y_val = y_val.to(self.device).float().unsqueeze(1)  
+
+                y_prediction_val = self.model(X_val)  # forward pass
+                loss = self.loss_function(y_prediction_val, y_val) 
+                val_losses_epoch.append(loss.item())
+
+                # Compute accuracy
+                y_prediction_val = torch.sigmoid(y_prediction_val)  # Convert logits to probabilities
+                prediction_classes = (y_prediction_val > 0.5).float()  # Convert to binary 0/1
+
+                acc = torch.mean((prediction_classes == y_val).float()).item()
+                accs.append(acc)
+                batch_sizes.append(X_val.shape[0])
+
+        # Compute final validation loss and accuracy
+        val_loss = np.mean(val_losses_epoch)
+        val_acc = np.average(accs, weights=batch_sizes)  # Weighted average accuracy
+
+        print(f'Validation accuracy: {val_acc*100:.2f}% | Validation loss: {val_loss:.4f}')
+
+        if save_best and val_acc > best_acc:
+            best_acc = val_acc
+            best_model_state = self.model.state_dict()
+
+            # Create model filename using hyperparameters
+            hyperparam_str = "_".join(f"{key}:{value}" for key, value in hyperparams.items())
+            model_filename = f"model_{hyperparam_str}_{time.time()}.pth"
+
+            # Save the best model
+            save_path = os.path.join(self.model_path, model_filename)
+            torch.save(best_model_state, save_path)
+            print(f"Best model saved at: {save_path}")
+        return val_acc, val_loss
+    
+
+    def evaluate(self, test_loader) -> float:
         """Evaluates the model on the test dataset.
 
         Args:
@@ -108,8 +157,8 @@ class ModelHandler:
         batch_sizes, accs = [], []
         with torch.no_grad():
             for X_test, y_test, in test_loader:
-                X_test.to(self.device)
-                y_test.to(self.device)
+                X_test = X_test.to(self.device)
+                y_test = y_test.to(self.device)
 
                 prediction = self.model(X_test)
                 batch_sizes.append(X_test.shape[0])
@@ -118,10 +167,10 @@ class ModelHandler:
                 prediction_classes = (prediction > 0.5).float() # This converts to binary classes 0 and 1
 
                 acc = torch.mean((prediction_classes == y_test).float()).item()
-                accuracy.append(acc)
+                accs.append(acc)
 
-        # Find average accuracy
-        accuracy = np.average(accs, weights=batch_sizes)
+        # Return average accuracy
+        return 0.0 if not accs else np.average(accs, weights=batch_sizes)
 
 
     def predict(self, spectrogram: torch.Tensor, model_name: str) -> int:
@@ -141,19 +190,19 @@ class ModelHandler:
 
             probability = torch.sigmoid(logits)
 
-            prediciton = (probability > 0.5).float() # Turn probability into binary classificaiton
+            prediction = (probability > 0.5).float() # Turn probability into binary classificaiton
 
-        return prediciton.item()
+        return prediction.item()
         
 
-    def save_model(self, model_name: str | None) -> None:
+    def save_model(self, model_state_dict: collections.OrderedDict, model_name: str | None) -> None:
         """Saves the model to the specified file path.
 
         Args:
             path (str): Path to save the model file.
         """
         path = self.model_path + "/" + model_name
-        torch.save(self.state_dict(), path)
+        torch.save(model_state_dict, path)
 
 
     def load_model(self, path: str) -> None:
@@ -165,3 +214,61 @@ class ModelHandler:
         self.model.load_state_dict(torch.load(path))
         self.model.to(self.device)
         self.model.eval()
+
+if __name__ == "__main__":
+
+
+    audioproccessor = AudioProcessor()
+    spectroproccessor = SpectrogramProcessor()
+    datapipline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
+    
+    
+    cnn_model = CNNModel()
+    loss_function = nn.BCEWithLogitsLoss()
+
+    # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=0.01, momentum=0.9) ###SDG
+    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
+
+    model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
+
+    train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
+
+    # Train the model
+    epochs = 1
+
+    model_handler.train(train_loader=train_loader, epochs=epochs, model_name="g1_model")
+
+    best_model = None
+    best_acc = 0.0
+
+    # Hyperparameters for validation
+    hyperparameter_options = [
+        {"learning_rate": 0.01},
+        {"learning_rate": 0.001},
+        {"learning_rate": 0.0001}
+    ]
+
+    for hyperparams in hyperparameter_options:
+        print(f"Validating model with hyperparameters: {hyperparams}")
+
+        cnn_model = CNNModel()
+        # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=hyperparams["learning_rate"], momentum=0.9) ###SDG
+        optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
+
+        # Create new ModelHandler for each hyperparameter set
+        model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
+        
+        # Perform validation
+        val_acc, val_loss = model_handler.validate(val_loader, hyperparams)
+
+        # Save the best model based on accuracy
+        if val_acc > best_acc:
+            best_acc = val_acc
+            best_model = model_handler
+
+        print(f"Validation accuracy: {val_acc*100:.2f}% | Validation loss: {val_loss:.4f}")
+
+    # Final testing with the best model
+    if best_model:
+        test_acc = best_model.evaluate(test_loader)
+        print(f"Test accuracy: {test_acc*100:.2f}%. Awesome!")
