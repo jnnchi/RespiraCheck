@@ -32,7 +32,7 @@ class SpectrogramProcessor:
         extracted_spectrograms (dict): Dictionary mapping filenames to their extracted spectrograms (as numpy arrays).
     """
 
-    def __init__(self, metadata_filepath=None, audio_folder="ml/data/cough_data/processed_audio", spectrograms_folder="ml/data/cough_data/spectrograms"):
+    def __init__(self, audio_folder="ml/data/cough_data/processed_audio", spectrograms_folder="ml/data/cough_data/spectrograms"):
         """Initializes the SpectrogramProcessor.
 
         Args:
@@ -41,8 +41,6 @@ class SpectrogramProcessor:
         """
         self.audio_folder = audio_folder # directory containing processed audio files
         self.spectrograms_folder = spectrograms_folder 
-        self.metadata_filepath = metadata_filepath # path to store extracted features from spectrograms
-        # os.makedirs(self.features_filepath, exist_ok=True) # create directory in case it does not exist
 
     def process_all_spectrograms(self) -> None:
         """Processes all spectrograms in the given directory and saves them as images.
