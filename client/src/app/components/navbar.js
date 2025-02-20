@@ -1,11 +1,17 @@
 "use client";
 
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+
 import { Box, Typography } from "@mui/material";
 import React from "react";
 import Image from "next/image";
 
+import { usePathname } from "next/navigation";
+
 const Navbar = () => {
+
+  const pathname = usePathname();
+
   return (
     <Box
       sx={{
@@ -25,12 +31,11 @@ const Navbar = () => {
           <Typography
             sx={{
               fontSize: "25px",
-              color: "black",
               lineHeight: "52.5px",
             }}
           >
-            <Link to="/home" style={{ textDecoration: "none", color: "black" }}>
-              Home
+            <Link href="/pages/home"> 
+              <span style={{ textDecoration: "none", color: pathname === "/pages/home" ? "#3D70EC" : "black" }}>Home</span>
             </Link>
             
           </Typography>
@@ -38,12 +43,11 @@ const Navbar = () => {
           <Typography
             sx={{
               fontSize: "25px",
-              color: "black",
               lineHeight: "52.5px",
             }}
           >
-            <Link to="/info" style={{ textDecoration: "none", color: "black" }}>
-              Info
+            <Link href="/pages/about"> 
+              <span style={{ textDecoration: "none", color: pathname === "/pages/about" ? "#3D70EC" : "black" }}>About</span>
             </Link>
             
           </Typography>
@@ -51,12 +55,11 @@ const Navbar = () => {
           <Typography
             sx={{
               fontSize: "25px",
-              color: "#3d70ec",
               lineHeight: "52.5px",
             }}
-          >
-            <Link to="/action" style={{ textDecoration: "none", color: "black" }}>
-              RespiraChecker
+          > 
+            <Link href="/pages/use-the-tool"> 
+              <span style={{ textDecoration: "underline", color: pathname === "/pages/use-the-tool" ? "#3D70EC" : "black" }}>Use The Tool</span>
             </Link>
             
           </Typography>
