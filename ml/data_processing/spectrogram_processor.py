@@ -3,15 +3,6 @@ Spectrogram Processing Module.
 
 This module provides the `SpectrogramProcessor` class for converting audio files 
 into spectrograms, normalizing them, and extracting features.
-
-Dependencies:
-    - librosa
-    - numpy
-    - ffmpeg
-    - matplotlib.pyplot
-
-TODO:
-    - Implement all methods to handle creation of spectrograms.
 """
 
 import numpy as np

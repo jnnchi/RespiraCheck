@@ -1,3 +1,16 @@
+"""
+ExtractedFeaturesProcessor class
+
+Inherits from abstract ImageProcessor
+
+Given input folder: 
+ml/data/cough_data/processed_audio/positive or negative,
+
+This class generates folders of extracted FBANK or MFCC images, default output folders are:
+ml/data/cough_data/positive or negative/fbank
+ml/data/cough_data/positive or negative/mfcc
+"""
+
 import librosa
 import numpy as np
 import os
@@ -11,7 +24,10 @@ class ExtractedFeaturesProcessor(ImageProcessor):
         self.feature_type = feature_type.lower()
         self.output_folder = os.path.join(output_folder, self.feature_type)
 
-    def process_all_images(self):
+    def process_all_images(self) -> None:
+        """
+        Iterates through all audios in input folder, saves image to output folder 
+        """
         for label in ["positive", "negative"]: 
             audio_dir = os.path.join(self.audio_folder, label)  
             output_dir = os.path.join(self.output_folder, label)

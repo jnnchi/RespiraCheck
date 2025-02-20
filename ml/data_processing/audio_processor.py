@@ -3,12 +3,6 @@
 This module provides the `AudioProcessor` class for processing audio files,
 including noise reduction, silence removal, and format conversion.
 
-Dependencies:
-    - pandas
-    - pydub
-
-TODO: - Implement audio processing logic.
-      - Include error handling for file operations.
 """
 
 import os
@@ -19,11 +13,8 @@ import noisereduce as nr
 from pydub.silence import detect_nonsilent
 import librosa
 import librosa.display
-from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
 
 import json
-import shutil
 
 
 class AudioProcessor:
