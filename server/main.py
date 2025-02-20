@@ -28,7 +28,8 @@ async def upload_audio(file: UploadFile = File(...)):
 
     # Call inference function
     data_pipeline = DataPipeline()
-    model_pipeline = ModelPipeline()
+    model_handler = ModelHandler()
+    model_pipeline = ModelPipeline(data_pipeline, model_handler)
     model_pipeline.make_single_inference(audio)
 
     return {"filename": file.filename, "format": file_format}

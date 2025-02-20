@@ -37,7 +37,7 @@ class ModelPipeline:
         self.model_handler = model_handler
         self.model_path = model_path
 
-    def make_single_inference(self, audio: AudioSegment) -> str:
+    def make_single_inference(self, audio_bytes: bytes, model_name: str) -> str:
         """Performs inference on a single audio file.
 
         Args:
@@ -46,4 +46,7 @@ class ModelPipeline:
         Returns:
             str: The final classification result.
         """
-        pass
+        image_tensor = self.data_pipeline.process_single_for_inference(audio_bytes)
+
+        # todo
+        self.model_handler.predict(image_tensor, model_name)

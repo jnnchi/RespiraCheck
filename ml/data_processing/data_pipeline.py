@@ -122,19 +122,8 @@ class DataPipeline:
         # Apply transformations
         image_tensor = transform(image)  # Shape: (1, 3, 224, 224)
         image_tensor = image_tensor.unsqueeze(0)  # Add batch dimension → (1, 3, 224, 224)
-
-        # Move tensor to the correct device
-        image_tensor = image_tensor.to(self.model.device)
-
-        # Pass through the model to get predictions
-        self.model.eval()
-        with torch.no_grad():
-            prediction = self.model(image_tensor)  # Forward pass
-
-        # Convert logits to probability using sigmoid (since BCEWithLogitsLoss was used)
-        probability = torch.sigmoid(prediction).item()
-
-        return probability  # Probability of being COVID-positive (0.0 to 1.0)
+        
+        return image_tensor
 
 
     def create_dataloaders(self, batch_size) -> tuple[DataLoader, DataLoader, DataLoader]:
