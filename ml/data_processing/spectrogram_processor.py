@@ -10,6 +10,7 @@ import librosa
 import os
 import matplotlib.pyplot as plt
 from .image_processor import ImageProcessor
+from pydub import AudioSegment
 
 class SpectrogramProcessor(ImageProcessor):
     """Processes and extracts features from audio spectrograms.
@@ -85,6 +86,7 @@ class SpectrogramProcessor(ImageProcessor):
         Returns:
             np.ndarray: The generated spectrogram as a numpy array.
         """
+        
         # Create spectrogram using helper function
         if self.stft:
             spectrogram = self.apply_stft(audio_path)
@@ -96,6 +98,43 @@ class SpectrogramProcessor(ImageProcessor):
 
 
         return spectrogram_norm
+
+    def process_single_image_for_inference(self, audio: AudioSegment)-> np.ndarray:
+        """Converts an AudioSegment object to a mel spectrogram.
+        NOTE SHOULD MAKE THE REST OF THE CODE WORK ON AUDIOSEGMENT INSTEAD OF FILEPATH
+        THIS IS TEMPORARY FOR TESTING STAGES
+
+        Args:
+            audio (AudioSegment): The input audio segment.
+
+        Returns:
+            np.ndarray: Log-scaled mel spectrogram.
+        """
+        # Convert AudioSegment to raw samples (NumPy array)
+        samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
+
+        # Normalize to range [-1, 1] (librosa expects this format)
+        samples /= np.max(np.abs(samples))
+
+        # Get sample rate
+        sr = audio.frame_rate  # librosa needs sample rate information
+
+        if self.stft:
+            # Compute STFT (the values below are default except hop length)
+            n_fft = 2048  # FFT window size
+            hop_length = 512  # Hop length for STFT
+            audio_stft = np.abs(librosa.stft(samples, n_fft=n_fft, hop_length=hop_length, window="hann"))
+
+            # Converting the amplitude to decibels
+            spectrogram_db = librosa.amplitude_to_db(audio_stft)  
+        else:
+            # Convert to log-scaled mel spectrogram
+            spectrogram = librosa.feature.melspectrogram(y=samples, sr=sr, n_mels=128, fmax=8000)
+
+            # Convert to decibels
+            spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
+
+        return spectrogram_db
 
     def conv_to_spectrogram(self, audio_path: str) -> np.ndarray:
         """Converts an audio file to its spectrogram representation.
