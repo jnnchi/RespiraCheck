@@ -3,17 +3,10 @@
 This module provides the `DataPipeline` class for handling dataset operations, 
 including loading, processing, and splitting datasets for training and inference.
 
-Dependencies:
-    - pandas
-    - sklearn
-
-TODO: - Implement actual dataset processing logic.
-      - Include error handling for file operations.
 """
 from .audio_processor import AudioProcessor
-from .spectrogram_processor import SpectrogramProcessor
+from .image_processor import ImageProcessor
 
-import pandas as pd
 import os
 from PIL import Image
 
@@ -37,49 +30,40 @@ class DataPipeline:
     """
 
     def __init__(self, test_size: float, val_size: float, audio_processor: AudioProcessor,  
-                spectrogram_processor: SpectrogramProcessor, metadata_df: pd.DataFrame, 
-                metadata_path: str, input_path="data/cough_data/original_data", output_path="data/cough_data"):
+                image_processor: ImageProcessor):
         """Initializes the DatasetProcessor.
 
         Args: 
             data_path (str): Path to the dataset file.
             test_size (float): Proportion of the dataset to include in the test split.
             audio_processor (AudioProcessor): Instance for handling audio processing.
-            spectrogram_processor (SpectrogramProcessor): Instance for handling spectrogram processing.
-            metadata_df (pd.DataFrame): DataFrame containing metadata for the dataset.
-            metadata_path (str): Path to the metadata file.
+            image_processor (ImageProcessor): Instance for handling spectrogram processing.
         """
-        self.input_path = input_path
-        self.audio_output_path = f"{output_path}/processed_audio"
-        self.spectrogram_output_path = f"{output_path}/spectrograms"
         self.test_size = test_size
         self.val_size = val_size
         self.audio_processor = audio_processor
-        self.spectrogram_processor = spectrogram_processor
-        self.metadata_df = metadata_df
-        self.metadata_path = metadata_path
+        self.image_processor = image_processor
 
     def process_all(self) -> None:
         """Processes the entire dataset for training or analysis. 
         Creates folders of labeled audio and spectrograms
         """
         self.audio_processor.process_all_audio()
-        self.spectrogram_processor.process_all_spectrograms()
+        self.image_processor.process_all_images()
         
     def load_dataset(self) -> TensorDataset:
         """Loads the dataset from the specified file path into a DataFrame."""
         tensors = []
         labels = []  
-        # TODO: add this as param
-        spectrograms_folder = "ml/data/cough_data/spectrograms"
-        for label_folder, label_value in zip(["positive", "negative"], [1, 0]): 
-            spectrogram_dir = os.path.join(spectrograms_folder, label_folder)
 
-            for image_name in os.listdir(spectrogram_dir):
-                image_path = os.path.join(spectrogram_dir, image_name)
-                spectrogram_tensor = self.spectrogram_to_tensor(image_path)
+        for label_folder, label_value in zip(["positive", "negative"], [1, 0]): 
+            output_dir = os.path.join(self.image_processor.output_folder, label_folder)
+
+            for image_name in os.listdir(output_dir):
+                image_path = os.path.join(output_dir, image_name)
+                image_tensor = self.image_to_tensor(image_path)
                 
-                tensors.append(spectrogram_tensor)
+                tensors.append(image_tensor)
                 labels.append(label_value)
 
         # Tensor of all features (N x D) - N is number of samples (377), D is feature dimension (3,224,224)
@@ -90,7 +74,7 @@ class DataPipeline:
         return TensorDataset(X, y)
 
 
-    def spectrogram_to_tensor(self, image_path: str) -> torch.Tensor:
+    def image_to_tensor(self, image_path: str) -> torch.Tensor:
         """Converts a spectrogram image to a PyTorch tensor.
 
         Args:

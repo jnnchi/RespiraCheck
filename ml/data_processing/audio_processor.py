@@ -3,12 +3,6 @@
 This module provides the `AudioProcessor` class for processing audio files,
 including noise reduction, silence removal, and format conversion.
 
-Dependencies:
-    - pandas
-    - pydub
-
-TODO: - Implement audio processing logic.
-      - Include error handling for file operations.
 """
 
 import os
@@ -19,11 +13,8 @@ import noisereduce as nr
 from pydub.silence import detect_nonsilent
 import librosa
 import librosa.display
-from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt
 
 import json
-import shutil
 
 
 class AudioProcessor:
@@ -66,7 +57,6 @@ class AudioProcessor:
                 "duration",
                 "sample_rate",
                 "channels",
-                "fbank_features",
             ]
         )
 
@@ -80,7 +70,7 @@ class AudioProcessor:
             # Create labeled output folder if it doesn't exist
             os.makedirs(labeled_output_dir, exist_ok=True)
 
-            for filename in os.listdir(labeled_input_dir)[:100]:
+            for filename in os.listdir(labeled_input_dir):
                 if filename.endswith((".wav", ".mp3")):
                     audio_path = os.path.join(labeled_input_dir, filename)
                     output_audio_path = os.path.join(self.output_folder, label, filename)
@@ -128,27 +118,25 @@ class AudioProcessor:
         audio.export(output_audio_path, format="wav")
 
         # save metadata
-        self.save_metadata(input_audio_path, filename, fbank)
+        self.save_metadata(output_audio_path, filename)
     
         return 0
 
-    def save_metadata(self, input_audio_path, filename, fbank) -> None:
+    def save_metadata(self, audio_path, filename) -> None:
         """
         Saves metadata for the processed audio file.
         """
         # Save metadata for this processed audio
-        y, sr = librosa.load(input_audio_path, sr=None)
+        y, sr = librosa.load(audio_path, sr=None)
         duration = librosa.get_duration(y=y, sr=sr)
         channels = 1
-        fbank_features = self.fbank(input_audio_path) if fbank else None
         new_row = pd.DataFrame(
-            [[filename, duration, sr, channels, fbank_features]],
+            [[filename, duration, sr, channels]],
             columns=[
                 "filename",
                 "duration",
                 "sample_rate",
                 "channels",
-                "fbank_features",
             ],
         )
         self.metadata_df = pd.concat([self.metadata_df, new_row], ignore_index=True)
@@ -314,77 +302,3 @@ class AudioProcessor:
             standardized_audio = audio
 
         return standardized_audio
-
-
-    def fbank(
-        audio_path,
-        samplerate=16000,
-        winlen=0.025,
-        winstep=0.01,
-        nfilt=40,
-        nfft=512,
-        lowfreq=0,
-        highfreq=None,
-        preemph=0.97,
-        wintype="hamming",
-        grayscale=False,
-        save_image=False,
-        image_path="fbank_image.png",
-    ):
-        """Compute Mel-filterbank energy features and optionally convert to a grayscale image.
-
-        :param audio_path: Path to the audio file.
-        :param samplerate: Sample rate of the signal.
-        :param winlen: Window length in seconds.
-        :param winstep: Step size between windows in seconds.
-        :param nfilt: Number of Mel filters.
-        :param nfft: FFT size.
-        :param lowfreq: Lowest frequency in Mel filters.
-        :param highfreq: Highest frequency in Mel filters.
-        :param preemph: Pre-emphasis factor.
-        :param wintype: Window function type.
-        :param grayscale: Whether to convert the filterbank to a grayscale image.
-        :param save_image: Whether to save the grayscale image.
-        :param image_path: File path to save the image.
-        :return: Filterbank features (2D numpy array).
-        """
-        signal, samplerate = librosa.load(audio_path, sr=samplerate)
-
-        highfreq = highfreq or samplerate / 2
-
-        signal = np.append(signal[0], signal[1:] - preemph * signal[:-1])
-
-        frame_length = int(winlen * samplerate)
-        frame_step = int(winstep * samplerate)
-        frames = librosa.util.frame(
-            signal, frame_length=frame_length, hop_length=frame_step
-        ).T
-
-        if wintype == "hamming":
-            window = np.hamming(frame_length)
-        elif wintype == "hann":
-            window = np.hanning(frame_length)
-        else:
-            window = np.ones(frame_length)
-        frames *= window
-
-        mag_frames = np.abs(np.fft.rfft(frames, n=nfft))
-        pow_frames = (1.0 / nfft) * (mag_frames**2)
-
-        mel_filters = librosa.filters.mel(
-            sr=samplerate, n_fft=nfft, n_mels=nfilt, fmin=lowfreq, fmax=highfreq
-        )
-        fbank_features = np.dot(pow_frames, mel_filters.T)
-        fbank_features = np.where(
-            fbank_features == 0, np.finfo(float).eps, fbank_features
-        )
-
-        if grayscale or save_image:
-            plt.figure(figsize=(4, 4))
-            plt.imshow(fbank_features.T, cmap="gray", origin="lower", aspect="auto")
-            plt.axis("off")
-            if save_image:
-                plt.savefig(image_path, bbox_inches="tight", pad_inches=0)
-            plt.close()
-
-        return fbank_features
