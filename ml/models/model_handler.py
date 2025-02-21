@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
     audioproccessor = AudioProcessor()
     spectroproccessor = SpectrogramProcessor()
-    datapipeline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
+    datapipline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
     
     
     cnn_model = CNNModel()
@@ -231,9 +231,7 @@ if __name__ == "__main__":
 
     model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
 
-    if not os.path.exists("data/cough_data/spectrograms"):
-        datapipeline.process_all()
-    train_loader, val_loader, test_loader = datapipeline.create_dataloaders(batch_size=32)
+    train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
 
     # Train the model
     epochs = 1
