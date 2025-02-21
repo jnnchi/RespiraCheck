@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
 
-const Results = () => {
+const Result = () => {
     return (
         <Box position="relative" width={352} height={75}>
             <Typography
@@ -14,7 +14,7 @@ const Results = () => {
                     WebkitTextStroke: "1px #3d70ec", 
                     fontFamily: "'Spartan', Helvetica", 
                     fontWeight: "bold", 
-                    color: "3d70ec",
+                    color: "#3d70ec",
                     fontSize: 40, 
                     letterSpacing: 0.15, 
                     lineHeight: "60px", 
@@ -27,4 +27,4 @@ const Results = () => {
     );
 };
 
-export default Results;
+export default Result;

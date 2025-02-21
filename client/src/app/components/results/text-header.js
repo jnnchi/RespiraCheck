@@ -1,14 +1,15 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
 
-const Label = () => {
+const TextHeader = () => {
   return (
     <Box sx={{ width: 616, height: 120 }}>
       <Typography
         variant="h1"
         sx={{
           fontFamily: "'Spartan', sans-serif",
-          fontWeight: 600,
+          fontWeight: 300,
+          WebkitTextStroke: "0.5px black", 
           color: "black",
           fontSize: 40,
           letterSpacing: 0.15,
@@ -21,4 +22,4 @@ const Label = () => {
   );
 };
 
-export default Label;
+export default TextHeader;
