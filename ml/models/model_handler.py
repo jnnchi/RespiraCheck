@@ -19,7 +19,8 @@ import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
 
-from cnn_model import CNNModel
+# from cnn_model import CNNModel
+from joseph_cnn_model import CNNModel
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -220,7 +221,7 @@ if __name__ == "__main__":
 
     audioproccessor = AudioProcessor()
     spectroproccessor = SpectrogramProcessor()
-    datapipline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
+    datapipeline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
     
     
     cnn_model = CNNModel()
@@ -231,7 +232,9 @@ if __name__ == "__main__":
 
     model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
 
-    train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
+    if not os.path.exists("data/cough_data/spectrograms"):
+        datapipeline.process_all()
+    train_loader, val_loader, test_loader = datapipeline.create_dataloaders(batch_size=32)
 
     # Train the model
     epochs = 1
