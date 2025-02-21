@@ -19,7 +19,7 @@ import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
 
-from cnn_model import CNNModel
+from joseph_cnn_model import CNNModel
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 

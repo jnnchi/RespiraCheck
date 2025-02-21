@@ -26,19 +26,26 @@ class CNNModel(nn.Module):
         resnet (torchvision.models.resnet.ResNet): The ResNet backbone used for feature extraction.
     """
 
-    def __init__(self):
+    def __init__(self, dropout: float = 0.0):
         """Initializes the CNNModel.
         """
         super(CNNModel, self).__init__()
         self.resnet = models.resnet18(weights='IMAGENET1K_V1')
+        num_features = self.resnet.fc.in_features  # Get input size of original FC layer
+
+        # Freeze all the pre-trained layers
+        for param in self.resnet.parameters():
+            param.requires_grad = False
         
         # Remove the last FC layer and replace it with a binary classifier
-        num_features = self.resnet.fc.in_features  # Get input size of original FC layer
-        self.resnet.fc = nn.Linear(num_features, 1)  # Output a single logit
+        self.resnet.fc = nn.Sequential(
+            nn.Dropout(p=dropout),  # Apply dropout before the final layer
+            nn.Linear(num_features, 1)  # Binary classification output
+        )
 
         # Initialize weights and biases for the new FC layer
-        nn.init.normal_(self.resnet.fc.weight, mean=0.0, std=0.01)
-        nn.init.zeros_(self.resnet.fc.bias)
+        self.resnet.fc[1].weight.data.normal_(mean=0.0, std=0.01)
+        self.resnet.fc[1].bias.data.zero_()
 
     def forward(self, spectrogram: torch.Tensor) -> torch.Tensor:
         """Defines the forward pass for the model.
