@@ -17,7 +17,7 @@ const Result = () => {
                     color: "#3d70ec",
                     fontSize: 40, 
                     letterSpacing: 0.15, 
-                    lineHeight: "60px", 
+                    lineHeight: "30px", 
                     whiteSpace: "nowrap",
                 }}
             >

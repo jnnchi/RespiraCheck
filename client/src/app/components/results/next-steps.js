@@ -3,18 +3,18 @@ import React from "react";
 
 const NextSteps = () => {
     return (
-        <Box sx={{ position: "relative", widht: "100%", maxWidth: 1123, height: 212}}>
+        <Box sx={{ paddingTop: 0, position: "relative", width: "100%", maxWidth: 1123, height: 0}}>
             <Typography
                 variant="h2"
                 component="div"
                 sx={{
-                    position: "absolute",
+                    position: "relative",
                     top: 0,
                     left: 0,
                     fontFamily: "Spartan-SemiBold, Helvetica",
-                    fontWeight: "bold",
+                    fontWeight: 500,
                     color: "black",
-                    lineHeight: "45px",
+                    fontSize: "30px",
                 }}
             >
                 Next Steps:
@@ -24,8 +24,8 @@ const NextSteps = () => {
                 variant="body1"
                 component="p"
                 sx={{
-                    position: "absolute",
-                    top: 61, 
+                    position: "relative",
+                    top: 0, 
                     left: 0, 
                     fontFamily: "Spartan-Regular, Helvetica",
                     color: "black",

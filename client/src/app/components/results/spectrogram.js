@@ -6,7 +6,7 @@ const Spectrogram = () => {
         <Box sx = {{width: 479, height: 389, position: "relative"}}>
             <Box
                 component="img" 
-                sx={{ width: 479, height: 389, position: "absolute", backgroundColor: "black"}} 
+                sx={{width: 479, height: 300, position: "absolute", backgroundColor: "black"}} 
                 />
         </Box>
     )
