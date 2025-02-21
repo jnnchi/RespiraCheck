@@ -24,7 +24,8 @@ const Results = () => {
                                 fontFamily: "'Spartan-Regular', Helvetica", 
                                 color: "#303030", 
                                 fontSize: "1.5rem",
-                                textDecoration: "underline"
+                                textDecoration: "underline",
+                                fontWeight: 200,
                             }
                         }>
                         Learn more about our model &gt;
