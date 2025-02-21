@@ -13,7 +13,7 @@ const Home = () => {
   return (
     <div>
       <Navbar></Navbar>
-      <Stack direction="row" spacing={0} sx={{paddingLeft: "120px", paddingTop: "60px"}}>
+      <Stack direction="row" spacing={0} sx={{paddingLeft: "120px", paddingTop: "50px"}}>
         <Stack direction="column" spacing={5}>
           <Title/>
           <StartButton/>

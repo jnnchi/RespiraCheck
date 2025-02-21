@@ -1,7 +1,18 @@
+"use client"
+
 import React from "react";
 import { Box, Button, Typography } from "@mui/material";
+import { useRouter } from 'next/navigation';
+
 
 const StartButton = () => {
+
+    const router = useRouter();
+
+    const handleNavigate = () => {
+        router.push('use-the-tool'); 
+    };
+
     return (
         <Button
         sx={{
@@ -20,7 +31,9 @@ const StartButton = () => {
             letterSpacing: "0.1em",
             textTransform: "none",
             letterSpacing: "0.15px"
-        }}>
+        }}
+        onClick={handleNavigate}
+        >
             Get Started
         </Button>
     )
