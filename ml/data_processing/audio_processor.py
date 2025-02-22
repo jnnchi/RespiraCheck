@@ -13,7 +13,10 @@ import noisereduce as nr
 from pydub.silence import detect_nonsilent
 import librosa
 import librosa.display
-
+from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
+import soundfile as sf
+from scipy.signal import butter, lfilter
 import json
 
 
@@ -325,3 +328,185 @@ class AudioProcessor:
             standardized_audio = audio
 
         return standardized_audio
+
+
+    def fbank(
+        audio_path,
+        samplerate=16000,
+        winlen=0.025,
+        winstep=0.01,
+        nfilt=40,
+        nfft=512,
+        lowfreq=0,
+        highfreq=None,
+        preemph=0.97,
+        wintype="hamming",
+        grayscale=False,
+        save_image=False,
+        image_path="fbank_image.png",
+    ):
+        """Compute Mel-filterbank energy features and optionally convert to a grayscale image.
+
+        :param audio_path: Path to the audio file.
+        :param samplerate: Sample rate of the signal.
+        :param winlen: Window length in seconds.
+        :param winstep: Step size between windows in seconds.
+        :param nfilt: Number of Mel filters.
+        :param nfft: FFT size.
+        :param lowfreq: Lowest frequency in Mel filters.
+        :param highfreq: Highest frequency in Mel filters.
+        :param preemph: Pre-emphasis factor.
+        :param wintype: Window function type.
+        :param grayscale: Whether to convert the filterbank to a grayscale image.
+        :param save_image: Whether to save the grayscale image.
+        :param image_path: File path to save the image.
+        :return: Filterbank features (2D numpy array).
+        """
+        signal, samplerate = librosa.load(audio_path, sr=samplerate)
+
+        highfreq = highfreq or samplerate / 2
+
+        signal = np.append(signal[0], signal[1:] - preemph * signal[:-1])
+
+        frame_length = int(winlen * samplerate)
+        frame_step = int(winstep * samplerate)
+        frames = librosa.util.frame(
+            signal, frame_length=frame_length, hop_length=frame_step
+        ).T
+
+        if wintype == "hamming":
+            window = np.hamming(frame_length)
+        elif wintype == "hann":
+            window = np.hanning(frame_length)
+        else:
+            window = np.ones(frame_length)
+        frames *= window
+
+        mag_frames = np.abs(np.fft.rfft(frames, n=nfft))
+        pow_frames = (1.0 / nfft) * (mag_frames**2)
+
+        mel_filters = librosa.filters.mel(
+            sr=samplerate, n_fft=nfft, n_mels=nfilt, fmin=lowfreq, fmax=highfreq
+        )
+        fbank_features = np.dot(pow_frames, mel_filters.T)
+        fbank_features = np.where(
+            fbank_features == 0, np.finfo(float).eps, fbank_features
+        )
+
+        if grayscale or save_image:
+            plt.figure(figsize=(4, 4))
+            plt.imshow(fbank_features.T, cmap="gray", origin="lower", aspect="auto")
+            plt.axis("off")
+            if save_image:
+                plt.savefig(image_path, bbox_inches="tight", pad_inches=0)
+            plt.close()
+
+        return fbank_features
+
+    def mfcc(self, audio_path, samplerate=16000, n_mfcc=13, n_fft=512, hop_length=160, win_length=400):
+        # Load audio
+        y, sr = librosa.load(audio_path, sr=samplerate)
+        
+        # Compute MFCC
+        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc, n_fft=n_fft, hop_length=hop_length, win_length=win_length)
+        
+        # Normalize MFCC to 0-255 grayscale range
+        mfcc_min, mfcc_max = np.min(mfcc), np.max(mfcc)
+        mfcc_norm = 255 * (mfcc - mfcc_min) / (mfcc_max - mfcc_min)
+        mfcc_norm = mfcc_norm.astype(np.uint8)
+        
+        # Apply random transformation
+        transformation_matrix = np.random.rand(mfcc.shape[0], mfcc.shape[0])
+        transformed_mfcc = np.dot(transformation_matrix, mfcc_norm)
+        
+        # Normalize transformed MFCC
+        transformed_min, transformed_max = np.min(transformed_mfcc), np.max(transformed_mfcc)
+        transformed_mfcc_norm = 255 * (transformed_mfcc - transformed_min) / (transformed_max - transformed_min)
+        transformed_mfcc_norm = transformed_mfcc_norm.astype(np.uint8)
+        
+        # Plot original MFCC
+        plt.figure(figsize=(10, 4))
+        plt.imshow(mfcc_norm, cmap="gray", aspect="auto", origin="lower")  
+        plt.colorbar(label="MFCC Intensity")
+        plt.xlabel("Time Frames")
+        plt.ylabel("MFCC Coefficients")
+        plt.title("MFCC Features (Grayscale)")
+        plt.show()
+        
+        return mfcc
+
+    def bandpass_filter(self, y, sr, lowcut=300, highcut=4000, order=6):
+        """
+        Apply a bandpass filter to isolate frequencies between lowcut and highcut.
+        Used to reduce background noise and focus on cough sounds.
+        (specifically used for the minimize_speech method)
+        
+        Returns:
+            np.ndarray: Filtered audio signal.
+        """
+        nyquist = 0.5 * sr
+        low = lowcut / nyquist
+        high = highcut / nyquist
+        b, a = butter(order, [low, high], btype="band")
+        return lfilter(b, a, y)
+    
+
+    def minimize_speech(self ,audio_path, output_path="isolated_cough.wav (subject to change)", duration=None):
+        """
+        Minimizes speech while preserving cough sounds using HPSS, soft masking, and bandpass filtering.
+        """
+        y, sr = librosa.load(audio_path, sr=None, duration=duration)
+
+        y_harmonic, y_percussive = librosa.effects.hpss(y, margin=(1, 5)) 
+
+        y_cough_filtered = self.bandpass_filter(y_percussive, sr)
+
+        S_full, phase = librosa.magphase(librosa.stft(y_cough_filtered))
+
+        S_filter = librosa.decompose.nn_filter(S_full,
+                                            aggregate=np.median,
+                                            metric='cosine',
+                                            width=int(librosa.time_to_frames(2, sr=sr)))
+
+        S_filter = np.minimum(S_full, S_filter)
+
+        margin_speech, margin_cough = 2, 10 
+        power = 2
+
+        mask_speech = librosa.util.softmask(S_filter,
+                                            margin_speech * (S_full - S_filter),
+                                            power=power)
+
+        mask_cough = librosa.util.softmask(S_full - S_filter,
+                                        margin_cough * S_filter,
+                                        power=power)
+
+        S_cough = mask_cough * S_full
+
+        y_cough = librosa.istft(S_cough * phase)
+
+        sf.write(output_path, y_cough, sr)
+        print(f"✅ Isolated cough saved at: {output_path}")
+
+        fig, ax = plt.subplots(nrows=3, sharex=True, sharey=True, figsize=(10, 6))
+
+        idx = slice(*librosa.time_to_frames([0, min(5, len(y) / sr)], sr=sr))
+
+        img = librosa.display.specshow(librosa.amplitude_to_db(S_full[:, idx], ref=np.max),
+                                    y_axis='log', x_axis='time', sr=sr, ax=ax[0])
+        ax[0].set(title='Full Percussive Spectrum')
+        ax[0].label_outer()
+
+        librosa.display.specshow(librosa.amplitude_to_db(S_filter[:, idx], ref=np.max),
+                                y_axis='log', x_axis='time', sr=sr, ax=ax[1])
+        ax[1].set(title='Background Speech Estimate')
+        ax[1].label_outer()
+
+        librosa.display.specshow(librosa.amplitude_to_db(S_cough[:, idx], ref=np.max),
+                                y_axis='log', x_axis='time', sr=sr, ax=ax[2])
+        ax[2].set(title='Isolated Cough (Speech Reduced)')
+
+        fig.colorbar(img, ax=ax)
+        plt.show()
+
+        return y_cough, sr 
