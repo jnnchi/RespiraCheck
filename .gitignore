@@ -1,4 +1,5 @@
 venv
+.venv
 env
 *__pycache__
 
@@ -6,5 +7,7 @@ ml/data/stethoscope_data
 ml/data/cough_data
 ml/data
 *spectrograms
+
+node_modules/
 
 *.DS_Store

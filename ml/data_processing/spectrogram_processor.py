@@ -3,23 +3,16 @@ Spectrogram Processing Module.
 
 This module provides the `SpectrogramProcessor` class for converting audio files 
 into spectrograms, normalizing them, and extracting features.
-
-Dependencies:
-    - librosa
-    - numpy
-    - ffmpeg
-    - matplotlib.pyplot
-
-TODO:
-    - Implement all methods to handle creation of spectrograms.
 """
 
 import numpy as np
 import librosa
 import os
 import matplotlib.pyplot as plt
+from .image_processor import ImageProcessor
+from pydub import AudioSegment
 
-class SpectrogramProcessor:
+class SpectrogramProcessor(ImageProcessor):
     """Processes and extracts features from audio spectrograms.
 
     This class provides methods for converting audio files to spectrograms, 
@@ -32,19 +25,17 @@ class SpectrogramProcessor:
         extracted_spectrograms (dict): Dictionary mapping filenames to their extracted spectrograms (as numpy arrays).
     """
 
-    def __init__(self, metadata_filepath=None, audio_folder="ml/data/cough_data/processed_audio", spectrograms_folder="ml/data/cough_data/spectrograms"):
+    def __init__(self, stft=False, audio_folder="ml/data/cough_data/processed_audio", output_folder="ml/data/cough_data/spectrograms"):
         """Initializes the SpectrogramProcessor.
 
         Args:
             audio_folder (str): Path to the directory with processed audio files in wav
             features_filepath (str): Path to the directory where extracted features will be saved.
         """
-        self.audio_folder = audio_folder # directory containing processed audio files
-        self.spectrograms_folder = spectrograms_folder 
-        self.metadata_filepath = metadata_filepath # path to store extracted features from spectrograms
-        # os.makedirs(self.features_filepath, exist_ok=True) # create directory in case it does not exist
+        super().__init__(audio_folder, output_folder)
+        self.stft = stft
 
-    def process_all_spectrograms(self) -> None:
+    def process_all_images(self) -> None:
         """Processes all spectrograms in the given directory and saves them as images.
 
         Note: This assumes that all processed audio files are in WAV format
@@ -52,7 +43,7 @@ class SpectrogramProcessor:
         """
         for label in ["positive", "negative"]: 
             audio_dir = os.path.join(self.audio_folder, label)  # Full path to the labeled folder
-            spectrogram_dir = os.path.join(self.spectrograms_folder, label)  # Path to save spectrogram
+            spectrogram_dir = os.path.join(self.output_folder, label)  # Path to save spectrogram
 
             # Make spectrogram folder if it doesn't exist
             os.makedirs(spectrogram_dir, exist_ok=True)
@@ -66,6 +57,7 @@ class SpectrogramProcessor:
 
                     # Save spectrogram image to the spectrogram folder
                     spectrogram_path = os.path.join(spectrogram_dir, filename.replace(".wav", ".png"))
+                    
                     self.save_spectrogram_image(spectrogram, spectrogram_path)
 
     def save_spectrogram_image(self, spectrogram: np.ndarray, save_path: str) -> None:
@@ -94,13 +86,55 @@ class SpectrogramProcessor:
         Returns:
             np.ndarray: The generated spectrogram as a numpy array.
         """
+        
         # Create spectrogram using helper function
-        spectrogram = self.conv_to_spectrogram(audio_path)
+        if self.stft:
+            spectrogram = self.apply_stft(audio_path)
+        else:
+            spectrogram = self.conv_to_spectrogram(audio_path)
 
         # Normalize generated spectrogram using helper function
         spectrogram_norm = self.normalize_spectrogram(spectrogram)
 
+
         return spectrogram_norm
+
+    def process_single_image_for_inference(self, audio: AudioSegment)-> np.ndarray:
+        """Converts an AudioSegment object to a mel spectrogram.
+        NOTE SHOULD MAKE THE REST OF THE CODE WORK ON AUDIOSEGMENT INSTEAD OF FILEPATH
+        THIS IS TEMPORARY FOR TESTING STAGES
+
+        Args:
+            audio (AudioSegment): The input audio segment.
+
+        Returns:
+            np.ndarray: Log-scaled mel spectrogram.
+        """
+        # Convert AudioSegment to raw samples (NumPy array)
+        samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
+
+        # Normalize to range [-1, 1] (librosa expects this format)
+        samples /= np.max(np.abs(samples))
+
+        # Get sample rate
+        sr = audio.frame_rate  # librosa needs sample rate information
+
+        if self.stft:
+            # Compute STFT (the values below are default except hop length)
+            n_fft = 2048  # FFT window size
+            hop_length = 512  # Hop length for STFT
+            audio_stft = np.abs(librosa.stft(samples, n_fft=n_fft, hop_length=hop_length, window="hann"))
+
+            # Converting the amplitude to decibels
+            spectrogram_db = librosa.amplitude_to_db(audio_stft)  
+        else:
+            # Convert to log-scaled mel spectrogram
+            spectrogram = librosa.feature.melspectrogram(y=samples, sr=sr, n_mels=128, fmax=8000)
+
+            # Convert to decibels
+            spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
+
+        return spectrogram_db
 
     def conv_to_spectrogram(self, audio_path: str) -> np.ndarray:
         """Converts an audio file to its spectrogram representation.
@@ -136,14 +170,6 @@ class SpectrogramProcessor:
 
         return spectrogram_norm
 
-    def extract_features(self, audio_path: str, extracted_features: dict) -> None:
-        """Extracts features from a given audio file's spectrogram.
-
-        Args:
-            audio_path (str): Path to the audio file.
-            extracted_features (dict): A dictionary mapping filename to features that were extracted.
-        """
-        pass
 
     def apply_stft(self, audio_path: str) -> np.ndarray:
       """Applies STFT Filter with a Hanning Window to a Audio File
@@ -152,7 +178,7 @@ class SpectrogramProcessor:
         audio_path (str): Path to the audio file
 
       Returns:
-        np.ndarray: Features exxtracted by STFT on Audio   
+        np.ndarray: Features extracted by STFT on Audio   
       """
       # Reference Code: https://importchris.medium.com/how-to-create-understand-mel-spectrograms-ff7634991056
       # Load the audio file with original sample rate

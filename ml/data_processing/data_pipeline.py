@@ -3,23 +3,19 @@
 This module provides the `DataPipeline` class for handling dataset operations, 
 including loading, processing, and splitting datasets for training and inference.
 
-Dependencies:
-    - pandas
-    - sklearn
-
-TODO: - Implement actual dataset processing logic.
-      - Include error handling for file operations.
 """
 from .audio_processor import AudioProcessor
-from .spectrogram_processor import SpectrogramProcessor
+from .image_processor import ImageProcessor
 
-import pandas as pd
 import os
 from PIL import Image
 
 import torch
 from torch.utils.data import random_split, DataLoader, TensorDataset
 from torchvision import transforms
+from pydub import AudioSegment
+import io
+
 
 class DataPipeline:
     """Processes datasets, including loading, splitting, and preparing for inference.
@@ -28,58 +24,47 @@ class DataPipeline:
     and preparing single instances for inference.
 
     Attributes:
-        data_path (str): Path to the dataset file.
         test_size (float): Proportion of the dataset to include in the test split.
+        val_size (float): Proportion of the dataset to include for validation.
         audio_processor: AudioProcessor instance for handling audio processing.
-        spectrogram_processor: SpectrogramProcessor instance for handling spectrogram processing.
-        metadata_df (pd.DataFrame): DataFrame containing metadata for the dataset.
-        metadata_path (str): Path to the metadata file.
+        image_processor: ImageProcessor instance for handling spectrogram or extracted features processing.
     """
 
     def __init__(self, test_size: float, val_size: float, audio_processor: AudioProcessor,  
-                spectrogram_processor: SpectrogramProcessor, metadata_df: pd.DataFrame, 
-                metadata_path: str, input_path="data/cough_data/original_data", output_path="data/cough_data"):
+                image_processor: ImageProcessor):
         """Initializes the DatasetProcessor.
 
         Args: 
             data_path (str): Path to the dataset file.
             test_size (float): Proportion of the dataset to include in the test split.
             audio_processor (AudioProcessor): Instance for handling audio processing.
-            spectrogram_processor (SpectrogramProcessor): Instance for handling spectrogram processing.
-            metadata_df (pd.DataFrame): DataFrame containing metadata for the dataset.
-            metadata_path (str): Path to the metadata file.
+            image_processor (ImageProcessor): Instance for handling spectrogram processing.
         """
-        self.input_path = input_path
-        self.audio_output_path = f"{output_path}/processed_audio"
-        self.spectrogram_output_path = f"{output_path}/spectrograms"
         self.test_size = test_size
         self.val_size = val_size
         self.audio_processor = audio_processor
-        self.spectrogram_processor = spectrogram_processor
-        self.metadata_df = metadata_df
-        self.metadata_path = metadata_path
+        self.image_processor = image_processor
 
     def process_all(self) -> None:
         """Processes the entire dataset for training or analysis. 
         Creates folders of labeled audio and spectrograms
         """
         self.audio_processor.process_all_audio()
-        self.spectrogram_processor.process_all_spectrograms()
+        self.image_processor.process_all_images()
         
     def load_dataset(self) -> TensorDataset:
         """Loads the dataset from the specified file path into a DataFrame."""
         tensors = []
         labels = []  
-        # TODO: add this as param
-        spectrograms_folder = "ml/data/cough_data/spectrograms"
-        for label_folder, label_value in zip(["positive", "negative"], [1, 0]): 
-            spectrogram_dir = os.path.join(spectrograms_folder, label_folder)
 
-            for image_name in os.listdir(spectrogram_dir):
-                image_path = os.path.join(spectrogram_dir, image_name)
-                spectrogram_tensor = self.spectrogram_to_tensor(image_path)
+        for label_folder, label_value in zip(["positive", "negative"], [1, 0]): 
+            output_dir = os.path.join(self.image_processor.output_folder, label_folder)
+
+            for image_name in os.listdir(output_dir):
+                image_path = os.path.join(output_dir, image_name)
+                image_tensor = self.image_to_tensor(image_path)
                 
-                tensors.append(spectrogram_tensor)
+                tensors.append(image_tensor)
                 labels.append(label_value)
 
         # Tensor of all features (N x D) - N is number of samples (377), D is feature dimension (3,224,224)
@@ -90,7 +75,7 @@ class DataPipeline:
         return TensorDataset(X, y)
 
 
-    def spectrogram_to_tensor(self, image_path: str) -> torch.Tensor:
+    def image_to_tensor(self, image_path: str) -> torch.Tensor:
         """Converts a spectrogram image to a PyTorch tensor.
 
         Args:
@@ -109,13 +94,47 @@ class DataPipeline:
 
         return tensor_image  # shape will be 3, 224, 224
 
-    def process_single_for_inference(self, instance) -> torch.Tensor:
+    def process_single_for_inference(self, audio_bytes: bytes) -> torch.Tensor:
         """Processes a single instance for inference.
 
         Args:
-            instance: A single data instance to be processed.
+            audio: assume we receive audio in bytes
         """
-        pass
+        # Convert WebM bytes to AudioSegment (Requires FFmpeg installed)
+        audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="webm")
+        # Convert AudioSegment to WAV format
+        audio = audio.set_frame_rate(48000).set_channels(1)
+
+        audio = self.audio_processor.process_single_audio_for_inference(audio)
+
+        # just spectrograms for now
+        image_array = self.image_processor.process_single_image_for_inference()
+
+        # Convert spectrogram (NumPy array) to PIL Image (needed for torchvision transforms)
+        image = Image.fromarray(image_array)
+
+        # Same transformations used in training
+        transform = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(), 
+        ])
+
+        # Apply transformations
+        image_tensor = transform(image)  # Shape: (1, 3, 224, 224)
+        image_tensor = image_tensor.unsqueeze(0)  # Add batch dimension → (1, 3, 224, 224)
+
+        # Move tensor to the correct device
+        image_tensor = image_tensor.to(self.model.device)
+
+        # Pass through the model to get predictions
+        self.model.eval()
+        with torch.no_grad():
+            prediction = self.model(image_tensor)  # Forward pass
+
+        # Convert logits to probability using sigmoid (since BCEWithLogitsLoss was used)
+        probability = torch.sigmoid(prediction).item()
+
+        return probability  # Probability of being COVID-positive (0.0 to 1.0)
 
 
     def create_dataloaders(self, batch_size) -> tuple[DataLoader, DataLoader, DataLoader]:

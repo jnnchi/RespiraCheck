@@ -3,12 +3,6 @@
 This module provides the `AudioProcessor` class for processing audio files,
 including noise reduction, silence removal, and format conversion.
 
-Dependencies:
-    - pandas
-    - pydub
-
-TODO: - Implement audio processing logic.
-      - Include error handling for file operations.
 """
 
 import os
@@ -23,9 +17,7 @@ from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 import soundfile as sf
 from scipy.signal import butter, lfilter
-
 import json
-import shutil
 
 
 class AudioProcessor:
@@ -68,7 +60,6 @@ class AudioProcessor:
                 "duration",
                 "sample_rate",
                 "channels",
-                "fbank_features",
             ]
         )
 
@@ -82,7 +73,7 @@ class AudioProcessor:
             # Create labeled output folder if it doesn't exist
             os.makedirs(labeled_output_dir, exist_ok=True)
 
-            for filename in os.listdir(labeled_input_dir)[:100]:
+            for filename in os.listdir(labeled_input_dir):
                 if filename.endswith((".wav", ".mp3")):
                     audio_path = os.path.join(labeled_input_dir, filename)
                     output_audio_path = os.path.join(self.output_folder, label, filename)
@@ -130,27 +121,48 @@ class AudioProcessor:
         audio.export(output_audio_path, format="wav")
 
         # save metadata
-        self.save_metadata(input_audio_path, filename, fbank)
+        self.save_metadata(output_audio_path, filename)
     
         return 0
 
-    def save_metadata(self, input_audio_path, filename, fbank) -> None:
+    def process_single_audio_for_inference(self, audio: AudioSegment) -> AudioSegment:
+        """Processes a single audio file."""
+
+        # remove sections of no coughs
+        audio = self.remove_no_cough(audio)
+        if not audio:
+            print("No cough detected. Skipping.")
+            return 1
+        
+        # remove silences (may pass in non_silent_chunks into remove_silences)
+        audio = self.remove_silences(audio)
+        if not audio:
+            print("Clip is silent. Skipping.")
+            return 1
+
+        # reduce noise
+        audio = self.reduce_noise(audio)
+
+        audio = self.standardize_duration(audio)
+
+        return audio
+    
+
+    def save_metadata(self, audio_path, filename) -> None:
         """
         Saves metadata for the processed audio file.
         """
         # Save metadata for this processed audio
-        y, sr = librosa.load(input_audio_path, sr=None)
+        y, sr = librosa.load(audio_path, sr=None)
         duration = librosa.get_duration(y=y, sr=sr)
         channels = 1
-        fbank_features = self.fbank(input_audio_path) if fbank else None
         new_row = pd.DataFrame(
-            [[filename, duration, sr, channels, fbank_features]],
+            [[filename, duration, sr, channels]],
             columns=[
                 "filename",
                 "duration",
                 "sample_rate",
                 "channels",
-                "fbank_features",
             ],
         )
         self.metadata_df = pd.concat([self.metadata_df, new_row], ignore_index=True)

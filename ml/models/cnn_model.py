@@ -26,17 +26,19 @@ class CNNModel(nn.Module):
         resnet (torchvision.models.resnet.ResNet): The ResNet backbone used for feature extraction.
     """
 
-    def __init__(self, input_folder: str, output_folder: str):
+    def __init__(self):
         """Initializes the CNNModel.
-
-        Args:
-            input_folder (str): Path to the input folder containing spectrograms.
-            output_folder (str): Path to the folder where model outputs will be saved.
         """
         super(CNNModel, self).__init__()
-        self.input_folder = input_folder
-        self.output_folder = output_folder
-        self.resnet: models.ResNet = models.resnet18(pretrained=True)
+        self.resnet = models.resnet18(weights='IMAGENET1K_V1')
+        
+        # Remove the last FC layer and replace it with a binary classifier
+        num_features = self.resnet.fc.in_features  # Get input size of original FC layer
+        self.resnet.fc = nn.Linear(num_features, 1)  # Output a single logit
+
+        # Initialize weights and biases for the new FC layer
+        nn.init.normal_(self.resnet.fc.weight, mean=0.0, std=0.01)
+        nn.init.zeros_(self.resnet.fc.bias)
 
     def forward(self, spectrogram: torch.Tensor) -> torch.Tensor:
         """Defines the forward pass for the model.
@@ -47,4 +49,4 @@ class CNNModel(nn.Module):
         Returns:
             torch.Tensor: The model's output after processing the spectrogram.
         """
-        pass
+        return self.resnet(spectrogram)
