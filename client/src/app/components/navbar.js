@@ -21,50 +21,62 @@ const Navbar = () => {
         backgroundColor: "white",
         display: "flex",
         alignItems: "center",
-        padding: "0 63px",
+        padding: "0 35px",
         
       }}
     >
 
-      <Image src="/RespiraCheckLogo.png" width={200} height={80} alt="hi" sx={{justifyContent: 'left'}}></Image>
-        <Box sx={{ width: "100%", gap: 15, display: 'flex', justifyContent: "right"}}>
-          <Typography
-            sx={{
-              fontSize: "25px",
-              lineHeight: "52.5px",
-            }}
-          >
-            <Link href="/pages/home"> 
-              <span style={{ textDecoration: "none", color: pathname === "/pages/home" ? "#3D70EC" : "black" }}>Home</span>
-            </Link>
-            
-          </Typography>
+      <Link href="/pages/home">
+        <Image src="/RespiraCheckLogo.png" width={200} height={80} alt="hi" sx={{display: 'flex', 
+        justifyContent: 'flex-start', marginLeft: 0}}></Image>
+      </Link>
+      <Box sx={{ width: "100%", gap: 15, display: 'flex', justifyContent: "right"}}>
+        <Typography
+          sx={{
+            fontSize: "25px",
+            lineHeight: "52.5px",
+          }}
+        >
+          <Link href="/pages/home"> 
+            <span style={{ textDecoration: "none", color: pathname === "/pages/home" ? "#3D70EC" : "black" }}
+              onMouseEnter={(e) => e.target.style.color = "#3D70EC"}
+              onMouseLeave={(e) => e.target.style.color = "black"}
+            >Home</span>
+          </Link>
+          
+        </Typography>
 
-          <Typography
-            sx={{
-              fontSize: "25px",
-              lineHeight: "52.5px",
-            }}
-          >
-            <Link href="/pages/about"> 
-              <span style={{ textDecoration: "none", color: pathname === "/pages/about" ? "#3D70EC" : "black" }}>About</span>
-            </Link>
-            
-          </Typography>
+        <Typography
+          sx={{
+            fontSize: "25px",
+            lineHeight: "52.5px",
+          }}
+        >
+          <Link href="/pages/about"> 
+            <span style={{ textDecoration: "none", color: pathname === "/pages/about" ? "#3D70EC" : "black" }}
+              onMouseEnter={(e) => e.target.style.color = "#3D70EC"}
+              onMouseLeave={(e) => e.target.style.color = "black"}
+            >About</span>
+          </Link>
+          
+        </Typography>
 
-          <Typography
-            sx={{
-              fontSize: "25px",
-              lineHeight: "52.5px",
-            }}
-          > 
-            <Link href="/pages/use-the-tool"> 
-              <span style={{ textDecoration: "underline", color: pathname === "/pages/use-the-tool" ? "#3D70EC" : "black" }}>Use The Tool</span>
-            </Link>
-            
-          </Typography>
+        <Typography
+          sx={{
+            fontSize: "25px",
+            lineHeight: "52.5px",
+          }}
+        > 
+          <Link href="/pages/use-the-tool"> 
+            <span style={{ textDecoration: "none", color: pathname === "/pages/use-the-tool" ? "#3D70EC" : "black" }}
+              onMouseEnter={(e) => e.target.style.color = "#3D70EC"}
+              onMouseLeave={(e) => e.target.style.color = "black"}
+            >Use The Tool</span>
+          </Link>
+          
+        </Typography>
 
-        </Box>
+      </Box>
       
     </Box>
   );
