@@ -26,7 +26,7 @@ const RecordAudio = () => {
             }
         };
 
-        // saves audio as .wav
+        // saves audio as .wav, sends POST request to backend
         mediaRecorder.onstop = async () => {
             const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
             await uploadAudio(audioBlob);
