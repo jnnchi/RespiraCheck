@@ -33,8 +33,9 @@ const Navbar = () => {
       <Box sx={{ width: "100%", gap: 15, display: 'flex', justifyContent: "right"}}>
         <Typography
           sx={{
-            fontSize: "25px",
+            fontSize: "20px",
             lineHeight: "52.5px",
+            fontWeight: 300,
           }}
         >
           <Link href="/pages/home"> 
@@ -48,8 +49,9 @@ const Navbar = () => {
 
         <Typography
           sx={{
-            fontSize: "25px",
+            fontSize: "20px",
             lineHeight: "52.5px",
+            fontWeight: 300,
           }}
         >
           <Link href="/pages/about"> 
@@ -63,8 +65,9 @@ const Navbar = () => {
 
         <Typography
           sx={{
-            fontSize: "25px",
+            fontSize: "20px",
             lineHeight: "52.5px",
+            fontWeight: 300,
           }}
         > 
           <Link href="/pages/use-the-tool"> 
