@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import soundfile as sf
 from scipy.signal import butter, lfilter
 import json
+import librosa.feature
 
 
 class AudioProcessor:
@@ -66,8 +67,8 @@ class AudioProcessor:
 
     def process_all_audio(self) -> None:
         """Processes all audio files in a given directory."""
-        for label in ["positive", "negative"]: 
-            labeled_input_dir = os.path.join(self.input_folder, label) 
+        for label in ["positive", "negative"]:
+            labeled_input_dir = os.path.join(self.input_folder, label)
             labeled_output_dir = os.path.join(self.output_folder, label)
 
             # Create labeled output folder if it doesn't exist
@@ -77,7 +78,7 @@ class AudioProcessor:
                 if filename.endswith((".wav", ".mp3")):
                     audio_path = os.path.join(labeled_input_dir, filename)
                     output_audio_path = os.path.join(self.output_folder, label, filename)
-            
+
                     print(f"Processing: {audio_path}")
                     self.process_single_audio(audio_path, output_audio_path)
 
@@ -105,7 +106,7 @@ class AudioProcessor:
         if not audio:
             print("No cough detected. Skipping.")
             return 1
-        
+
         # remove silences (may pass in non_silent_chunks into remove_silences)
         audio = self.remove_silences(audio)
         if not audio:
@@ -114,7 +115,6 @@ class AudioProcessor:
 
         # reduce noise
         audio = self.reduce_noise(audio)
-
         audio = self.standardize_duration(audio)
 
         # overwrite the original file with the cleaned version
@@ -122,7 +122,7 @@ class AudioProcessor:
 
         # save metadata
         self.save_metadata(output_audio_path, filename)
-    
+
         return 0
 
     def process_single_audio_for_inference(self, audio: AudioSegment) -> AudioSegment:
@@ -133,7 +133,7 @@ class AudioProcessor:
         if not audio:
             print("No cough detected. Skipping.")
             return 1
-        
+
         # remove silences (may pass in non_silent_chunks into remove_silences)
         audio = self.remove_silences(audio)
         if not audio:
@@ -146,7 +146,7 @@ class AudioProcessor:
         audio = self.standardize_duration(audio)
 
         return audio
-    
+
 
     def save_metadata(self, audio_path, filename) -> None:
         """
@@ -170,11 +170,11 @@ class AudioProcessor:
 
     def get_labeled_path(self, filename: str) -> str:
         """
-        Sorts audio files into positive or negative depending on their json annotation. 
+        Sorts audio files into positive or negative depending on their json annotation.
 
         Args:
             filename (str): Name of the audio file (ex: 49f7f1de-5199-4291-b906-f058a8dc74d9)
-       
+
         Returns:
             str: Path to the output folder (data/cough_data/processed_audio/positive or negative)
         """
@@ -185,13 +185,13 @@ class AudioProcessor:
         os.makedirs(negative_folder, exist_ok=True)
 
         json_path = f"{self.input_folder}/{filename}.json"
-        
+
         if os.path.exists(json_path):
             with open(json_path, "r") as f:
                 try:
                     data = json.load(f)
                     status = data.get("status", "").lower()
-                    
+
                     if status == "covid-19":
                         return positive_folder
                     elif status == "healthy":
@@ -202,7 +202,7 @@ class AudioProcessor:
                     return "none"
         else:
             return "none"
-        
+
 
     def conv_to_wav(self, audio_path: str, wav_path: str, file_type: str) -> None:
         """Converts an audio file to WAV format.
@@ -214,11 +214,11 @@ class AudioProcessor:
             audio = AudioSegment.from_file(audio_path)
         elif file_type == "webm":
             # Ensure ffmpeg is correctly installed and set up
-            AudioSegment.converter = "ffmpeg"  
+            AudioSegment.converter = "ffmpeg"
 
             # Load the audio file
             audio = AudioSegment.from_file(audio_path, format="webm")
-        
+
         # save wav file to output folder
         audio.export(wav_path, format="wav")
 
@@ -251,17 +251,17 @@ class AudioProcessor:
         """
 
         samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
-    
+
         # Normalize samples to range [-1.0, 1.0] (standardizes input for noise reduction)
         max_val = np.max(np.abs(samples))
         if max_val != 0:
             samples /= max_val
-        
+
         # Perform noise reduction
         reduced_noise = nr.reduce_noise(
             y=samples, sr=audio.frame_rate, stationary=False, prop_decrease=0.8
         )
-        
+
         # Normalize the noise-reduced audio to restore amplitude
         max_reduced = np.max(np.abs(reduced_noise))
         if max_reduced != 0:
@@ -272,8 +272,8 @@ class AudioProcessor:
         # Need to convert back to int format (required by wav) cuz normalization turns into float
         # audio.sample_width == 4 -> scale to int32 range
         int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
-        
-        
+
+
         # Create a new AudioSegment with the processed audio data
         processed_audio = AudioSegment(
             int_samples.tobytes(),
@@ -281,7 +281,7 @@ class AudioProcessor:
             sample_width=audio.sample_width,
             channels=audio.channels,
         )
-        
+
         return processed_audio
 
 
@@ -334,7 +334,7 @@ class AudioProcessor:
         Apply a bandpass filter to isolate frequencies between lowcut and highcut.
         Used to reduce background noise and focus on cough sounds.
         (specifically used for the minimize_speech method)
-        
+
         Returns:
             np.ndarray: Filtered audio signal.
         """
@@ -343,7 +343,66 @@ class AudioProcessor:
         high = highcut / nyquist
         b, a = butter(order, [low, high], btype="band")
         return lfilter(b, a, y)
-    
+
+    def is_muffled(self, audio_path, threshold=0.5):
+        """
+        Determines whether an audio file is muffled based on spectral flatness.
+
+        Spectral flatness measures how noise-like or tonal an audio signal is.
+        A lower spectral flatness value indicates a more tonal sound, while a higher value suggests a noise-like sound.
+        Muffled audio typically has low high-frequency energy, resulting in lower spectral flatness.
+
+        Args:
+            audio_path (str): Path to the audio file to be analyzed.
+            threshold (float, optional): The spectral flatness threshold above which audio is considered muffled.
+                                         Default is 0.5.
+
+        Returns:
+            bool: True if the audio is considered muffled, False otherwise.
+        """
+        y, sr = librosa.load(audio_path, sr=None)
+        flatness = np.mean(librosa.feature.spectral_flatness(y=y))
+        return flatness > threshold
+
+    def highpass_filter(self, y, sr, cutoff=800):
+        """
+            Applies a high-pass Butterworth filter to remove low-frequency noise from the audio signal.
+
+            This filter helps enhance clarity by eliminating frequencies below the specified cutoff,
+            which is useful for reducing muffling and preserving important speech or cough frequencies.
+
+            Args:
+                y (np.ndarray): The input audio signal.
+                sr (int): The sampling rate of the audio.
+                cutoff (float, optional): The cutoff frequency in Hz. Default is 800 Hz.
+
+            Returns:
+                np.ndarray: The high-pass filtered audio signal.
+        """
+
+        b, a = butter(6, cutoff / (0.5 * sr), btype='high')
+        return lfilter(b, a, y)
+
+    def demuffle_audio(self, y, sr):
+        """
+           Reduces muffling in an audio signal by applying a bandpass filter
+           and a high-pass filter.
+
+           This method helps enhance clarity by removing low-frequency noise
+           and preserving important speech or cough frequencies.
+
+           Args:
+               y (np.ndarray): The input audio signal.
+               sr (int): The sampling rate of the audio.
+
+           Returns:
+               np.ndarray: The filtered audio signal with reduced muffling.
+        """
+
+        y_filtered, sr = self.bandpass_filter(y, sr, lowcut=800)
+        y_filtered = self.highpass_filter(y_filtered, sr, cutoff=800)
+
+        return y_filtered
 
     def minimize_speech(self ,audio_path, output_path="isolated_cough.wav (subject to change)", duration=None):
         """
@@ -351,7 +410,7 @@ class AudioProcessor:
         """
         y, sr = librosa.load(audio_path, sr=None, duration=duration)
 
-        y_harmonic, y_percussive = librosa.effects.hpss(y, margin=(1, 5)) 
+        y_harmonic, y_percussive = librosa.effects.hpss(y, margin=(1, 5))
 
         y_cough_filtered = self.bandpass_filter(y_percussive, sr)
 
@@ -364,7 +423,7 @@ class AudioProcessor:
 
         S_filter = np.minimum(S_full, S_filter)
 
-        margin_speech, margin_cough = 2, 10 
+        margin_speech, margin_cough = 2, 10
         power = 2
 
         mask_speech = librosa.util.softmask(S_filter,
@@ -403,4 +462,4 @@ class AudioProcessor:
         fig.colorbar(img, ax=ax)
         plt.show()
 
-        return y_cough, sr 
+        return y_cough, sr
