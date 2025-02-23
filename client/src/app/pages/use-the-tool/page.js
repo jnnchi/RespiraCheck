@@ -10,6 +10,8 @@ export default function Action() {
   return (
       <ThemeProvider theme={theme}>
         <Navbar></Navbar>
+    
+        
         <Stack width= "100%" direction ="column" alignItems="center" spacing={5} sx={{ justifyContent: "center", mt: 6 }} >
           <SubmitAudioHeading></SubmitAudioHeading>
 
@@ -19,6 +21,7 @@ export default function Action() {
           </Stack>
 
         </Stack>
+      
     </ThemeProvider>
   );
 }

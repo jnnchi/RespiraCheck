@@ -17,7 +17,7 @@
 @layer base {
   html, body {
     color: var(--foreground);
-    background: #FFFFFF;
+    background: #ffffff;
     font-family: 'Spartan', sans-serif;
   }
 }
