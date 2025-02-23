@@ -1,43 +1,20 @@
-"""Model Handler Module.
-
-This module provides the `ModelHandler` class for managing the training, evaluation, 
-and inference processes of a machine learning model. It also includes functionality 
-for saving and loading models.
-
-Dependencies:
-    - PyTorch (torch)
-    - CNNModel: A custom-defined neural network architecture.
-"""
-
 import numpy as np
-import collections
-import time
-import sys
-import os
-
-import torch
-from torch.utils.data import DataLoader
-import torch.nn as nn
-
-from joseph_cnn_model import CNNModel
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from data_processing.audio_processor import AudioProcessor 
-from data_processing.spectrogram_processor import SpectrogramProcessor
-from data_processing.data_pipeline import DataPipeline
-
 
 class ModelHandler:
     """Handles the model training, evaluation, and inference pipeline.
 
     Attributes:
-        model (CNNModel): The machine learning model.
         device (torch.device): The device on which the model is executed (e.g., 'cpu' or 'cuda').
-        model_path: Path to where .plt models should be saved.
+        model_path: Path to where .pth models should be saved.
     """
-    
-    def __init__(self, model, model_path: str, optimizer: torch.optim.Optimizer, loss_function: nn.Module):
+
+    def __init__(self,
+                 model,
+                 model_path: str,
+                 optimizer: torch.optim.Optimizer,
+                 loss_function: nn.Module,
+                 steps_per_decay = 5,
+                 lr_decay = 0.1):
         """Initializes the ModelHandler.
 
         Args:
@@ -47,48 +24,108 @@ class ModelHandler:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.model_path = model_path
         self.optimizer = optimizer
+        self.lr_scheduler = opt.lr_scheduler.StepLR(self.optimizer, step_size=steps_per_decay, gamma=lr_decay)
         self.loss_function = loss_function
 
- 
-    import numpy as np
+    def train_step(self, dataloader):
+        """Trains the model for a single epoch.
 
-    def train(self, train_loader, epochs: int, model_name: str) -> None:
+        Args:
+            dataloader (torch.utils.data.DataLoader): DataLoader for the training dataset.
+        """
+        self.model.train()
+        avg_loss, acc = 0, 0
+        for in_tensor, labels in dataloader:
+            in_tensor, labels = in_tensor.to(self.device), labels.to(self.device)
+            labels = labels.float().unsqueeze(1)  # Ensure correct shape for BCE loss
+
+            logits = self.model(in_tensor) # Feed input into model
+
+            loss = self.loss_function(logits, labels)  # Calculate loss
+            avg_loss += loss.item()  # Add to cumulative loss
+
+            # Gradient descent
+            self.optimizer.zero_grad()
+            loss.backward()
+            self.optimizer.step()
+
+            # Calculate batch accuracy and add it to cumulative accuracy
+            prediction_classes = torch.round(torch.sigmoid(logits))
+            batch_acc = torch.mean((prediction_classes == labels).float()).item()
+            acc += batch_acc
+
+        avg_loss /= len(dataloader)  # Calculate avg loss for epoch from cumulative loss
+        acc /= len(dataloader)  # Calculate avg accuracy for epoch from cumulative accuracy
+        train_results = {"avg_loss_per_batch": avg_loss, "avg_acc_per_batch": acc * 100}
+        return train_results
+
+    def val_step(self, dataloader):
+        """Evaluates the model on the validation dataset.
+
+        Args:
+            dataloader (torch.utils.data.DataLoader): DataLoader for the validation dataset.
+        """
+
+        self.model.eval()
+        with torch.inference_mode():
+            avg_loss, acc = 0, 0
+            for in_tensor, labels in dataloader:
+                in_tensor, labels = in_tensor.to(self.device), labels.to(self.device)
+                labels = labels.float().unsqueeze(1)  # Ensure correct shape for BCE loss
+
+                logits = self.model(in_tensor)  # Feed input into model
+
+                loss = self.loss_function(logits, labels)  # Calculate loss
+                avg_loss += loss.item()  # Add to cumulative loss
+
+                # Calculate batch accuracy and add it to cumulative accuracy
+                prediction_classes = torch.round(torch.sigmoid(logits))
+                batch_acc = torch.mean((prediction_classes == labels).float()).item()
+                acc += batch_acc
+
+            avg_loss /= len(dataloader)  # Calculate avg loss for each epoch from cumulative loss
+            acc /= len(dataloader)  # Calculate avg accuracy for each epoch from cumulative accuracy
+            valid_results = {"avg_loss_per_batch": avg_loss, "avg_acc_per_batch": acc * 100}
+            return valid_results
+
+    def train(self, train_loader, epochs: int, model_name: str):
         """Trains the model
 
         Args:
-            train_loader: DataLoader for the training dataset.
+            train_loader: DataLoader for the training datasets
             epochs (int): Number of training epochs.
             model_name (str): Name to save the trained model.
         """
-
         self.model.to(self.device)
+        training_results = {"epoch": [], "loss": [], "accuracy": []}
+        validation_results = {"epoch": [], "loss": [], "accuracy": []}
 
         for epoch in range(epochs):
-            train_losses_epoch = []
 
-            self.model.train()
-            for X_train, y_train in train_loader:
-                X_train = X_train.to(self.device)
-                y_train = y_train.to(self.device)
+            # Train the model
+            training_data = self.train_step(train_loader)
+            training_results["epoch"].append(epoch)
+            training_results["loss"].append(training_data["avg_loss_per_batch"])
+            training_results["accuracy"].append(training_data["avg_acc_per_batch"])
 
-                y_train = y_train.float().unsqueeze(1)  # Ensure correct shape for BCE loss
-                y_prediction_train = self.model(X_train)
-                
-                # Compute loss
-                loss = self.loss_function(y_prediction_train, y_train) 
-                train_losses_epoch.append(loss.item())
+            # Check the validation loss after training
+            validation_data = self.val_step(val_loader)
+            validation_results["epoch"].append(epoch)
+            validation_results["loss"].append(validation_data["avg_loss_per_batch"])
+            validation_results["accuracy"].append(validation_data["avg_acc_per_batch"])
 
-                self.optimizer.zero_grad()
-                loss.backward()
-                self.optimizer.step()
+            # Adjust learning rate if necessary
+            if self.lr_scheduler:
+                self.lr_scheduler.step()
 
-            # Evaluate model after each epoch
-            train_acc = self.evaluate(train_loader)
-            train_loss = np.mean(train_losses_epoch)
-            print(f'Epoch {epoch+1}/{epochs} - Train Accuracy: {train_acc*100:.2f}% | Training Loss: {train_loss:.4f} | LR: {self.optimizer.param_groups[0]["lr"]:.6f}')
-        
+            if epoch % 1 == 0:
+                print(f"{epoch}:")
+                print(f"LR: {self.optimizer.param_groups[0]['lr']}")
+                print(f"Loss - {training_data['avg_loss_per_batch']:.5f} | Accuracy - {training_data['avg_acc_per_batch']:.2f}%")
+                print(f"VLoss - {validation_data['avg_loss_per_batch']:.5f} | VAccuracy - {validation_data['avg_acc_per_batch']:.2f}%\n")
+
         self.save_model(model_state_dict=self.model.state_dict(), model_name=model_name)
-
+        return training_results, validation_results
 
 
     def validate(self, val_loader, hyperparams: dict, save_best: bool = True) -> tuple[float, float]:
@@ -100,21 +137,21 @@ class ModelHandler:
         Returns:
             tuple: (validation accuracy, validation loss)
         """
-        
+
         self.model.to(self.device)
-        self.model.eval() 
+        self.model.eval()
 
         val_losses_epoch, batch_sizes, accs = [], [], []
         best_acc = -1
         best_model_state = None  # Track the best model weights
 
-        with torch.no_grad(): 
+        with torch.no_grad():
             for X_val, y_val in val_loader:
                 X_val = X_val.to(self.device)
-                y_val = y_val.to(self.device).float().unsqueeze(1)  
+                y_val = y_val.to(self.device).float().unsqueeze(1)
 
                 y_prediction_val = self.model(X_val)  # forward pass
-                loss = self.loss_function(y_prediction_val, y_val) 
+                loss = self.loss_function(y_prediction_val, y_val)
                 val_losses_epoch.append(loss.item())
 
                 # Compute accuracy
@@ -144,7 +181,7 @@ class ModelHandler:
             torch.save(best_model_state, save_path)
             print(f"Best model saved at: {save_path}")
         return val_acc, val_loss
-    
+
 
     def evaluate(self, test_loader) -> float:
         """Evaluates the model on the test dataset.
@@ -193,7 +230,7 @@ class ModelHandler:
             prediction = (probability > 0.5).float() # Turn probability into binary classificaiton
 
         return prediction.item()
-        
+
 
     def save_model(self, model_state_dict: collections.OrderedDict, model_name: str | None) -> None:
         """Saves the model to the specified file path.
@@ -214,63 +251,3 @@ class ModelHandler:
         self.model.load_state_dict(torch.load(path))
         self.model.to(self.device)
         self.model.eval()
-
-if __name__ == "__main__":
-
-
-    audioproccessor = AudioProcessor()
-    spectroproccessor = SpectrogramProcessor()
-    datapipeline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
-    
-    
-    cnn_model = CNNModel()
-    loss_function = nn.BCEWithLogitsLoss()
-
-    # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=0.01, momentum=0.9) ###SDG
-    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
-
-    model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
-
-    if not os.path.exists("data/cough_data/spectrograms"):
-        datapipeline.process_all()
-    train_loader, val_loader, test_loader = datapipeline.create_dataloaders(batch_size=32)
-
-    # Train the model
-    epochs = 1
-
-    model_handler.train(train_loader=train_loader, epochs=epochs, model_name="g1_model")
-
-    best_model = None
-    best_acc = 0.0
-
-    # Hyperparameters for validation
-    hyperparameter_options = [
-        {"learning_rate": 0.01},
-        {"learning_rate": 0.001},
-        {"learning_rate": 0.0001}
-    ]
-
-    for hyperparams in hyperparameter_options:
-        print(f"Validating model with hyperparameters: {hyperparams}")
-
-        cnn_model = CNNModel()
-        # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=hyperparams["learning_rate"], momentum=0.9) ###SDG
-        optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
-
-        # Create new ModelHandler for each hyperparameter set
-        model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
-        
-        # Perform validation
-        val_acc, val_loss = model_handler.validate(val_loader, hyperparams)
-
-        # Save the best model based on accuracy
-        if val_acc > best_acc:
-            best_acc = val_acc
-            best_model = model_handler
-
-        print(f"Validation accuracy: {val_acc*100:.2f}% | Validation loss: {val_loss:.4f}")
-
-    # Final testing with the best model
-    if best_model:
-        test_acc = best_model.evaluate(test_loader)
-        print(f"Test accuracy: {test_acc*100:.2f}%. Awesome!")
