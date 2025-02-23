@@ -1,4 +1,9 @@
 import React from 'react';
+import Spectrogram from '@/app/components/results/spectrogram';
+import NextSteps from '@/app/components/results/next-steps';
+import TextHeader from '@/app/components/results/text-header';
+import Result from '@/app/components/results/result';
+import { Box, Stack, ThemeProvider, Typography } from "@mui/material";
 
 import Navbar from '../../components/navbar';
 
@@ -6,8 +11,32 @@ const Results = () => {
     return (
         <div>
             <Navbar></Navbar>
-            <h1>Results page</h1>
+            <Stack direction="column" spacing={0} sx={{paddingLeft: "120px", paddingTop: "80px"}}>
+                <Stack direction="row" spacing={12}>
+                    <Spectrogram/>
+                    
+                    <Stack direction="column" spacing={2}>
+                        <TextHeader/>
+                        <Result/>
+                        <Typography 
+                            sx={{
+                                position: "relative", 
+                                fontFamily: "'Spartan-Regular', Helvetica", 
+                                color: "#303030", 
+                                fontSize: "1.5rem",
+                                textDecoration: "underline",
+                                fontWeight: 200,
+                            }
+                        }>
+                        Learn more about our model &gt;
+                        </Typography>
+                    </Stack>
+                </Stack>
+                <Box sx={{ marginTop: "-50px !important"}}><NextSteps sx={{ marginTop: "0px !important"}}/></Box>
+                
+            </Stack>
+            
         </div>
     );
 };
-export default Info;
+export default Results;

@@ -23,6 +23,12 @@ class ExtractedFeaturesProcessor(ImageProcessor):
         super().__init__(audio_folder, output_folder)
         self.feature_type = feature_type.lower()
         self.output_folder = os.path.join(output_folder, self.feature_type)
+
+    def process_single_image_for_inference(self):
+        """
+        to be implemented
+        """
+        return None
     
     def process_all_images(self) -> None:
         """
@@ -39,29 +45,47 @@ class ExtractedFeaturesProcessor(ImageProcessor):
                 if filename.endswith(".wav"):
                     audio_path = os.path.join(audio_dir, filename)
 
-                    # Process file to generate and save spectrogram
-                    if self.feature_type == "fbank":
-                        self.process_single_audio_to_fbank(audio_path, output_dir)
-                    elif self.feature_type == "mfcc":
-                        self.process_single_audio_to_mfcc()
+                    # Process file to generate and save image
+                    self.process_single_audio_to_image(audio_path, output_dir)
     
-    def process_single_audio_to_mfcc(self):
-        pass
-
-    def process_single_audio_to_fbank(self, audio_path: str, output_dir: str):
-        """
-        Extracts FBANK features from a single audio, saves to output_dir
-        """
+    
+    def process_single_audio_to_image(self, audio_path: str, output_dir: str):
         filename = os.path.splitext(os.path.basename(audio_path))[0]
-        fbank_image_path = os.path.join(output_dir, filename)
-        fbank_features = self.fbank(audio_path, wintype="hamming")
-        
-        # Save to image
+        image_path = os.path.join(output_dir, filename)
+        if self.feature_type == "fbank":
+            extracted_features = self.fbank(audio_path)
+        elif self.feature_type == "mfcc":
+            extracted_features = self.mfcc(audio_path)
         plt.figure(figsize=(4, 4))
-        plt.imshow(fbank_features.T, cmap="gray", origin="lower", aspect="auto")
+        plt.imshow(extracted_features, cmap="gray", aspect="auto", origin="lower")  
         plt.axis("off")
-        plt.savefig(fbank_image_path, bbox_inches="tight", pad_inches=0)
+        plt.savefig(image_path, bbox_inches="tight", pad_inches=0)
         plt.close()
+
+
+    def mfcc(self, audio_path, samplerate=48000, n_mfcc=13, n_fft=512, hop_length=160, win_length=400):
+        # Load audio
+        y, sr = librosa.load(audio_path, sr=samplerate)
+        
+        # Compute MFCC
+        mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc, n_fft=n_fft, hop_length=hop_length, win_length=win_length)
+        
+        # Normalize MFCC to 0-255 grayscale range
+        mfcc_min, mfcc_max = np.min(mfcc), np.max(mfcc)
+        mfcc_norm = 255 * (mfcc - mfcc_min) / (mfcc_max - mfcc_min)
+        mfcc_norm = mfcc_norm.astype(np.uint8)
+        
+        # Apply random transformation
+        transformation_matrix = np.random.rand(mfcc.shape[0], mfcc.shape[0])
+        transformed_mfcc = np.dot(transformation_matrix, mfcc_norm)
+        
+        # Normalize transformed MFCC
+        transformed_min, transformed_max = np.min(transformed_mfcc), np.max(transformed_mfcc)
+        transformed_mfcc_norm = 255 * (transformed_mfcc - transformed_min) / (transformed_max - transformed_min)
+        transformed_mfcc_norm = transformed_mfcc_norm.astype(np.uint8)
+        
+        return transformed_mfcc_norm
+    
 
     def fbank(self,
         audio_path,

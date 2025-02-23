@@ -13,7 +13,10 @@ import noisereduce as nr
 from pydub.silence import detect_nonsilent
 import librosa
 import librosa.display
-
+from sklearn.preprocessing import MinMaxScaler
+import matplotlib.pyplot as plt
+import soundfile as sf
+from scipy.signal import butter, lfilter
 import json
 
 
@@ -325,3 +328,79 @@ class AudioProcessor:
             standardized_audio = audio
 
         return standardized_audio
+
+    def bandpass_filter(self, y, sr, lowcut=300, highcut=4000, order=6):
+        """
+        Apply a bandpass filter to isolate frequencies between lowcut and highcut.
+        Used to reduce background noise and focus on cough sounds.
+        (specifically used for the minimize_speech method)
+        
+        Returns:
+            np.ndarray: Filtered audio signal.
+        """
+        nyquist = 0.5 * sr
+        low = lowcut / nyquist
+        high = highcut / nyquist
+        b, a = butter(order, [low, high], btype="band")
+        return lfilter(b, a, y)
+    
+
+    def minimize_speech(self ,audio_path, output_path="isolated_cough.wav (subject to change)", duration=None):
+        """
+        Minimizes speech while preserving cough sounds using HPSS, soft masking, and bandpass filtering.
+        """
+        y, sr = librosa.load(audio_path, sr=None, duration=duration)
+
+        y_harmonic, y_percussive = librosa.effects.hpss(y, margin=(1, 5)) 
+
+        y_cough_filtered = self.bandpass_filter(y_percussive, sr)
+
+        S_full, phase = librosa.magphase(librosa.stft(y_cough_filtered))
+
+        S_filter = librosa.decompose.nn_filter(S_full,
+                                            aggregate=np.median,
+                                            metric='cosine',
+                                            width=int(librosa.time_to_frames(2, sr=sr)))
+
+        S_filter = np.minimum(S_full, S_filter)
+
+        margin_speech, margin_cough = 2, 10 
+        power = 2
+
+        mask_speech = librosa.util.softmask(S_filter,
+                                            margin_speech * (S_full - S_filter),
+                                            power=power)
+
+        mask_cough = librosa.util.softmask(S_full - S_filter,
+                                        margin_cough * S_filter,
+                                        power=power)
+
+        S_cough = mask_cough * S_full
+
+        y_cough = librosa.istft(S_cough * phase)
+
+        sf.write(output_path, y_cough, sr)
+        print(f"✅ Isolated cough saved at: {output_path}")
+
+        fig, ax = plt.subplots(nrows=3, sharex=True, sharey=True, figsize=(10, 6))
+
+        idx = slice(*librosa.time_to_frames([0, min(5, len(y) / sr)], sr=sr))
+
+        img = librosa.display.specshow(librosa.amplitude_to_db(S_full[:, idx], ref=np.max),
+                                    y_axis='log', x_axis='time', sr=sr, ax=ax[0])
+        ax[0].set(title='Full Percussive Spectrum')
+        ax[0].label_outer()
+
+        librosa.display.specshow(librosa.amplitude_to_db(S_filter[:, idx], ref=np.max),
+                                y_axis='log', x_axis='time', sr=sr, ax=ax[1])
+        ax[1].set(title='Background Speech Estimate')
+        ax[1].label_outer()
+
+        librosa.display.specshow(librosa.amplitude_to_db(S_cough[:, idx], ref=np.max),
+                                y_axis='log', x_axis='time', sr=sr, ax=ax[2])
+        ax[2].set(title='Isolated Cough (Speech Reduced)')
+
+        fig.colorbar(img, ax=ax)
+        plt.show()
+
+        return y_cough, sr 
