@@ -7,7 +7,6 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme/theme";
 import "./globals.css";
 
-import UploadButton from './components/upload-button';
 import Steps from './components/steps';
 import Navbar from "./components/navbar";
 
