@@ -341,7 +341,7 @@ class AudioProcessor:
         nyquist = 0.5 * sr
         low = lowcut / nyquist
         high = highcut / nyquist
-        b, a = butter(order, [low, high], btype="band")
+        b, a, c = butter(order, [low, high], btype="band")
         return lfilter(b, a, y)
 
     def is_muffled(self, audio_path, threshold=0.5):
