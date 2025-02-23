@@ -4,11 +4,13 @@ import theme from "../../theme/theme";
 import UploadAudio from "@/app/components/upload-audio";
 import RecordAudio from "@/app/components/record-audio";
 import SubmitAudioHeading from "@/app/components/submit-audio-heading";
+import Navbar from "@/app/components/navbar";
 
 export default function Action() {
   return (
       <ThemeProvider theme={theme}>
-        <Stack width= "100%" direction ="column" alignItems="center" spacing={10} sx={{ justifyContent: "center", mt: 6 }} >
+        <Navbar></Navbar>
+        <Stack width= "100%" direction ="column" alignItems="center" spacing={5} sx={{ justifyContent: "center", mt: 6 }} >
           <SubmitAudioHeading></SubmitAudioHeading>
 
           <Stack width= "100%" direction ="row" alignItems="center" spacing={22} sx={{ justifyContent: "center" }} >
