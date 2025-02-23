@@ -380,7 +380,7 @@ class AudioProcessor:
                 np.ndarray: The high-pass filtered audio signal.
         """
 
-        b, a = butter(6, cutoff / (0.5 * sr), btype='high')
+        b, a, c = butter(6, cutoff / (0.5 * sr), btype='high')
         return lfilter(b, a, y)
 
     def demuffle_audio(self, y, sr):
