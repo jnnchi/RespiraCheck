@@ -15,7 +15,7 @@ const FileStatus = () => {
             </p>
 
             <div>
-                <CheckIcon className="w-[82px] h-[83px] top-[4px] left-[289px] bg-[#e8f5ff] rounded-[60px] flex flex-col items-center justify-center" sx={{ width: 100, height: 100, color: '#3D70EC', mt: 3 }}/>
+                <CheckIcon className="w-[82px] h-[83px] top-[4px] left-[289px] bg-[#e8f5ff] rounded-[60px] flex flex-col items-center justify-center" sx={{ width: 115, height: 115, color: '#3D70EC', mt: 3 }}/>
             </div>
         </div>
     );
