@@ -4,6 +4,8 @@ import { React, useState, useRef } from "react";
 import { Box, Card, CardContent, Button } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
 
+// https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+// https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder
 
 const RecordAudio = () => {
 
