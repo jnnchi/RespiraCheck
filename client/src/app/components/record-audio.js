@@ -73,7 +73,7 @@ const RecordAudio = () => {
           Record Audio:
         </h1>
 
-        <Button onClick={handleRecording} className="w-full rounded-[40px] cursor-pointer" sx={{fontWeight: 400, textTransform: "none", color: "black", width: 350, height: 310, bgcolor: '#F1F7FF', transition: "transform 0.3s, box-shadow 0.3s", "&:hover": {transform: "scale(1.05)", boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',} }}>
+        <Button onClick={handleRecording} className="w-full rounded-[40px] cursor-pointer" sx={{borderRadius: "25px", fontWeight: 400, textTransform: "none", color: "black", width: 350, height: 310, bgcolor: '#F1F7FF', transition: "transform 0.3s, box-shadow 0.3s", "&:hover": {transform: "scale(1.05)", boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',} }}>
           <Box className="flex flex-col items-center pt-1 px-10 bg-[#F1F7FF] space-y-9">
             <div
                 className={`pt-5 w-[200px] h-[200px] bg-[#EED65C] rounded-full flex items-center justify-center ${

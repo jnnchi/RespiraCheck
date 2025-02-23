@@ -1,40 +1,33 @@
-"use client";
+import React from 'react';
 
-import Image from "next/image";
-import { Typography, Box, Stack } from "@mui/material";
+import Navbar from './components/navbar';
+import { Stack, Box } from '@mui/material';
+import Title from '@/app/components/home/title';
+import StartButton from '@/app/components/home/button';
+import InfoText from '@/app/components/home/info-text';
+import Image from 'next/image';
+import Link from 'next/link';
 
-import { ThemeProvider } from "@mui/material/styles";
-import theme from "./theme/theme";
-import "./globals.css";
 
-import Steps from './components/steps';
-import Navbar from "./components/navbar";
-
-export default function Landing() {
+const Home = () => {
   return (
-    <ThemeProvider theme={theme}>
+    <div>
       <Navbar></Navbar>
-      {/* <Router>
-        <Navbar></Navbar>
-        <Routes>
-          <Route path="/" element={<Home />}></Route>
-          <Route path="/info" element={<Info />}></Route>
-          <Route path="/action" element={<Action />}></Route>
-          <Route path="/results" element={<Results />}></Route>
-        </Routes>
-        
-      </Router> */}
-{/*       
-        <Stack width= "100%" direction ="row" alignItems="center" sx={{ paddingTop: "60px", justifyContent: "center" }} >
-            <Box sx={{gap : 7,width: "30%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-                <UploadButton></UploadButton>
-                
-                <Typography sx={{fontSize: "25px"}}>Upload Audio</Typography>
-            </Box>
-            <Steps></Steps>
+      <Stack direction="row" spacing={0} sx={{paddingLeft: "120px", paddingTop: "50px"}}>
+        <Stack direction="column" spacing={5}>
+          <Title/>
+          <StartButton/>
+          <InfoText/>
+        </Stack>
+        <Box sx={{paddingRight: "120px", paddingTop: "50px", alignItems: "flex-start"}}>
+          <Image src="/undraw_medical_icon.svg" alt="medical image" width={500} height={367} s/> 
 
-        </Stack> */}
-        
-    </ThemeProvider>
+        </Box>
+      </Stack>
+
+      
+    </div>
   );
-}
+};
+
+export default Home;

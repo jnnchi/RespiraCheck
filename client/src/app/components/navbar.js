@@ -38,8 +38,8 @@ const Navbar = () => {
             fontWeight: 300,
           }}
         >
-          <Link href="/pages/home"> 
-            <span style={{ textDecoration: "none", color: pathname === "/pages/home" ? "#3D70EC" : "black" }}
+          <Link href="/"> 
+            <span style={{ textDecoration: "none", color: pathname === "/" ? "#3D70EC" : "black" }}
               onMouseEnter={(e) => e.target.style.color = "#3D70EC"}
               onMouseLeave={(e) => e.target.style.color = "black"}
             >Home</span>
