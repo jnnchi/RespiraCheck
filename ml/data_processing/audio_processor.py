@@ -389,7 +389,7 @@ class AudioProcessor:
            and a high-pass filter.
 
            This method helps enhance clarity by removing low-frequency noise
-           and preserving important speech or cough frequencies.
+           and preserving cough frequencies.
 
            Args:
                y (np.ndarray): The input audio signal.
