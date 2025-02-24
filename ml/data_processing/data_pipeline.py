@@ -11,7 +11,7 @@ import os
 from PIL import Image
 
 import torch
-from torch.utils.data import random_split, DataLoader, TensorDataset
+from torch.utils.data import random_split, DataLoader, TensorDataset, WeightedRandomSampler
 from torchvision import transforms
 from pydub import AudioSegment
 import io
@@ -137,13 +137,22 @@ class DataPipeline:
         return probability  # Probability of being COVID-positive (0.0 to 1.0)
 
 
-    def create_dataloaders(self, batch_size) -> tuple[DataLoader, DataLoader, DataLoader]:
+    def create_dataloaders(self, batch_size, dataset_path = None, upsample = True) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Splits the dataset into training and test sets.
+
+        Args:
+            batch_size (int): The batch size for the DataLoader.
+            dataset_path (str | None): Path to the TensorDataset file.
 
         Returns:
             tuple: (train_df, test_df) - The training and testing DataFrames.
         """
-        dataset = self.load_dataset()
+        if dataset_path:
+            print(f"Loading dataset from {dataset_path}")
+            dataset = torch.load(dataset_path, weights_only=False)
+        else:
+            print("Processing and loading dataset")
+            dataset = self.load_dataset()
 
         # Calculate sizes
         test_size = round(self.test_size * len(dataset))
@@ -153,9 +162,39 @@ class DataPipeline:
         # Perform split
         train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
+        # Upsample positive class
+        if upsample:
+            print("Upsampling data")
+            labels = [label.item() for _, label in train_dataset]
+            train_counts = {}
+            for label in labels:
+                train_counts[label] = train_counts.get(label, 0) + 1
+            # print(train_counts)
+
+            weights = torch.where(torch.tensor(labels) == 0, 1 / train_counts[0], 1 / train_counts[1])
+            # print(labels[:5], weights[:5])
+
+            wr_sampler = WeightedRandomSampler(weights, int(len(train_dataset) * 1.5))
+
+            train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=wr_sampler)
+        
+        else:
+            print("No upsampling")
+            train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+
         # Create DataLoaders
-        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
         val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
         test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+        # Count labels in train_loader
+        train_counts = {}
+        for _, labels in train_loader:
+            for label in labels:
+                train_counts[label.item()] = train_counts.get(label.item(), 0) + 1
+
+        # print(train_counts)
+
+        # Reduce memory footprint
+        dataset, train_dataset, val_dataset, test_dataset = None, None, None, None
 
         return train_loader, val_loader, test_loader
