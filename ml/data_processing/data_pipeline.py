@@ -52,8 +52,8 @@ class DataPipeline:
         self.audio_processor.process_all_audio()
         self.image_processor.process_all_images()
         
-    def load_dataset(self) -> TensorDataset:
-        """Loads the dataset from the specified file path into a DataFrame."""
+    def load_and_save_dataset(self, dataset_path: str) -> TensorDataset:
+        """Loads the dataset from the specified file path and saves it, returns TensorDataset."""
         tensors = []
         labels = []  
 
@@ -71,8 +71,13 @@ class DataPipeline:
         X = torch.stack(tensors)  
         # Tensor of all labels (N x 1) - 377x1
         y = torch.tensor(labels, dtype=torch.long) 
+        
+        dataset = TensorDataset(X, y)
+        if dataset_path:
+            torch.save(dataset, dataset_path)
+            print(f"Dataset saved at {dataset_path}")
 
-        return TensorDataset(X, y)
+        return dataset
 
 
     def image_to_tensor(self, image_path: str) -> torch.Tensor:
@@ -152,7 +157,7 @@ class DataPipeline:
             dataset = torch.load(dataset_path, weights_only=False)
         else:
             print("Processing and loading dataset")
-            dataset = self.load_dataset()
+            dataset = self.load_and_save_dataset(dataset_path)
 
         # Calculate sizes
         test_size = round(self.test_size * len(dataset))
