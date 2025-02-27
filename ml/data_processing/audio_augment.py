@@ -10,6 +10,9 @@ import os
 import torchaudio.transforms as T
 import torch
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+from spectrogram_processor import SpectrogramProcessor
 
 class DataAugmentProcessor:
   """Creates new audio and spectrogram samples through augmentation techniques
@@ -28,109 +31,118 @@ class DataAugmentProcessor:
     # Store path to audio file
     self.audio_path = audio_path
 
-  def get_mel_spectrogram(self, y, sr) -> np.ndarray:
-    """Helper function similar to one in SpectrogramProcessor 
-    to return Mel Spectrogram
+  def augment_all_audio(self, percent: float, vol_shift: int, time_shift: float, pitch_shift: int, freq_mask: int, time_mask: int,  
+                        input_folder: str="ml/data/cough_data/processed_audio", 
+                        output_folder: str="ml/data/cough_data/augmented_spectrograms") -> None:
+    """Reads in all audio from the processed_audio folder converts to 
+    spectrograms, and augments the dataset by "percent" percentage.
     
-    Args: y, sr = Extracted Audio from libros.load
-    Returns: Mel Spectrogram"""
-    # Convert to log scaled mel spectrogram
-    spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
+    Args:
+    percent: The percent of the dataset that should be augmented (eg. 0.5 => two original spectrograms for every augmented spectrogram)
+    extracted_features: A boolean, False if you want to generate spectrograms, True if you want to generate FBANK or MFCC images.
+    output_folder: The folder we are saving augmented spectrograms to. Defaults to cough_data/augmented_spectrograms.
+    """
+    # Process orignial dataset:
+    processor = SpectrogramProcessor(audio_folder=input_folder, output_folder=output_folder)
+    processor.process_all_images()
 
-    # Convert to decibels
-    spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
+    # Augment dataset and generate images:
+    for label in "positive", "negative":
+      dir = os.listdir(os.path.join(input_folder, label))
+      for filepath in dir[0:round(len(dir)*percent)]:
 
-    #  Normalize Spectrogram
-    spectrogram_norm = (spectrogram_db - spectrogram_db.min()) / (spectrogram_db.max() - spectrogram_db.min())
+        path_in = os.path.join(input_folder, label, filepath)
+        audio, sr = librosa.load(path_in, sr=None)
+        
+        # Augmentation Audio
+        audio = self.change_volume(audio, sr, vol_shift)
+        audio = self.time_shift(audio, sr, time_shift)
+        audio = self.pitch_shift(audio, sr, pitch_shift)
+        
+        # Generate spectrogram
+        spectrogram = processor.normalize_spectrogram(processor.conv_to_spectrogram(audio_path=None, path_input=False, audio_clip=audio, sample_rate=sr))
 
-    # Return normalized Mel Spectrogram
-    return spectrogram_norm
+        # Augment Spectrogram
+        spectrogram = self.freq_mask(spectrogram, freq_mask)
+        spectrogram = self.time_mask(spectrogram, time_mask)
 
-  def change_volume(self, db_change=5) -> np.ndarray:
+        # Save image file
+        save_path = filepath[:-4] + "_aug" + ".png"
+        save_path = os.path.join(output_folder, label, save_path)
+
+        processor.save_spectrogram_image(spectrogram=spectrogram, save_path=save_path)
+
+  def change_volume(self, audio: np.ndarray, sr_in: int, db_change: int) -> np.ndarray:
      """Returns the mel spectrogram after increasing/decreasing volume
      
-     Args: db_change: Change in Volume in Decibels (Default kept small to 5)
+     Args: 
+     db_change: Change in Volume in Decibels (Default kept small to 5)
      Returns: Mel Spectrogram after increasing/decreasing volume """
-     # Load the audio
-     y, sr = librosa.load(self.audio_path)
-     
      # Add the Decibel change
-     augmented_audio = y + db_change
-     
-     # Return Mel Spectrogram
-     return self.get_mel_spectrogram(augmented_audio, sr)
+     augmented_audio = audio + db_change
+     return augmented_audio
 
-  def time_shift(self, shift_max=0.1) -> np.ndarray:
+  def time_shift(self, audio: np.ndarray, sr_in: int, shift_max: float) -> np.ndarray:
     """Returns Mel Spectrogram by time shifting the audio
     
     Args: shift_max: Max % of length of audio sample to be shifted (Default
     kept small to only 0.1 or 10%)
     Returns: Mel Spectrogram after shifting time"""
-    # Load the audio
-    y, sr = librosa.load(self.audio_path)
-
-    # Random (Uniform Dist.) shift upto 10% of total audio length
-    shift = int(np.random.uniform(-shift_max, shift_max) * len(y))
+    # Random (Uniform Dist.) shift up to 10% of total audio length
+    shift = int(np.random.uniform(-shift_max, shift_max) * len(audio))
 
     # Calculate time shift
-    shifted_audio = np.roll(y, shift)
+    shifted_audio = np.roll(audio, shift)
 
     # Return Mel Spectrogram
-    return self.get_mel_spectrogram(shifted_audio, sr)
+    return audio
   
-  def pitch_shift(self, n_steps=4) -> np.ndarray:
+  def pitch_shift(self, audio: np.ndarray, sr_in: int, n_steps: int) -> np.ndarray:
     """Returns the Mel Spectrogram after pitch shifting
     
     Args: n_steps: Number of semitones for frequency to be shifted (default
     used 4 as found in research papers)
     Returns: Mel Spectrogram after shifting pitch"""
-    # Load audio
-    y, sr = librosa.load(self.audio_path)
 
     # Pitch shift
-    pitch_shifted_audio = librosa.effects.pitch_shift(y=y, sr=sr, n_steps=n_steps)
+    pitch_shifted_audio = librosa.effects.pitch_shift(y=audio, sr=sr_in, n_steps=n_steps)
 
     # Return Mel Spectrogram
-    return self.get_mel_spectrogram(pitch_shifted_audio, sr)
+    return audio
   
-  def freq_mask(self, freq_mask_param=30) -> np.ndarray:
+  def freq_mask(self, spectrogram: np.ndarray, freq_mask: int) -> np.ndarray:
     """Returns mel spectrogram after frequency masking
     
-    Args: freq_mask_param: Max No of frequency bands that can be masked (used 
-    default value from research paper)
+    Args: 
+    spectrogram: orginal spectrogram data, passed in as a np.ndarray
+    freq_mask: Max no. of frequency bands that can be masked (used default value from research paper = 30).
     Returns: Mel Spectrogram after freq masking"""
-    # Load the audio file with original sample rate 
-    y, sr = librosa.load(self.audio_path, sr=None)
-
-    # Convert to log scaled mel spectrogram
-    spectrogram_norm = self.get_mel_spectrogram(y, sr)
-
+    
     # Time masking
-    freq_masking = T.FrequencyMasking(freq_mask_param)
-    augmented_melspec = np.array(freq_masking(torch.tensor(spectrogram_norm)))
+    freq_masking = T.FrequencyMasking(freq_mask)
+    augmented_melspec = np.array(freq_masking(torch.tensor(spectrogram)))
 
     # Return Augmented Mel Spectrogram
     return augmented_melspec
   
-  def time_mask(self, time_mask_param=30) -> np.ndarray:
+  def time_mask(self, spectrogram: np.ndarray, time_mask: int) -> np.ndarray:
     """Returns mel spectrogram after time masking
     
-    Args: time_mask_param: No of time stamps to mask (used default
-    value from research paper)
+    Args: 
+    spectrogram: orginal spectrogram data, passed in as a np.ndarray
+    time_mask_param: No. of time stamps to mask (used default value from research paper = 30)
     
     Returns: Mel Spectrogram with Time Masking"""
-    # Load the audio file with original sample rate 
-    y, sr = librosa.load(self.audio_path, sr=None)
-
-    # Convert to log scaled mel spectrogram
-    spectrogram_norm = self.get_mel_spectrogram(y, sr)
-
+    
     # Time masking
-    time_masking = T.TimeMasking(time_mask_param)
-    augmented_melspec = np.array(time_masking(torch.tensor(spectrogram_norm)))
+    time_masking = T.TimeMasking(time_mask)
+    augmented_melspec = np.array(time_masking(torch.tensor(spectrogram)))
 
     # Return Augmented Mel Spectrogram
     return augmented_melspec
+
+
+###### Visualization Functions: ######
 
   def plot_spectrogram(self, name, spectrogram) -> None:
     """Plots the spectrogram using Matplotlib
@@ -147,31 +159,65 @@ class DataAugmentProcessor:
     plt.xlabel("Time")
     plt.ylabel("Frequency")
     plt.tight_layout()
+    plt.show()
 
-  def plot_compare(self) -> None:
-    """Plots spectrogram across all augmentations for comparison
+  def plot_compare(self, audio_path: str, vol_shift: int, time_shift: float, pitch_shift: int, freq_mask: int, time_mask: int) -> None:
+    """Plots spectrogram across all augmentations for comparison"""
     
-    Args: None
-    Returns: None"""
-    # Load audio file
-    y, sr = librosa.load(self.audio_path, sr=None)
+    processor = SpectrogramProcessor()
 
-    # Do Augmentations and Plot accordingly
-    spectrogram = self.get_mel_spectrogram(y, sr) 
-    self.plot_spectrogram("Normal", spectrogram)
+    audio, sr = librosa.load(audio_path, sr=None)
 
-    pitch_spectrogram = self.pitch_shift()
-    self.plot_spectrogram("Pitch Shifted", pitch_spectrogram)
+    spectrogram = processor.normalize_spectrogram(processor.conv_to_spectrogram(audio_path=None, path_input=False, audio_clip=audio, sample_rate=sr))    
+    self.plot_spectrogram("Original", spectrogram)
 
-    timeshift_spectrogram = self.time_shift()
-    self.plot_spectrogram("Time Shifted", timeshift_spectrogram)
+    audio1 = self.change_volume(audio, sr, vol_shift)
+    spectrogram = processor.normalize_spectrogram(processor.conv_to_spectrogram(audio_path=None, path_input=False, audio_clip=audio1, sample_rate=sr))
+    self.plot_spectrogram("Volume Increased", spectrogram)
 
-    vol_spectrogram = self.change_volume()
-    self.plot_spectrogram("Volume Increased", vol_spectrogram)
+    audio2 = self.time_shift(audio, sr, time_shift)
+    spectrogram = processor.normalize_spectrogram(processor.conv_to_spectrogram(audio_path=None, path_input=False, audio_clip=audio2, sample_rate=sr))
+    self.plot_spectrogram("Time Shifted", spectrogram)
+    
+    audio3 = self.pitch_shift(audio, sr, pitch_shift)
+    spectrogram = processor.normalize_spectrogram(processor.conv_to_spectrogram(audio_path=None, path_input=False, audio_clip=audio3, sample_rate=sr))
+    self.plot_spectrogram("Pitch Shifted", spectrogram)
+    
+    # Generate clean spectrogram
+    spectrogram = processor.normalize_spectrogram(processor.conv_to_spectrogram(audio_path=None, path_input=False, audio_clip=audio, sample_rate=sr))
 
-    freq_spectrogram = self.freq_mask()
-    self.plot_spectrogram("Frequency Masked", freq_spectrogram)
+    # Augment Spectrogram
+    spectro1 = self.freq_mask(spectrogram, freq_mask)
+    self.plot_spectrogram("Frequency Masked", spectro1)
+    
+    spectro2 = self.time_mask(spectrogram, time_mask)
+    self.plot_spectrogram("Time Masked", spectro2)
 
-    time_spectrogram = self.time_mask()
-    self.plot_spectrogram("Time Masked", time_spectrogram)
+    # Finally, do full augmentation
+
+    aug_audio = self.time_shift(audio1, sr, time_shift)
+    aug_audio = self.pitch_shift(aug_audio, sr, pitch_shift)
+    aug_spectrogram = processor.normalize_spectrogram(processor.conv_to_spectrogram(audio_path=None, path_input=False, audio_clip=aug_audio, sample_rate=sr))
+    aug_spectrogram = self.freq_mask(aug_spectrogram, freq_mask)
+    aug_spectrogram = self.time_mask(aug_spectrogram, time_mask)
+
   
+if __name__ == "__main__":
+
+  # Load in all processed audio from ml/data/cough_data/processed_audio
+
+  augment_proc = DataAugmentProcessor(audio_path=None)
+
+  # Parameters
+  percent = 0.5
+  vol_shift = 5
+  time_shift = 2
+  pitch_shift = 25
+  freq_mask = 30
+  time_mask = 30
+
+  # augment_proc.augment_all_audio(percent, vol_shift, time_shift, pitch_shift, freq_mask, time_mask)
+  print("Augmentation Complete! Check your folders my friend.")
+
+  augment_proc.plot_compare("ml/data/cough_data/processed_audio/positive/0b1a540a-b6e7-4a2f-8796-28bd04554a36.wav", 
+                            vol_shift, time_shift, pitch_shift, freq_mask, time_mask)

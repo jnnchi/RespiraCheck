@@ -9,7 +9,7 @@ import numpy as np
 import librosa
 import os
 import matplotlib.pyplot as plt
-from .image_processor import ImageProcessor
+from image_processor import ImageProcessor
 from pydub import AudioSegment
 
 class SpectrogramProcessor(ImageProcessor):
@@ -70,9 +70,8 @@ class SpectrogramProcessor(ImageProcessor):
 
         plt.figure(figsize=(10, 4))
         plt.imshow(spectrogram, aspect='auto', origin='lower', cmap='inferno')
-        plt.colorbar(label='Amplitude (dB)')
-        plt.tight_layout()
-        
+        plt.axis('off')
+
         plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
         plt.close()
 
@@ -136,7 +135,7 @@ class SpectrogramProcessor(ImageProcessor):
 
         return spectrogram_db
 
-    def conv_to_spectrogram(self, audio_path: str) -> np.ndarray:
+    def conv_to_spectrogram(self, audio_path: str, path_input: bool=True, audio_clip: np.ndarray=None, sample_rate:int=0) -> np.ndarray:
         """Converts an audio file to its spectrogram representation.
 
         Args:
@@ -145,15 +144,22 @@ class SpectrogramProcessor(ImageProcessor):
         Returns:
             np.ndarray: The spectrogram of the audio file.
         """
-        # Load the audio file with original sample rate 
-        # (assumes sample rate already standardized by AudioProcessor)
-        y, sr = librosa.load(audio_path, sr=None)
+        if path_input:
+            # Load the audio file with original sample rate 
+            # (assumes sample rate already standardized by AudioProcessor)
+            y, sr = librosa.load(audio_path, sr=None)
 
-        # Convert to log scaled mel spectrogram
-        spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
+            # Convert to log scaled mel spectrogram
+            spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
 
-        # Convert to decibels
-        spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
+            # Convert to decibels
+            spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
+        else:
+            # Convert to log scaled mel spectrogram
+            spectrogram = librosa.feature.melspectrogram(y=audio_clip, sr=sample_rate, n_mels=128, fmax=8000)
+
+            # Convert to decibels
+            spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
 
         return spectrogram_db
 
