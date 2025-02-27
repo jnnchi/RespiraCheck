@@ -64,6 +64,11 @@ class DataAugmentProcessor:
         # Augment dataset and generate images:
         for label in "positive", "negative":
             dir = os.listdir(os.path.join(input_folder, label))
+            save_directory = os.path.join(
+                    output_folder + "_" + "".join([augmentation[0].upper() for augmentation in augmentations_to_perform]),
+                    label
+                )
+            os.makedirs(save_directory, exist_ok=True)
             for filepath in dir[0 : round(len(dir) * percent)]:
 
                 path_in = os.path.join(input_folder, label, filepath)
@@ -92,15 +97,7 @@ class DataAugmentProcessor:
                     spectrogram = self.time_mask(spectrogram, time_mask)
 
                 # Save image file
-                save_path = (
-                    filepath[:-4]
-                    + "_aug_"
-                    + "".join(
-                        [augmentation[0].upper() for augmentation in augmentations_to_perform]
-                    )
-                    + ".png"
-                )
-                save_path = os.path.join(output_folder, label, save_path)
+                save_path = os.path.join(save_directory, filepath[:-4] + "_aug.png")
                 print(save_path)
 
                 processor.save_spectrogram_image(
