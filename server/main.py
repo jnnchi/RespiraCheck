@@ -30,7 +30,7 @@ async def upload_audio(file: UploadFile = File(...)):
     data_pipeline = DataPipeline()
     model_handler = ModelHandler()
     model_pipeline = ModelPipeline(data_pipeline, model_handler)
-    prediction = model_pipeline.make_single_inference(audio, "model_name")
+    prediction = model_pipeline.make_single_inference(audio, "model_learning_rate_0.001_dropout_0.3_1739994880.920523.pth")
 
     # Post the inference to inference URL
     requests.post("http://localhost:8000/inference", json={"prediction": prediction})
