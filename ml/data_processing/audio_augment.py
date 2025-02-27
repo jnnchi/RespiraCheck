@@ -50,7 +50,7 @@ class DataAugmentProcessor:
 
         Args:
         augmentations_to_perform: A list of strings, each string is the name of an augmentation to perform.
-          ex: ["change_volume", "time_shift", "pitch_shift", "freq_mask", "time_mask"]
+          ex: ["CV", "TS", "PS", "FM", "TM"]
         percent: The percent of the dataset that should be augmented (eg. 0.5 => two original spectrograms for every augmented spectrogram)
         extracted_features: A boolean, False if you want to generate spectrograms, True if you want to generate FBANK or MFCC images.
         output_folder: The folder we are saving augmented spectrograms to. Defaults to cough_data/augmented_spectrograms.
@@ -65,7 +65,7 @@ class DataAugmentProcessor:
         for label in "positive", "negative":
             dir = os.listdir(os.path.join(input_folder, label))
             save_directory = os.path.join(
-                    output_folder + "_" + "".join([augmentation[0].upper() for augmentation in augmentations_to_perform]),
+                    output_folder + "_" + "_".join([augmentation for augmentation in augmentations_to_perform]),
                     label
                 )
             os.makedirs(save_directory, exist_ok=True)
@@ -75,11 +75,11 @@ class DataAugmentProcessor:
                 audio, sr = librosa.load(path_in, sr=None)
 
                 # Augmentation Audio
-                if "change_volume" in augmentations_to_perform:
+                if "CV" in augmentations_to_perform:
                     audio = self.change_volume(audio, sr, vol_shift)
-                if "time_shift" in augmentations_to_perform:
+                if "TS" in augmentations_to_perform:
                     audio = self.time_shift(audio, sr, time_shift)
-                if "pitch_shift" in augmentations_to_perform:
+                if "PS" in augmentations_to_perform:
                     audio = self.pitch_shift(audio, sr, pitch_shift)
 
                 # Generate spectrogram
@@ -91,9 +91,9 @@ class DataAugmentProcessor:
                 )
 
                 # Augment Spectrogram
-                if "freq_mask" in augmentations_to_perform:
+                if "FM" in augmentations_to_perform:
                     spectrogram = self.freq_mask(spectrogram, freq_mask)
-                if "time_mask" in augmentations_to_perform:
+                if "TM" in augmentations_to_perform:
                     spectrogram = self.time_mask(spectrogram, time_mask)
 
                 # Save image file
@@ -284,7 +284,7 @@ if __name__ == "__main__":
     time_mask = 30
 
     augment_proc.augment_all_audio(
-        ["change_volume", "time_shift", "pitch_shift", "freq_mask", "time_mask"],
+        ["CV", "TS", "PS", "FM", "TM"],
         percent,
         vol_shift,
         time_shift,
