@@ -30,9 +30,18 @@ async def upload_audio(file: UploadFile = File(...)):
     data_pipeline = DataPipeline()
     model_handler = ModelHandler()
     model_pipeline = ModelPipeline(data_pipeline, model_handler)
-    model_pipeline.make_single_inference(audio)
+    prediction = model_pipeline.make_single_inference(audio, "model_name")
 
-    return {"filename": file.filename, "format": file_format}
+    # Post the inference to inference URL
+    requests.post("http://localhost:8000/inference", json={"prediction": prediction})
+     
+    return {"prediction": prediction}
+
+@app.post("/inference")
+async def inference(prediction: int):
+    """Receives the prediction from the model."""
+    print(f"Received prediction: {prediction}")
+    return {"message": "Prediction received - {prediction}"}
 
 @app.get("/")
 def read_root():

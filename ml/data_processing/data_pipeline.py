@@ -102,14 +102,12 @@ class DataPipeline:
 
         return tensor_image  # shape will be 3, 224, 224
 
-    def process_single_for_inference(self, audio_bytes: bytes) -> torch.Tensor:
+    def process_single_for_inference(self, audio: AudioSegment) -> torch.Tensor:
         """Processes a single instance for inference.
 
         Args:
             audio: assume we receive audio in bytes
         """
-        # Convert WebM bytes to AudioSegment (Requires FFmpeg installed)
-        audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="webm")
         # Convert AudioSegment to WAV format
         audio = audio.set_frame_rate(48000).set_channels(1)
 
