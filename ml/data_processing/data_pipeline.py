@@ -53,7 +53,10 @@ class DataPipeline:
         self.image_processor.process_all_images()
         
     def load_and_save_dataset(self, dataset_path: str) -> TensorDataset:
-        """Loads the dataset from the specified file path and saves it, returns TensorDataset."""
+        """
+        Loads the dataset from the specified file path and saves it, returns TensorDataset.
+        dataset_path (str): path to save the TensorDataset
+        """
         tensors = []
         labels = []  
 
