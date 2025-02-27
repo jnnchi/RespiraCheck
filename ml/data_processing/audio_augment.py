@@ -75,8 +75,9 @@ class DataAugmentProcessor:
                 audio, sr = librosa.load(path_in, sr=None)
 
                 # Augmentation Audio
-                if "CV" in augmentations_to_perform:
-                    audio = self.change_volume(audio, sr, vol_shift)
+                # took out change in volume for now
+                #if "CV" in augmentations_to_perform:
+                #    audio = self.change_volume(audio, sr, vol_shift)
                 if "TS" in augmentations_to_perform:
                     audio = self.time_shift(audio, sr, time_shift)
                 if "PS" in augmentations_to_perform:
@@ -284,7 +285,7 @@ if __name__ == "__main__":
     time_mask = 30
 
     augment_proc.augment_all_audio(
-        ["CV", "TS", "PS", "FM", "TM"],
+        ["TS", "PS", "FM", "TM"],
         percent,
         vol_shift,
         time_shift,
