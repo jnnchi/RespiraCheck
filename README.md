@@ -1,4 +1,5 @@
 # RespiraCheck
+RespiraCheck is a project for the University of Toronto Machine Intelligence Student Team. We use a convolutional neural network (CNN) to classify cough audio as positive or negative of COVID-19. As our goal is to improve the convenience and encourage use of COVID testing, we built a Next.js website for users to use our tool.
 
 ## Setting up Docker
 
