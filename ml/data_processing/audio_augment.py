@@ -80,8 +80,6 @@ class DataAugmentProcessor:
                 # Generate spectrogram
                 spectrogram = processor.normalize_spectrogram(
                     processor.conv_to_spectrogram(
-                        audio_path=None,
-                        path_input=False,
                         audio_clip=audio,
                         sample_rate=sr,
                     )
@@ -98,11 +96,12 @@ class DataAugmentProcessor:
                     filepath[:-4]
                     + "_aug_"
                     + "".join(
-                        [augmentation[0] for augmentation in augmentations_to_perform]
+                        [augmentation[0].upper() for augmentation in augmentations_to_perform]
                     )
                     + ".png"
                 )
                 save_path = os.path.join(output_folder, label, save_path)
+                print(save_path)
 
                 processor.save_spectrogram_image(
                     spectrogram=spectrogram, save_path=save_path
