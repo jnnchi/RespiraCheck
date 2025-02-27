@@ -9,7 +9,7 @@ import numpy as np
 import librosa
 import os
 import matplotlib.pyplot as plt
-from .image_processor import ImageProcessor
+from image_processor import ImageProcessor
 from pydub import AudioSegment
 
 class SpectrogramProcessor(ImageProcessor):
@@ -70,9 +70,8 @@ class SpectrogramProcessor(ImageProcessor):
 
         plt.figure(figsize=(10, 4))
         plt.imshow(spectrogram, aspect='auto', origin='lower', cmap='inferno')
-        plt.colorbar(label='Amplitude (dB)')
-        plt.tight_layout()
-        
+        plt.axis('off')
+
         plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
         plt.close()
 
@@ -86,16 +85,17 @@ class SpectrogramProcessor(ImageProcessor):
         Returns:
             np.ndarray: The generated spectrogram as a numpy array.
         """
+
+        y, sr = librosa.load(audio_path, sr=None)
         
         # Create spectrogram using helper function
         if self.stft:
-            spectrogram = self.apply_stft(audio_path)
+            spectrogram = self.apply_stft(y)
         else:
-            spectrogram = self.conv_to_spectrogram(audio_path)
+            spectrogram = self.conv_to_spectrogram(y, sr)
 
         # Normalize generated spectrogram using helper function
         spectrogram_norm = self.normalize_spectrogram(spectrogram)
-
 
         return spectrogram_norm
 
@@ -136,7 +136,7 @@ class SpectrogramProcessor(ImageProcessor):
 
         return spectrogram_db
 
-    def conv_to_spectrogram(self, audio_path: str) -> np.ndarray:
+    def conv_to_spectrogram(self, audio_clip: np.ndarray, sample_rate: int) -> np.ndarray:
         """Converts an audio file to its spectrogram representation.
 
         Args:
@@ -145,12 +145,9 @@ class SpectrogramProcessor(ImageProcessor):
         Returns:
             np.ndarray: The spectrogram of the audio file.
         """
-        # Load the audio file with original sample rate 
-        # (assumes sample rate already standardized by AudioProcessor)
-        y, sr = librosa.load(audio_path, sr=None)
-
+       
         # Convert to log scaled mel spectrogram
-        spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
+        spectrogram = librosa.feature.melspectrogram(y=audio_clip, sr=sample_rate, n_mels=128, fmax=8000)
 
         # Convert to decibels
         spectrogram_db = librosa.power_to_db(spectrogram, ref=np.max)
@@ -171,7 +168,7 @@ class SpectrogramProcessor(ImageProcessor):
         return spectrogram_norm
 
 
-    def apply_stft(self, audio_path: str) -> np.ndarray:
+    def apply_stft(self, audio_clip: np.ndarray) -> np.ndarray:
       """Applies STFT Filter with a Hanning Window to a Audio File
 
       Args:
@@ -182,12 +179,11 @@ class SpectrogramProcessor(ImageProcessor):
       """
       # Reference Code: https://importchris.medium.com/how-to-create-understand-mel-spectrograms-ff7634991056
       # Load the audio file with original sample rate
-      y, sr = librosa.load(audio_path, sr=None)
 
       # Compute STFT (the values below are default except hop length)
       n_fft = 2048  # FFT window size
       hop_length = 512  # Hop length for STFT
-      audio_stft = np.abs(librosa.stft(y, n_fft=n_fft, hop_length=hop_length, window="hann"))
+      audio_stft = np.abs(librosa.stft(audio_clip, n_fft=n_fft, hop_length=hop_length, window="hann"))
 
       # Converting the amplitude to decibels
       log_spectro = librosa.amplitude_to_db(audio_stft)  
