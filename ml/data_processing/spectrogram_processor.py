@@ -163,9 +163,12 @@ class SpectrogramProcessor(ImageProcessor):
         Returns:
             np.ndarray: The normalized spectrogram.
         """
-        spectrogram_norm = (spectrogram - spectrogram.min()) / (spectrogram.max() - spectrogram.min())
+        # spectrogram_norm = (spectrogram - spectrogram.min()) / (spectrogram.max() - spectrogram.min())
+        
+        # CURRENTLY SKIPPING THIS FUNCTION TO TEST USING TRANSFORMS WITHIN TENSOR TO 
+        # ADHERE TO IMAGE NET TRAINING SPECS
 
-        return spectrogram_norm
+        return spectrogram
 
 
     def apply_stft(self, audio_clip: np.ndarray) -> np.ndarray:

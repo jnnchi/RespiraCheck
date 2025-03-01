@@ -95,6 +95,7 @@ class DataPipeline:
         transform = transforms.Compose([
             transforms.Resize((224, 224)),  # Resize to ResNet18 input size
             transforms.ToTensor(),  # Convert image to tensor
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),  # Normalize as per ResNet18
         ])
 
         image = Image.open(image_path).convert("RGB") # Convert from RGBA to RGB
