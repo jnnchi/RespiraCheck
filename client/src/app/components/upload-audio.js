@@ -28,6 +28,7 @@ const UploadAudio = () => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      uploadFile(selectedFile);
     }
   };
 
@@ -52,7 +53,7 @@ const UploadAudio = () => {
               boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)',
             }
           }}
-          onClick={fileInputRef.current.click()} // Trigger file input on button click
+          onClick={() => fileInputRef.current.click()}
         >
           <Box className="flex flex-col items-center pt-1 px-10 bg-[#F1F7FF]">
             <img
@@ -68,11 +69,11 @@ const UploadAudio = () => {
 
         {/* Hidden file input */}
         <input
-          ref={fileInputRef} // Attach the ref to the input
+          ref={fileInputRef}
           type="file"
           name="file"
           accept=".mp3"
-          style={{ display: 'none' }} // Hide the file input
+          style={{ display: 'none' }} 
           onChange={handleFileChange}
         />
 
