@@ -4,8 +4,8 @@ This module provides the `DataPipeline` class for handling dataset operations,
 including loading, processing, and splitting datasets for training and inference.
 
 """
-from .audio_processor import AudioProcessor
-from .image_processor import ImageProcessor
+from audio_processor import AudioProcessor
+from image_processor import ImageProcessor
 
 import os
 from PIL import Image
