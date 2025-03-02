@@ -320,7 +320,7 @@ if __name__ == "__main__":
     loss_function = nn.BCEWithLogitsLoss()
 
     # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=0.01, momentum=0.9) ###SDG
-    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
+    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01, weight_decay=0.0001) ### ADAM
 
     model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
 
@@ -346,7 +346,7 @@ if __name__ == "__main__":
 
         cnn_model = CNNModel()
         # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=hyperparams["learning_rate"], momentum=0.9) ###SDG
-        optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
+        optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01, weight_decay=0.0001) ### ADAM
 
         # Create new ModelHandler for each hyperparameter set
         model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)

@@ -33,10 +33,15 @@ class CNNModel(nn.Module):
         self.resnet = models.resnet18(weights='IMAGENET1K_V1')
         
         # Remove the last FC layer and replace it with a binary classifier
-        num_features = self.resnet.fc.in_features  # Get input size of original FC layer
-        self.resnet.fc = nn.Linear(num_features, 1)  # Output a single logit
+        num_features_resnet = self.resnet.fc.in_features  # Get input size of original FC layer
+        self.resnet.fc = nn.Linear(num_features_resnet, 1)  # Output a single logit
 
+        self.efficientnet = models.efficientnet_b0(weights='IMAGENET1K_V1')
+        num_features_efficientNet = self.efficientnet.classifier[1].in_features
+        self.efficientnet.classifier = nn.Identity()
         # Initialize weights and biases for the new FC layer
+
+        self.fc = nn.Linear(num_features_resnet+num_features_efficientNet, 1)
         nn.init.normal_(self.resnet.fc.weight, mean=0.0, std=0.01)
         nn.init.zeros_(self.resnet.fc.bias)
 
@@ -49,4 +54,7 @@ class CNNModel(nn.Module):
         Returns:
             torch.Tensor: The model's output after processing the spectrogram.
         """
-        return self.resnet(spectrogram)
+        resnet = self.resnet(spectrogram)
+        efficientNet = self.efficientnet(spectrogram)
+        combined = torch.cat((resnet, efficientNet), dim=1)
+        return self.fc(combined)
