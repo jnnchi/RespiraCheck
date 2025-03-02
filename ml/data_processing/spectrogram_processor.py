@@ -11,6 +11,7 @@ import os
 import matplotlib.pyplot as plt
 from .image_processor import ImageProcessor
 from pydub import AudioSegment
+from tqdm import tqdm
 
 class SpectrogramProcessor(ImageProcessor):
     """Processes and extracts features from audio spectrograms.
@@ -48,7 +49,7 @@ class SpectrogramProcessor(ImageProcessor):
             # Make spectrogram folder if it doesn't exist
             os.makedirs(spectrogram_dir, exist_ok=True)
 
-            for filename in os.listdir(audio_dir):
+            for filename in tqdm(os.listdir(audio_dir)):
                 if filename.endswith(".wav"):
                     audio_path = os.path.join(audio_dir, filename)
 
