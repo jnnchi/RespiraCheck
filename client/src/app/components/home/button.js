@@ -10,7 +10,7 @@ const StartButton = () => {
     const router = useRouter();
 
     const handleNavigate = () => {
-        router.push('use-the-tool'); 
+        router.push('pages/use-the-tool'); 
     };
 
     return (

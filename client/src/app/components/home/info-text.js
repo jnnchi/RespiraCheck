@@ -18,7 +18,10 @@ const InfoText = () => {
                     textJustify: "left",
                     fontSize: 19,
                 }}>
-                At RespiraCheck, our mission is to bring free, accurate COVID-19 testing to lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. 
+            RespiraCheck is a COVID-19 testing tool that classifies your cough as 
+            potentially positive or negative for COVID. By bridging the gap between 
+            clinical research and practical deployment, we aim to provide an accessible,
+             non-invasive, and scalable tool for COVID-19 screening.
             </Typography>
             <Typography
                 sx={{
