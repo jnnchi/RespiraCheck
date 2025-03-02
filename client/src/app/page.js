@@ -20,7 +20,7 @@ const Home = () => {
           <InfoText/>
         </Stack>
         <Box sx={{paddingRight: "120px", paddingTop: "50px", alignItems: "flex-start"}}>
-          <Image src="/undraw_medical_icon.svg" alt="medical image" width={500} height={367} s/> 
+          <Image src="/undraw_medical_icon.svg" alt="medical image" width={500} height={367}/> 
 
         </Box>
       </Stack>
