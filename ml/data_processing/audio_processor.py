@@ -19,6 +19,7 @@ import soundfile as sf
 from scipy.signal import butter, lfilter
 import json
 import librosa.feature
+from tqdm import tqdm
 
 
 class AudioProcessor:
@@ -74,7 +75,7 @@ class AudioProcessor:
             # Create labeled output folder if it doesn't exist
             os.makedirs(labeled_output_dir, exist_ok=True)
 
-            for filename in os.listdir(labeled_input_dir):
+            for filename in tqdm(os.listdir(labeled_input_dir)):
                 if filename.endswith((".wav", ".mp3")):
                     audio_path = os.path.join(labeled_input_dir, filename)
                     output_audio_path = os.path.join(self.output_folder, label, filename)
