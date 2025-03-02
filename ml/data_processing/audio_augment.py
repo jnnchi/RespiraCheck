@@ -12,6 +12,7 @@ import torchaudio.transforms as T
 import torch
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from tqdm import tqdm
 
 from .spectrogram_processor import SpectrogramProcessor
 
@@ -56,7 +57,7 @@ class DataAugmentProcessor:
         processor = SpectrogramProcessor(
             audio_folder=input_folder, output_folder=output_folder
         )
-        processor.process_all_images()
+        # processor.process_all_images()
 
         # Augment dataset and generate images:
         for label in folders_to_augment:
@@ -66,7 +67,7 @@ class DataAugmentProcessor:
                     label
                 )
             os.makedirs(save_directory, exist_ok=True)
-            for filepath in dir[0 : round(len(dir) * percent)]:
+            for filepath in tqdm(dir[0 : round(len(dir) * percent)]):
 
                 path_in = os.path.join(input_folder, label, filepath)
                 audio, sr = librosa.load(path_in, sr=None)
