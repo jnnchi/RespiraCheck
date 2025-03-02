@@ -13,7 +13,7 @@ import torch
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-from spectrogram_processor import SpectrogramProcessor
+from .spectrogram_processor import SpectrogramProcessor
 
 
 class DataAugmentProcessor:

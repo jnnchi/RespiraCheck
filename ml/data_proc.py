@@ -6,7 +6,7 @@ from data_processing.audio_processor import AudioProcessor
 from data_processing.spectrogram_processor import SpectrogramProcessor
 from data_processing.extracted_features_processor import ExtractedFeaturesProcessor
 from data_processing.audio_augment import DataAugmentProcessor
-from data_processing.data_pipeline import DataPipeline
+#from data_processing.data_pipeline import DataPipeline
 
 
 # GENERATE OUTPUT DATA FOLDERS
