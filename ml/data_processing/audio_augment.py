@@ -36,6 +36,7 @@ class DataAugmentProcessor:
     def augment_all_audio(
         self,
         augmentations_to_perform: list[str],
+        folders_to_augment: list[str],
         percent: float,
         vol_shift: int,
         time_shift: float,
@@ -62,7 +63,7 @@ class DataAugmentProcessor:
         processor.process_all_images()
 
         # Augment dataset and generate images:
-        for label in "positive", "negative":
+        for label in folders_to_augment:
             dir = os.listdir(os.path.join(input_folder, label))
             save_directory = os.path.join(
                     output_folder + "_" + "_".join([augmentation for augmentation in augmentations_to_perform]),
@@ -286,6 +287,7 @@ if __name__ == "__main__":
 
     augment_proc.augment_all_audio(
         ["TS", "PS", "FM", "TM"],
+        ["positive", "negative"],
         percent,
         vol_shift,
         time_shift,
