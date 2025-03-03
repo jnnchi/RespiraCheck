@@ -44,3 +44,28 @@ augment_proc.augment_all_audio(
 #datapipe.process_all()
 
 #train_loader, val_loader, test_loader = datapipe.create_dataloaders(batch_size=32)
+
+### Random Search
+# percent = 0.5
+# time_shift = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+# pitch_shift = [0, 1, 2, 3, 4]
+# freq_mask = [i for i in range(20, 41)]
+# time_mask = [i for i in range(10, 51)]
+
+# for i in range(10):
+#     ts = random.choice(time_shift)
+#     ps = random.choice(pitch_shift)
+#     freq = random.choice(freq_mask)
+#     time = random.choice(time_mask)
+#     augment_proc.augment_all_audio(
+#         ["TS", "PS", "FM", "TM"],
+#         percent,
+#         vol_shift=0,
+#         time_shift=ts,
+#         pitch_shift=ps,
+#         freq_mask=freq,
+#         time_mask=time,
+#         input_folder=processed_audio,
+#         output_folder=os.path.join(parent_dir, f"data/cough_data/aug_spec_{ts}_{ps}_{freq}_{time}")
+#     )
+#     print(f"Augmentation complete. TShift: {ts}, PShift: {ps}, FMask: {freq}, TMask: {time}")
