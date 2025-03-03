@@ -27,9 +27,9 @@ const RecordAudio = () => {
             }
         };
 
-        // saves audio as .wav, sends POST request to backend
+        // saves audio, sends POST request to backend
         mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+            const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorderRef.current.mimeType });
             await uploadAudio(audioBlob);
             audioChunksRef.current = [];
         };
@@ -45,7 +45,10 @@ const RecordAudio = () => {
 
     const uploadAudio = async (audioBlob) => {
         const formData = new FormData();
-        formData.append("file", audioBlob, "recording.wav");
+        const mimeType = mediaRecorderRef.current.mimeType; // usually "audio/webm"
+        const extension = (mimeType.split("/")[1]).split(";")[0]; // "webm"
+        console.log(`recording.${extension}`)
+        formData.append("file", audioBlob, `recording.${extension}`);
 
         const response = await fetch("http://localhost:8000/upload_audio", {
             method: "POST",

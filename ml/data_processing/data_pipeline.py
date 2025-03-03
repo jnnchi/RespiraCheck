@@ -115,7 +115,7 @@ class DataPipeline:
         audio = self.audio_processor.process_single_audio_for_inference(audio)
 
         # just spectrograms for now
-        image_array = self.image_processor.process_single_image_for_inference()
+        image_array = self.image_processor.process_single_image_for_inference(audio)
 
         # Convert spectrogram (NumPy array) to PIL Image (needed for torchvision transforms)
         image = Image.fromarray(image_array)
