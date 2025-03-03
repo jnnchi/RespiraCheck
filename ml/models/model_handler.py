@@ -323,7 +323,14 @@ if __name__ == "__main__":
     
     model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function, lr_scheduler=lr_scheduler)
 
-    train_loader, val_loader, test_loader = data_pipeline.create_dataloaders(batch_size=32)
+    train_loader, val_loader, test_loader = data_pipeline.create_dataloaders(
+            batch_size=32, 
+            dataset_path="ml/data/cough_data/tensor_dataset",
+            spectro_dir_path = None,
+            upsample = True,
+            aug_spectro_dir_path = None,
+            aug_dataset_path = None
+    )
 
     # Train the model
     epochs = 1

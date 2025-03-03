@@ -172,7 +172,7 @@ class DataPipeline:
             tuple: (train_df, test_df) - The training and testing DataFrames.
         """
         if not spectro_dir_path:
-            spectro_dir_path = self.image_processor.output_dir
+            spectro_dir_path = self.image_processor.output_folder
 
         if os.path.exists(dataset_path):  # Tensor dataset created already
             print(f"Loading dataset from {dataset_path}")
