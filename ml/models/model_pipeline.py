@@ -10,6 +10,7 @@ Dependencies:
 TODO: - Implement data pipeline integration.
       - Define model training and inference logic.
 """
+import io
 
 from pydub import AudioSegment
 
@@ -37,16 +38,18 @@ class ModelPipeline:
         self.model_handler = model_handler
         self.model_path = model_path
 
-    def make_single_inference(self, audio_bytes: bytes, model_name: str) -> str:
+    def make_single_inference(self, audio_bytes: bytes, model_name: str) -> int:
         """Performs inference on a single audio file.
 
         Args:
             webm_audio (str): Path to the webm audio file.
 
         Returns:
-            str: The final classification result.
+            int: 0 or 1 for the predicted class.
         """
-        image_tensor = self.data_pipeline.process_single_for_inference(audio_bytes)
+        # Convert WebM bytes to AudioSegment (Requires FFmpeg installed)
+        audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="webm")
+        image_tensor = self.data_pipeline.process_single_for_inference(audio)
+        prediction = self.model_handler.predict(image_tensor, model_name)
 
-        # todo
-        self.model_handler.predict(image_tensor, model_name)
+        return prediction
