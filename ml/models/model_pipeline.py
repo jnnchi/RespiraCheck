@@ -36,7 +36,7 @@ class ModelPipeline:
         self.data_pipeline = data_pipeline
         self.model_handler = model_handler
 
-    def make_single_inference(self, audio_bytes: bytes, model_name: str) -> int:
+    def make_single_inference(self, audio_bytes: bytes) -> int:
         """Performs inference on a single audio file.
 
         Args:
@@ -48,6 +48,6 @@ class ModelPipeline:
         # Convert WebM bytes to AudioSegment (Requires FFmpeg installed)
         audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="webm")
         image_tensor = self.data_pipeline.process_single_for_inference(audio)
-        prediction = self.model_handler.predict(image_tensor, model_name)
+        prediction = self.model_handler.predict(image_tensor)
 
         return prediction
