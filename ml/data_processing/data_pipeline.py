@@ -52,16 +52,17 @@ class DataPipeline:
         self.audio_processor.process_all_audio()
         self.image_processor.process_all_images()
         
-    def load_and_save_dataset(self, dataset_path: str) -> TensorDataset:
+    def load_and_save_dataset(self, image_path: str, tensor_path: str) -> TensorDataset:
         """
         Loads the dataset from the specified file path and saves it, returns TensorDataset.
-        dataset_path (str): path to save the TensorDataset
+        image_path (str): path to the folder containing the images
+        tensor_path (str): path to save the TensorDataset
         """
         tensors = []
-        labels = []  
+        labels = []
 
         for label_folder, label_value in zip(["positive", "negative"], [1, 0]): 
-            output_dir = os.path.join(self.image_processor.output_folder, label_folder)
+            output_dir = os.path.join(image_path, label_folder)
 
             for image_name in os.listdir(output_dir):
                 image_path = os.path.join(output_dir, image_name)
@@ -76,9 +77,9 @@ class DataPipeline:
         y = torch.tensor(labels, dtype=torch.long) 
         
         dataset = TensorDataset(X, y)
-        if dataset_path:
-            torch.save(dataset, dataset_path)
-            print(f"Dataset saved at {dataset_path}")
+        if tensor_path:
+            torch.save(dataset, tensor_path)
+            print(f"Dataset saved at {tensor_path}")
 
         return dataset
 
@@ -135,30 +136,68 @@ class DataPipeline:
         return image_tensor
 
 
-    def create_dataloaders(self, batch_size, dataset_path = None, upsample = True) -> tuple[DataLoader, DataLoader, DataLoader]:
+    def create_dataloaders(self, 
+                           batch_size,  
+                           dataset_path,
+                           upsample = True, 
+                           aug_spectro_path = None,
+                           aug_dataset_path = None) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Splits the dataset into training and test sets.
+
+        The first time you train on the dataset, this function will process the images into tensors 
+        and save them to the location `dataset_path` specifically for the tensor dataset.
+        In subsequent runs, this function will detect that the augmented tensor data has already been created
+        and will skip image processing.
+
+        The first time you are training on augmented data, provide the path to the augmented spectrograms
+        and the path you would like to save the augmented tensor data to.
+        This function will convert the spectrograms into tensors and save them to the indicated location.
+        In subsequent runs, this function will detect that the augmented tensor data has already been created
+        and will skip image processing.
 
         Args:
             batch_size (int): The batch size for the DataLoader.
             dataset_path (str | None): Path to the TensorDataset file.
+            upsample (bool): Whether to upsample the positive class.
+            aug_spectro_path (str | None): Path to the augmented spectrogram files.
+            aug_dataset_path (str | None): Path to the augmented tensor dataset file (created by this function).
 
         Returns:
             tuple: (train_df, test_df) - The training and testing DataFrames.
         """
-        if dataset_path:
+        if os.path.exists(dataset_path) and os.listdir(dataset_path):  # Folder exists and is non-empty
             print(f"Loading dataset from {dataset_path}")
             dataset = torch.load(dataset_path, weights_only=False)
-        else:
+        else:  # Folder is empty or does not exist
             print("Processing and loading dataset")
-            dataset = self.load_and_save_dataset(dataset_path)
+            dataset = self.load_and_save_dataset(image_path=self.image_processor.output_folder,
+                                                 tensor_path=dataset_path)
+        
+        if aug_dataset_path:
+            if os.path.exists(aug_dataset_path) and os.listdir(aug_dataset_path):  # Folder exists and is non-empty
+                print(f"Loading augmented dataset from {aug_dataset_path}")
+                aug_dataset = torch.load(aug_dataset_path)
+            elif aug_spectro_path:  
+                print("Adding augmented spectrogram data to training dataset...")
+                aug_dataset = self.load_and_save_dataset(image_path=aug_spectro_path,
+                                                        tensor_path=aug_dataset_path)
+            else:
+                print("No augmented spectrogram data found. Proceeding without augmented data...")
+                aug_dataset = TensorDataset(torch.tensor([]), torch.tensor([]))
+        else:
+            print("No augmented dataset path provided. Proceeding without augmented data...")
+            aug_dataset = TensorDataset(torch.tensor([]), torch.tensor([]))
 
         # Calculate sizes
         test_size = round(self.test_size * len(dataset))
         val_size = round(self.val_size * len(dataset))
-        train_size = round(len(dataset) - test_size - val_size)  # Remaining for training
+        train_size = round(len(dataset) + len(aug_dataset) - test_size - val_size)  # Remaining for training
 
         # Perform split
         train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+
+        # Combine train and augmented datasets
+        train_dataset = torch.utils.data.ConcatDataset([train_dataset, aug_dataset])
 
         # Upsample positive class
         if upsample:
@@ -190,9 +229,7 @@ class DataPipeline:
             for label in labels:
                 train_counts[label.item()] = train_counts.get(label.item(), 0) + 1
 
-        # print(train_counts)
-
-        # Reduce memory footprint
+        # Reduce memory footprint (only matters on JupyterNotebook)
         dataset, train_dataset, val_dataset, test_dataset = None, None, None, None
 
         return train_loader, val_loader, test_loader
