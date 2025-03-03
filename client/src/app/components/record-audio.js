@@ -47,7 +47,7 @@ const RecordAudio = () => {
         const formData = new FormData();
         formData.append("file", audioBlob, "recording.wav");
 
-        const response = await fetch("http://localhost:8000/upload-audio/", {
+        const response = await fetch("http://localhost:8000/upload_audio", {
             method: "POST",
             body: formData,
         });

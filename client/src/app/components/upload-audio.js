@@ -11,7 +11,7 @@ const UploadAudio = () => {
       const data = new FormData();
       data.set('file', file);
 
-      const res = await fetch('http://localhost:8000/upload-audio/', {
+      const res = await fetch('http://localhost:8000/upload_audio', {
         method: 'POST',
         body: data
       });

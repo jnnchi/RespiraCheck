@@ -1,10 +1,15 @@
 
 """
 To run the server, you can use:
-uvicorn main:app --reload
+./venv/bin/uvicorn server.main:app --reload
 
 View the app at: http://localhost:8000
 """
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import requests
 from pydub import AudioSegment
 import io
@@ -19,6 +24,7 @@ app = FastAPI()
 @app.post("/upload_audio")
 async def upload_audio(file: UploadFile = File(...)):
     """Receives an audio file upload."""
+    print("hi")
     file_format = file.filename.split(".")[-1]
     print(f"Received audio file: {file.filename}, Format: {file_format}")
 
