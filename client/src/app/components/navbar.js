@@ -26,7 +26,7 @@ const Navbar = () => {
       }}
     >
 
-      <Link href="/pages/home">
+      <Link href="/">
         <Image src="/RespiraCheckLogo.png" width={200} height={80} alt="hi" sx={{display: 'flex', 
         justifyContent: 'flex-start', marginLeft: 0}}></Image>
       </Link>
