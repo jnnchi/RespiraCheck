@@ -29,10 +29,6 @@ class DataAugmentProcessor:
       audio_path: Stores the path to audio file to be augmented
     """
 
-    def __init__(self, audio_path):
-        # Store path to audio file
-        self.audio_path = audio_path
-
     def augment_all_audio(
         self,
         augmentations_to_perform: list[str],

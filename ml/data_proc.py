@@ -6,7 +6,6 @@ from data_processing.spectrogram_processor import SpectrogramProcessor
 from data_processing.extracted_features_processor import ExtractedFeaturesProcessor
 from data_processing.audio_augment import DataAugmentProcessor
 
-
 # GENERATE OUTPUT DATA FOLDERS
 audio_proc = AudioProcessor()
 #audio_proc.process_all_audio()
@@ -17,7 +16,8 @@ spectroproc = SpectrogramProcessor(stft=False)
 extractproc = ExtractedFeaturesProcessor(feature_type="fbank")
 #extractproc.process_all_images()
 
-augment_proc = DataAugmentProcessor(audio_path=None)
+
+augment_proc = DataAugmentProcessor()
 
 # Parameters
 percent = 0.5
