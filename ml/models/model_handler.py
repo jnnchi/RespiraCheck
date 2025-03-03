@@ -309,27 +309,26 @@ class ModelHandler:
 
 
 if __name__ == "__main__":
-
-
     audioproccessor = AudioProcessor()
     spectroproccessor = SpectrogramProcessor()
-    datapipline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, spectrogram_processor=spectroproccessor, metadata_df=None, metadata_path="data/cough_data/metadata.csv")
-    
+
+    data_pipeline = DataPipeline(test_size=0.15, val_size=0.15, audio_processor=audioproccessor, image_processor=spectroproccessor)
     
     cnn_model = CNNModel()
     loss_function = nn.BCEWithLogitsLoss()
 
     # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=0.01, momentum=0.9) ###SDG
     optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
+    
+    model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function, lr_scheduler=lr_scheduler)
 
-    model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
-
-    train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
+    train_loader, val_loader, test_loader = data_pipeline.create_dataloaders(batch_size=32)
 
     # Train the model
     epochs = 1
 
-    model_handler.train(train_loader=train_loader, epochs=epochs, model_name="g1_model")
+    model_handler.train(train_loader=train_loader, val_loader=val_loader, epochs=epochs, model_name="g1_model")
 
     best_model = None
     best_acc = 0.0
