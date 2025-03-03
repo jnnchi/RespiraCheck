@@ -45,19 +45,17 @@ const RecordAudio = () => {
 
     const uploadAudio = async (audioBlob) => {
         const formData = new FormData();
-        const mimeType = mediaRecorderRef.current.mimeType; // usually "audio/webm"
+        const mimeType = mediaRecorderRef.current.mimeType; // e.g., "audio/webm"
         const extension = (mimeType.split("/")[1]).split(";")[0]; // "webm"
-        console.log(`recording.${extension}`)
         formData.append("file", audioBlob, `recording.${extension}`);
-
+        console.log(`recording.${extension}`)
         const response = await fetch("http://localhost:8000/upload_audio", {
             method: "POST",
             body: formData,
         });
-
+    
         const data = await response.json();
-        console.log("Server response:", data);
-        
+        console.log("Server response:", data); 
     };
 
     const handleRecording = () => {
