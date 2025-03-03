@@ -14,7 +14,6 @@ const RecordAudio = () => {
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
 
-    // 
     const startRecording = async () => {
         // accesses user mic (and waits for user permissions)
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
