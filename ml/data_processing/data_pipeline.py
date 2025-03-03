@@ -55,7 +55,7 @@ class DataPipeline:
     def load_and_save_dataset(self, image_dir_path: str, tensor_path: str) -> TensorDataset:
         """
         Loads the dataset from the specified file path and saves it, returns TensorDataset.
-        image_path (str): path to the folder containing the images
+        image_dir_path (str): path to the folder containing the images
         tensor_path (str): path to save the TensorDataset
         """
         tensors = []
@@ -142,13 +142,15 @@ class DataPipeline:
 
     def create_dataloaders(self,
                            batch_size,
-                           spectro_dir_path,
                            dataset_path,
+                           spectro_dir_path = None,
                            upsample = True,
                            aug_spectro_dir_path = None,
                            aug_dataset_path = None) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Splits the dataset into training and test sets.
 
+        Usage:
+        
         The first time you train on the dataset, this function will process the images into tensors
         and save them to the location `dataset_path` specifically for the tensor dataset.
         In subsequent runs, this function will detect that the augmented tensor data has already been created
@@ -171,8 +173,8 @@ class DataPipeline:
         Returns:
             tuple: (train_df, test_df) - The training and testing DataFrames.
         """
-        if not spectro_path:
-            spectro_path = self.image_processor.output_dir
+        if not spectro_dir_path:
+            spectro_dir_path = self.image_processor.output_dir
 
         if os.path.exists(dataset_path):  # Tensor dataset created already
             print(f"Loading dataset from {dataset_path}")
