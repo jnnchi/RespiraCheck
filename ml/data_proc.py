@@ -1,12 +1,10 @@
 """
-Testing file for data_pipeline.py.
-Run this file to generate all output data folders on disk and load them into dataloaders in memory.
+File that processes all data and saves to ourput folders
 """
 from data_processing.audio_processor import AudioProcessor
 from data_processing.spectrogram_processor import SpectrogramProcessor
 from data_processing.extracted_features_processor import ExtractedFeaturesProcessor
 from data_processing.audio_augment import DataAugmentProcessor
-#from data_processing.data_pipeline import DataPipeline
 
 
 # GENERATE OUTPUT DATA FOLDERS
@@ -40,12 +38,7 @@ augment_proc.augment_all_audio(
     time_mask,
 )
 
-#datapipe = DataPipeline(test_size=0.2, val_size=0.3, audio_processor=audio_proc, image_processor=spectroproc)
-#datapipe.process_all()
-
-#train_loader, val_loader, test_loader = datapipe.create_dataloaders(batch_size=32)
-
-### Random Search
+### Random Search for Augmentation Parameters - Uncomment to experiment with augmentation
 # percent = 0.5
 # time_shift = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
 # pitch_shift = [0, 1, 2, 3, 4]

@@ -348,7 +348,7 @@ if __name__ == "__main__":
         optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01) ### ADAM
 
         # Create new ModelHandler for each hyperparameter set
-        model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
+        model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function, lr_scheduler=lr_scheduler)
         
         # Perform validation
         val_acc, val_loss = model_handler.validate(val_loader, hyperparams)
