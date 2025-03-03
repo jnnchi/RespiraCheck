@@ -136,15 +136,16 @@ class DataPipeline:
         return image_tensor
 
 
-    def create_dataloaders(self, 
-                           batch_size,  
+def create_dataloaders(self,
+                           batch_size,
                            dataset_path,
-                           upsample = True, 
+                           spectro_path = None,
+                           upsample = True,
                            aug_spectro_path = None,
                            aug_dataset_path = None) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Splits the dataset into training and test sets.
 
-        The first time you train on the dataset, this function will process the images into tensors 
+        The first time you train on the dataset, this function will process the images into tensors
         and save them to the location `dataset_path` specifically for the tensor dataset.
         In subsequent runs, this function will detect that the augmented tensor data has already been created
         and will skip image processing.
@@ -157,7 +158,8 @@ class DataPipeline:
 
         Args:
             batch_size (int): The batch size for the DataLoader.
-            dataset_path (str | None): Path to the TensorDataset file.
+            spectro_path (str | None): Path to the spectrogram files.
+            dataset_path (str | None): Path to the TensorDataset file (created by this function)
             upsample (bool): Whether to upsample the positive class.
             aug_spectro_path (str | None): Path to the augmented spectrogram files.
             aug_dataset_path (str | None): Path to the augmented tensor dataset file (created by this function).
@@ -165,12 +167,15 @@ class DataPipeline:
         Returns:
             tuple: (train_df, test_df) - The training and testing DataFrames.
         """
+        if not spectro_path:
+            spectro_path = self.image_processor.output_dir
+
         if os.path.exists(dataset_path) and os.listdir(dataset_path):  # Folder exists and is non-empty
             print(f"Loading dataset from {dataset_path}")
             dataset = torch.load(dataset_path, weights_only=False)
         else:  # Folder is empty or does not exist
             print("Processing and loading dataset")
-            dataset = self.load_and_save_dataset(image_path=self.image_processor.output_folder,
+            dataset = self.load_and_save_dataset(image_path=spectro_path,
                                                  tensor_path=dataset_path)
         
         if aug_dataset_path:
@@ -214,7 +219,7 @@ class DataPipeline:
             wr_sampler = WeightedRandomSampler(weights, int(len(train_dataset) * 1.5))
 
             train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=wr_sampler)
-        
+
         else:
             print("No upsampling")
             train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
