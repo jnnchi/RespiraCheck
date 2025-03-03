@@ -52,7 +52,7 @@ class DataPipeline:
         self.audio_processor.process_all_audio()
         self.image_processor.process_all_images()
         
-    def load_and_save_dataset(self, image_path: str, tensor_path: str) -> TensorDataset:
+    def load_and_save_dataset(self, image_dir_path: str, tensor_path: str) -> TensorDataset:
         """
         Loads the dataset from the specified file path and saves it, returns TensorDataset.
         image_path (str): path to the folder containing the images
@@ -61,9 +61,13 @@ class DataPipeline:
         tensors = []
         labels = []
 
-        for label_folder, label_value in zip(["positive", "negative"], [1, 0]): 
-            output_dir = os.path.join(image_path, label_folder)
-
+        for label_folder, label_value in zip(["positive", "negative"], [1, 0]):
+            output_dir = os.path.join(image_dir_path, label_folder)
+            print(f"Processing folder: {output_dir}")
+            
+            if not os.path.exists(output_dir):
+                print(f"Folder not found: {output_dir}. Skipping...")
+                continue
             for image_name in os.listdir(output_dir):
                 image_path = os.path.join(output_dir, image_name)
                 image_tensor = self.image_to_tensor(image_path)
@@ -72,10 +76,10 @@ class DataPipeline:
                 labels.append(label_value)
 
         # Tensor of all features (N x D) - N is number of samples (377), D is feature dimension (3,224,224)
-        X = torch.stack(tensors)  
+        X = torch.stack(tensors)
         # Tensor of all labels (N x 1) - 377x1
-        y = torch.tensor(labels, dtype=torch.long) 
-        
+        y = torch.tensor(labels, dtype=torch.long)
+
         dataset = TensorDataset(X, y)
         if tensor_path:
             torch.save(dataset, tensor_path)
@@ -136,12 +140,12 @@ class DataPipeline:
         return image_tensor
 
 
-def create_dataloaders(self,
+    def create_dataloaders(self,
                            batch_size,
+                           spectro_dir_path,
                            dataset_path,
-                           spectro_path = None,
                            upsample = True,
-                           aug_spectro_path = None,
+                           aug_spectro_dir_path = None,
                            aug_dataset_path = None) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Splits the dataset into training and test sets.
 
@@ -158,10 +162,10 @@ def create_dataloaders(self,
 
         Args:
             batch_size (int): The batch size for the DataLoader.
-            spectro_path (str | None): Path to the spectrogram files.
+            spectro_dir_path (str | None): Path to the spectrogram directory.
             dataset_path (str | None): Path to the TensorDataset file (created by this function)
             upsample (bool): Whether to upsample the positive class.
-            aug_spectro_path (str | None): Path to the augmented spectrogram files.
+            aug_spectro_dir_path (str | None): Path to the augmented spectrogram directory.
             aug_dataset_path (str | None): Path to the augmented tensor dataset file (created by this function).
 
         Returns:
@@ -170,22 +174,22 @@ def create_dataloaders(self,
         if not spectro_path:
             spectro_path = self.image_processor.output_dir
 
-        if os.path.exists(dataset_path) and os.listdir(dataset_path):  # Folder exists and is non-empty
+        if os.path.exists(dataset_path):  # Tensor dataset created already
             print(f"Loading dataset from {dataset_path}")
             dataset = torch.load(dataset_path, weights_only=False)
         else:  # Folder is empty or does not exist
-            print("Processing and loading dataset")
-            dataset = self.load_and_save_dataset(image_path=spectro_path,
+            print(f"Processing and loading dataset from {spectro_dir_path}")
+            dataset = self.load_and_save_dataset(image_dir_path=spectro_dir_path,
                                                  tensor_path=dataset_path)
-        
-        if aug_dataset_path:
-            if os.path.exists(aug_dataset_path) and os.listdir(aug_dataset_path):  # Folder exists and is non-empty
+
+        if aug_dataset_path is not None:
+            if os.path.exists(aug_dataset_path):  # Augmented tensor dataset created already
                 print(f"Loading augmented dataset from {aug_dataset_path}")
-                aug_dataset = torch.load(aug_dataset_path)
-            elif aug_spectro_path:  
-                print("Adding augmented spectrogram data to training dataset...")
-                aug_dataset = self.load_and_save_dataset(image_path=aug_spectro_path,
-                                                        tensor_path=aug_dataset_path)
+                aug_dataset = torch.load(aug_dataset_path, weights_only=False)
+            elif aug_spectro_dir_path:
+                print(f"Adding augmented spectrogram data to training dataset from {aug_spectro_dir_path}")
+                aug_dataset = self.load_and_save_dataset(image_dir_path=aug_spectro_dir_path,
+                                                         tensor_path=aug_dataset_path)
             else:
                 print("No augmented spectrogram data found. Proceeding without augmented data...")
                 aug_dataset = TensorDataset(torch.tensor([]), torch.tensor([]))
@@ -196,21 +200,23 @@ def create_dataloaders(self,
         # Calculate sizes
         test_size = round(self.test_size * len(dataset))
         val_size = round(self.val_size * len(dataset))
-        train_size = round(len(dataset) + len(aug_dataset) - test_size - val_size)  # Remaining for training
+        train_size = round(len(dataset) - test_size - val_size)  # Remaining for training
 
         # Perform split
         train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
-
+        print(f"Train dataset size: {len(train_dataset)}")
+        print(f"Augmented dataset size: {len(aug_dataset)}")
         # Combine train and augmented datasets
         train_dataset = torch.utils.data.ConcatDataset([train_dataset, aug_dataset])
+        print(f"Train + augmented dataset size: {len(train_dataset)}")
 
         # Upsample positive class
         if upsample:
             print("Upsampling data")
             labels = [label.item() for _, label in train_dataset]
-            train_counts = {}
+            train_counts = {0: 0, 1: 0}
             for label in labels:
-                train_counts[label] = train_counts.get(label, 0) + 1
+                train_counts[label] = train_counts[label] + 1
             # print(train_counts)
 
             weights = torch.where(torch.tensor(labels) == 0, 1 / train_counts[0], 1 / train_counts[1])
@@ -236,5 +242,7 @@ def create_dataloaders(self,
 
         # Reduce memory footprint (only matters on JupyterNotebook)
         dataset, train_dataset, val_dataset, test_dataset = None, None, None, None
+
+        print("Done.")
 
         return train_loader, val_loader, test_loader
