@@ -153,9 +153,18 @@ class DataAugmentProcessor:
         freq_mask: Max no. of frequency bands that can be masked (used default value from research paper = 30).
         Returns: Mel Spectrogram after freq masking"""
 
-        # Time masking
+        # Convert spectrogram to tensor
+        spectrogram_tensor = torch.tensor(spectrogram)
+
+        # Apply frequency masking
         freq_masking = T.FrequencyMasking(freq_mask)
-        augmented_melspec = np.array(freq_masking(torch.tensor(spectrogram)))
+        masked_spectrogram = freq_masking(spectrogram_tensor)
+
+        # Convert to numpy array
+        augmented_melspec = np.array(masked_spectrogram)
+
+        # Explicitly set masked regions to -80 (black)
+        augmented_melspec[masked_spectrogram == masked_spectrogram.max()] = -80
 
         # Return Augmented Mel Spectrogram
         return augmented_melspec
@@ -169,9 +178,18 @@ class DataAugmentProcessor:
 
         Returns: Mel Spectrogram with Time Masking"""
 
-        # Time masking
+        # Convert spectrogram to tensor
+        spectrogram_tensor = torch.tensor(spectrogram)
+
+        # Apply time masking
         time_masking = T.TimeMasking(time_mask)
-        augmented_melspec = np.array(time_masking(torch.tensor(spectrogram)))
+        masked_spectrogram = time_masking(spectrogram_tensor)
+
+        # Convert to numpy array
+        augmented_melspec = np.array(masked_spectrogram)
+
+        # Explicitly set masked regions to -80 (black)
+        augmented_melspec[masked_spectrogram == masked_spectrogram.max()] = -80
 
         # Return Augmented Mel Spectrogram
         return augmented_melspec
