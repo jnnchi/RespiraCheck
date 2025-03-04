@@ -54,8 +54,8 @@ const RecordAudio = () => {
             body: formData,
         });
     
-        const data = await response.json();
-        console.log("Server response:", data); 
+        const prediction = await response.json();
+        console.log("Server response:", prediction); 
     };
 
     const handleRecording = () => {

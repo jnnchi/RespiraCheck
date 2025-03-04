@@ -27,8 +27,8 @@ const UploadAudio = () => {
           body: formData,
       });
 
-      const data = await response.json();
-      console.log("Server response:", data); 
+      const prediction = await response.json();
+      console.log("Server response:", prediction); 
 
       setFile(null);
       setError(null);
