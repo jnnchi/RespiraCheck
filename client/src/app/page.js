@@ -7,7 +7,6 @@ import Title from "@/app/components/home/title";
 import StartButton from "@/app/components/home/button";
 import InfoText from "@/app/components/home/info-text";
 import Image from "next/image";
-import Link from "next/link";
 
 const Home = () => {
   const [isClient, setIsClient] = useState(false);

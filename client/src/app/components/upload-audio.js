@@ -51,7 +51,6 @@ const UploadAudio = () => {
       setFile(selectedFile);
       setError(null);
 
-      // Convert file to Blob and send as bytes
       const reader = new FileReader();
       reader.readAsArrayBuffer(selectedFile);
       reader.onloadend = () => {
