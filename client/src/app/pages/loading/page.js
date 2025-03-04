@@ -6,11 +6,11 @@ import { Box, Typography, Stack } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "../../theme/theme";
 
-import SubmitAudioHeading from '@/app/components/submit-audio-heading';
-import PredictingHeading from '@/app/components/predicting-heading';
-import FileStatus from '@/app/components/file-status';
+import SubmitAudioHeading from '@/app/components/loading/submit-audio-heading';
+import PredictingHeading from '@/app/components/loading/predicting-heading';
+import FileStatus from '@/app/components/loading/file-status';
 import Navbar from '@/app/components/navbar';
-import LoadingDots from '@/app/components/three-dots';
+import LoadingDots from '@/app/components/loading/three-dots';
 
 export default function Loading() {
     return (

@@ -3,7 +3,7 @@ import { Stack } from "@mui/material"
 import theme from "../../theme/theme";
 import UploadAudio from "@/app/components/upload-audio";
 import RecordAudio from "@/app/components/record-audio";
-import SubmitAudioHeading from "@/app/components/submit-audio-heading";
+import SubmitAudioHeading from "@/app/components/loading/submit-audio-heading";
 import Navbar from "@/app/components/navbar";
 import Link from "next/link";
 
