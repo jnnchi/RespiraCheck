@@ -2,7 +2,7 @@ import React from 'react';
 
 const SubmitAudioHeading = () => {
     return (
-        <div className="flex items-center gap-4 max-w-[697px]">
+        <div className="flex items-center gap-4 max-w-[697px] transition ease-in-out delay-100 duration-200 hover:scale-110">
         <div className="relative w-12 h-[46px]">
           {/* Base circle */}
           <div className="absolute inset-0 bg-[#83a2ee] rounded-[24px/23px]" />
