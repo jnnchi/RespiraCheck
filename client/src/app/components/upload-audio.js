@@ -22,12 +22,13 @@ const UploadAudio = () => {
       
       console.log(`Uploading: upload.${extension}`);
 
-      const res = await fetch("http://localhost:8000/upload_audio", {
-        method: "POST",
-        body: formData,
+      const response = await fetch("http://localhost:8000/upload_audio", {
+          method: "POST",
+          body: formData,
       });
 
-      if (!res.ok) throw new Error(await res.text());
+      const data = await response.json();
+      console.log("Server response:", data); 
 
       setFile(null);
       setError(null);
