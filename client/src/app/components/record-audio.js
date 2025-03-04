@@ -14,7 +14,6 @@ const RecordAudio = () => {
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);
 
-    // 
     const startRecording = async () => {
         // accesses user mic (and waits for user permissions)
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -28,9 +27,9 @@ const RecordAudio = () => {
             }
         };
 
-        // saves audio as .wav, sends POST request to backend
+        // saves audio, sends POST request to backend
         mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunksRef.current, { type: "audio/wav" });
+            const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorderRef.current.mimeType });
             await uploadAudio(audioBlob);
             audioChunksRef.current = [];
         };
@@ -46,16 +45,17 @@ const RecordAudio = () => {
 
     const uploadAudio = async (audioBlob) => {
         const formData = new FormData();
-        formData.append("file", audioBlob, "recording.wav");
-
-        const response = await fetch("http://localhost:8000/upload-audio/", {
+        const mimeType = mediaRecorderRef.current.mimeType; // e.g., "audio/webm"
+        const extension = (mimeType.split("/")[1]).split(";")[0]; // "webm"
+        formData.append("file", audioBlob, `recording.${extension}`);
+        console.log(`recording.${extension}`)
+        const response = await fetch("http://localhost:8000/upload_audio", {
             method: "POST",
             body: formData,
         });
-
+    
         const data = await response.json();
-        console.log("Server response:", data);
-        
+        console.log("Server response:", data); 
     };
 
     const handleRecording = () => {

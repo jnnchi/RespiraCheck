@@ -20,7 +20,7 @@ from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch.optim as opt
 
-from cnn_model import CNNModel
+from .cnn_model import CNNModel
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -265,7 +265,7 @@ class ModelHandler:
         return 0.0 if not accs else np.average(accs, weights=batch_sizes)
 
 
-    def predict(self, spectrogram: torch.Tensor, model_name: str) -> int:
+    def predict(self, spectrogram: torch.Tensor) -> int:
         """Performs inference on a single spectrogram.
 
         Args:
@@ -274,10 +274,13 @@ class ModelHandler:
         Returns:
             torch.Tensor: The predicted output from the model.
         """
-        self.load_model(self.model_path +f"/{model_name}")
+        self.model.load_state_dict(torch.load(self.model_path))
+        self.model.to(self.device)
+        self.model.eval()
+
         spectrogram = spectrogram.unsqueeze(0).to(self.device)
 
-        with torch.no_grad:
+        with torch.no_grad():
             logits = self.model(spectrogram)
 
             probability = torch.sigmoid(logits)
