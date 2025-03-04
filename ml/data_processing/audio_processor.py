@@ -19,6 +19,8 @@ import soundfile as sf
 from scipy.signal import butter, lfilter
 import json
 import librosa.feature
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor
 
 
 class AudioProcessor:
@@ -55,37 +57,34 @@ class AudioProcessor:
         self.target_duration = target_duration
 
         # create metadata dataframe
-        self.metadata_df = pd.DataFrame(
-            columns=[
-                "filename",
-                "duration",
-                "sample_rate",
-                "channels",
-            ]
-        )
+        self.metadata_df = pd.DataFrame({
+            "filename": pd.Series(dtype="str"),
+            "duration": pd.Series(dtype="float"),
+            "sample_rate": pd.Series(dtype="int"),
+            "channels": pd.Series(dtype="int")
+        })
 
 
     def process_all_audio(self) -> None:
         """Processes all audio files in a given directory."""
-        for label in ["positive", "negative"]:
-            labeled_input_dir = os.path.join(self.input_folder, label)
-            labeled_output_dir = os.path.join(self.output_folder, label)
-
-            # Create labeled output folder if it doesn't exist
-            os.makedirs(labeled_output_dir, exist_ok=True)
-
-            for filename in os.listdir(labeled_input_dir):
-                if filename.endswith((".wav", ".mp3")):
-                    audio_path = os.path.join(labeled_input_dir, filename)
-                    output_audio_path = os.path.join(self.output_folder, label, filename)
-
-                    print(f"Processing: {audio_path}")
-                    self.process_single_audio(audio_path, output_audio_path)
-
+        with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as p:
+            for label in ["positive", "negative"]:
+                labeled_input_dir = os.path.join(self.input_folder, label)
+                labeled_output_dir = os.path.join(self.output_folder, label)
+                os.makedirs(labeled_output_dir, exist_ok=True)
+                for filename in os.listdir(labeled_input_dir):
+                    if filename.endswith((".wav", ".mp3")):
+                        audio_path = os.path.join(labeled_input_dir, filename)
+                        output_audio_path = os.path.join(labeled_output_dir, filename)
+                        p.submit(self.process_a, audio_path, output_audio_path)
 
         # Save metadata to a CSV file
         metadata_path = os.path.join(self.output_folder, "metadata.csv")
         self.metadata_df.to_csv(metadata_path, index=False)
+
+    def process_a(self, audio_path: str, output_audio_path: str) -> None:
+        self.process_single_audio(audio_path, output_audio_path)
+        print(f"Processing: {audio_path}")
 
 
     def process_single_audio(self, input_audio_path, output_audio_path, fbank=False) -> None:

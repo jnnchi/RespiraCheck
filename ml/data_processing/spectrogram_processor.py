@@ -11,6 +11,8 @@ import os
 import matplotlib.pyplot as plt
 from .image_processor import ImageProcessor
 from pydub import AudioSegment
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor
 
 class SpectrogramProcessor(ImageProcessor):
     """Processes and extracts features from audio spectrograms.
@@ -37,28 +39,28 @@ class SpectrogramProcessor(ImageProcessor):
 
     def process_all_images(self) -> None:
         """Processes all spectrograms in the given directory and saves them as images.
-
+        
         Note: This assumes that all processed audio files are in WAV format
-                and saved in one folder(directory) whose path is in self.audio_folder.
+            and saved in one folder (directory) whose path is in self.audio_folder.
         """
-        for label in ["positive", "negative"]: 
-            audio_dir = os.path.join(self.audio_folder, label)  # Full path to the labeled folder
-            spectrogram_dir = os.path.join(self.output_folder, label)  # Path to save spectrogram
+        with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as p:
+            for label in ["positive", "negative"]:
+                audio_dir = os.path.join(self.audio_folder, label)  # Full path to the labeled folder
+                spectrogram_dir = os.path.join(self.output_folder, label)  # Path to save spectrogram
+                os.makedirs(spectrogram_dir, exist_ok=True)
+                for filename in os.listdir(audio_dir):
+                    if filename.endswith(".wav"):
+                        audio_path = os.path.join(audio_dir, filename)
+                        spectrogram_path = os.path.join(spectrogram_dir, filename.replace(".wav", ".png"))
+                        p.submit(self.process_and_save_spectrogram, audio_path, spectrogram_path)
+    
+    def process_and_save_spectrogram(self, audio_path: str, spectrogram_path: str) -> None:
+        """Processes spectrogram for use in multiprocessing"""
+        spectrogram = self.process_single_spectrogram(audio_path)
+        self.save_spectrogram_image(spectrogram, spectrogram_path)
+        print(f"Processed and saved spectrogram: {spectrogram_path}")
 
-            # Make spectrogram folder if it doesn't exist
-            os.makedirs(spectrogram_dir, exist_ok=True)
-
-            for filename in os.listdir(audio_dir):
-                if filename.endswith(".wav"):
-                    audio_path = os.path.join(audio_dir, filename)
-
-                    # Process file to generate spectrogram
-                    spectrogram = self.process_single_spectrogram(audio_path)
-
-                    # Save spectrogram image to the spectrogram folder
-                    spectrogram_path = os.path.join(spectrogram_dir, filename.replace(".wav", ".png"))
-                    
-                    self.save_spectrogram_image(spectrogram, spectrogram_path)
+    
 
     def save_spectrogram_image(self, spectrogram: np.ndarray, save_path: str) -> None:
         """Saves a spectrogram array as an image.
