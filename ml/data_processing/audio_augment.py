@@ -56,7 +56,6 @@ class DataAugmentProcessor:
         processor = SpectrogramProcessor(
             audio_folder=input_folder, output_folder=output_folder
         )
-        processor.process_all_images()
 
         # Augment dataset and generate images:
         for label in folders_to_augment:
