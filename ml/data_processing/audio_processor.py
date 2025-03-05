@@ -269,8 +269,12 @@ class AudioProcessor:
             normalized_reduced_noise = reduced_noise
 
         # Need to convert back to int format (required by wav) cuz normalization turns into float
-        # audio.sample_width == 2 -> scale to int16 range
-        int_samples = (normalized_reduced_noise * 32767).astype(np.int16)
+        if audio.sample_width == 2:  # 16-bit audio
+            int_samples = (normalized_reduced_noise * 32767).astype(np.int16) 
+        elif audio.sample_width == 4:  # 32-bit audio
+            int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
+        else:
+            raise ValueError(f"Unsupported sample width: {audio.sample_width}")
 
 
         # Create a new AudioSegment with the processed audio data
