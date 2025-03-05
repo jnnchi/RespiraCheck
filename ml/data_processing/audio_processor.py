@@ -72,7 +72,7 @@ class AudioProcessor:
                 labeled_input_dir = os.path.join(self.input_folder, label)
                 labeled_output_dir = os.path.join(self.output_folder, label)
                 os.makedirs(labeled_output_dir, exist_ok=True)
-                for filename in os.listdir(labeled_input_dir)[:10]:
+                for filename in os.listdir(labeled_input_dir):
                     if filename.endswith((".wav", ".mp3")):
                         audio_path = os.path.join(labeled_input_dir, filename)
                         output_audio_path = os.path.join(labeled_output_dir, filename)
