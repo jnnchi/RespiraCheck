@@ -119,7 +119,7 @@ class DataPipeline:
             PIL image: The processed image for visualization.
         """
         # Convert AudioSegment to WAV format
-        audio = audio.set_frame_rate(48000).set_channels(1)
+        audio = audio.set_frame_rate(self.audio_processor.target_sample_rate).set_channels(1)
 
         audio = self.audio_processor.process_single_audio_for_inference(audio)
 
