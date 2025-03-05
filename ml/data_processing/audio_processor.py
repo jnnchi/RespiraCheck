@@ -260,7 +260,6 @@ class AudioProcessor:
         reduced_noise = nr.reduce_noise(
             y=samples, sr=audio.frame_rate, stationary=False, prop_decrease=0.8
         )
-        print(audo.frame_rate, audio.sample_width)
 
         # Normalize the noise-reduced audio to restore amplitude
         max_reduced = np.max(np.abs(reduced_noise))
