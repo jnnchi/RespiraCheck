@@ -113,7 +113,7 @@ class AudioProcessor:
             return 1
 
         # reduce noise
-        audio = self.reduce_noise(audio)
+        #audio = self.reduce_noise(audio)
         audio = self.standardize_duration(audio)
 
         # overwrite the original file with the cleaned version
