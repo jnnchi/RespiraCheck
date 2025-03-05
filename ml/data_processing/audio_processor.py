@@ -38,7 +38,7 @@ class AudioProcessor:
 
     def __init__(
         self,
-        target_sample_rate=48000,
+        target_sample_rate=22050,
         target_duration=5, # in seconds
         input_folder="ml/data/cough_data/original_data",
         output_folder="ml/data/cough_data/processed_audio",
@@ -72,7 +72,7 @@ class AudioProcessor:
                 labeled_input_dir = os.path.join(self.input_folder, label)
                 labeled_output_dir = os.path.join(self.output_folder, label)
                 os.makedirs(labeled_output_dir, exist_ok=True)
-                for filename in os.listdir(labeled_input_dir):
+                for filename in os.listdir(labeled_input_dir)[:10]:
                     if filename.endswith((".wav", ".mp3")):
                         audio_path = os.path.join(labeled_input_dir, filename)
                         output_audio_path = os.path.join(labeled_output_dir, filename)
@@ -113,7 +113,7 @@ class AudioProcessor:
             return 1
 
         # reduce noise
-        #audio = self.reduce_noise(audio)
+        audio = self.reduce_noise(audio)
         audio = self.standardize_duration(audio)
 
         # overwrite the original file with the cleaned version
@@ -260,6 +260,7 @@ class AudioProcessor:
         reduced_noise = nr.reduce_noise(
             y=samples, sr=audio.frame_rate, stationary=False, prop_decrease=0.8
         )
+        print(audo.frame_rate, audio.sample_width)
 
         # Normalize the noise-reduced audio to restore amplitude
         max_reduced = np.max(np.abs(reduced_noise))
@@ -269,8 +270,8 @@ class AudioProcessor:
             normalized_reduced_noise = reduced_noise
 
         # Need to convert back to int format (required by wav) cuz normalization turns into float
-        # audio.sample_width == 4 -> scale to int32 range
-        int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
+        # audio.sample_width == 2 -> scale to int16 range
+        int_samples = (normalized_reduced_noise * 32767).astype(np.int16)
 
 
         # Create a new AudioSegment with the processed audio data

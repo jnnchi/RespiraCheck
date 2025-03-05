@@ -20,7 +20,7 @@ if __name__ == "__main__":
     audio_proc.process_all_audio()
 
     spectroproc = SpectrogramProcessor(stft=False)
-    # spectroproc.process_all_images()
+    spectroproc.process_all_images()
 
     # extractproc = ExtractedFeaturesProcessor(feature_type="fbank")
     #extractproc.process_all_images()
