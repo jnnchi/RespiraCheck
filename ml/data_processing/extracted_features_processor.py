@@ -15,7 +15,7 @@ import librosa
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-from .image_processor import ImageProcessor
+from image_processor import ImageProcessor
 from pydub import AudioSegment
 
 class ExtractedFeaturesProcessor(ImageProcessor):
