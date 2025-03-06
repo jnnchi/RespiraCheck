@@ -3,13 +3,15 @@
 import { React, useState, useRef } from "react";
 import { Box, Card, CardContent, Button } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
+
 import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder
 
 const RecordAudio = () => {
-
+    const router = useRouter();
     const [recording, setRecording] = useState(false);
     // keeps track of MediaRecorder object + audio chunks
     const mediaRecorderRef = useRef(null);
@@ -45,24 +47,26 @@ const RecordAudio = () => {
     };
 
     const uploadAudio = async (audioBlob) => {
-        try {
-            const formData = new FormData();
-            const mimeType = mediaRecorderRef.current.mimeType; // e.g., "audio/webm"
-            const extension = (mimeType.split("/")[1]).split(";")[0]; // "webm"
-            formData.append("file", audioBlob, `recording.${extension}`);
-            console.log(`recording.${extension}`)
-            const response = await fetch("http://localhost:8000/upload_audio", {
-                method: "POST",
-                body: formData,
-            });
-            const prediction = await response.json();
-            console.log("Server response:", prediction); 
-            redirect("/pages/loading");
+        const formData = new FormData();
+        const mimeType = mediaRecorderRef.current.mimeType; // e.g., "audio/webm"
+        const extension = (mimeType.split("/")[1]).split(";")[0]; // "webm"
+        formData.append("file", audioBlob, `recording.${extension}`);
+        console.log(`recording.${extension}`)
+        const response = await fetch("http://localhost:8000/upload_audio", {
+            method: "POST",
+            body: formData,
+        });
 
-        } catch (e) {
-            console.error("Recording failed:", e);
-            setError("Recording failed. Please try again.");
-        }
+        const result = await response.json();
+        console.log("Server response:", result); 
+
+        localStorage.setItem("prediction", result.prediction);
+        localStorage.setItem("spectrogram_image", result.spectrogram_image);
+
+        // Redirect to the /loading page
+        //router.push("/pages/results");
+        redirect("/pages/loading");
+    
     };
 
     const handleRecording = () => {
