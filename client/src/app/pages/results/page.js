@@ -10,6 +10,7 @@ import Navbar from '../../components/navbar';
 import { useRouter } from 'next/router';
 
 const Results = () => {
+    const router = useRouter();
     const { prediction, spectrogram_image } = router.query;
     return (
         <div>
