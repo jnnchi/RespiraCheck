@@ -45,24 +45,30 @@ const RecordAudio = () => {
     };
 
     const uploadAudio = async (audioBlob) => {
-        const formData = new FormData();
-        const mimeType = mediaRecorderRef.current.mimeType; // e.g., "audio/webm"
-        const extension = (mimeType.split("/")[1]).split(";")[0]; // "webm"
-        formData.append("file", audioBlob, `recording.${extension}`);
-        console.log(`recording.${extension}`)
-        const response = await fetch("http://localhost:8000/upload_audio", {
-            method: "POST",
-            body: formData,
-        });
-        console.log("beep");
-        const prediction = await response.json();
-        console.log("Server response:", prediction); 
+        try {
+            const formData = new FormData();
+            const mimeType = mediaRecorderRef.current.mimeType; // e.g., "audio/webm"
+            const extension = (mimeType.split("/")[1]).split(";")[0]; // "webm"
+            formData.append("file", audioBlob, `recording.${extension}`);
+            console.log(`recording.${extension}`)
+            const response = await fetch("http://localhost:8000/upload_audio", {
+                method: "POST",
+                body: formData,
+            });
+            const prediction = await response.json();
+            console.log("Server response:", prediction); 
+            redirect("/pages/loading");
+
+        } catch (e) {
+            console.error("Recording failed:", e);
+            setError("Recording failed. Please try again.");
+        }
     };
 
     const handleRecording = () => {
         if (recording) {
             stopRecording();
-            redirect('/pages/loading');
+            
         } else {
             startRecording();
         }
