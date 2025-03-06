@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 const UploadAudio = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
+  const [spectrogramImage, setSpectrogramImage] = useState(null);
   const fileInputRef = useRef(null);
   //const router = useRouter();
 
@@ -38,6 +39,9 @@ const UploadAudio = () => {
 
       const prediction = await response.json();
       console.log("Server response:", prediction); 
+
+  
+      setSpectrogramImage(prediction.spectrogram_image);
 
       setFile(null);
       setError(null);
@@ -125,6 +129,17 @@ const UploadAudio = () => {
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
+
+      {spectrogramImage && (
+        <Box mt={4} textAlign="center">
+          <Typography variant="h6">Spectrogram</Typography>
+          <img
+            src={`data:image/png;base64,${spectrogramImage}`}
+            alt="Spectrogram"
+            style={{ maxWidth: "100%", height: "auto" }}
+          />
+        </Box>
+      )}
     </div>
   );
 };

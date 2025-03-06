@@ -35,13 +35,6 @@ app.add_middleware(
     allow_headers=["*"], 
 )
 
-def pil_to_base64(image):
-    buffer = io.BytesIO()
-    if image.mode not in ("RGB", "L"):
-        image = image.convert("RGB")
-    image.save(buffer, format="PNG")  # Convert to PNG 
-    return base64.b64encode(buffer.getvalue()).decode("utf-8")
-
 @app.post("/upload_audio")
 async def upload_audio(file: UploadFile = File(...)):
     """Receives an audio file, processes it, and returns a prediction."""
@@ -61,18 +54,21 @@ async def upload_audio(file: UploadFile = File(...)):
                                  lr_scheduler=None)
     model_pipeline = ModelPipeline(data_pipeline, model_handler)
 
-    # prediction = 0  # Mock prediction for now
-    prediction, spectrogram_image = model_pipeline.make_single_inference(audio_bytes, file_format)
+    prediction, spectrogram_buf = model_pipeline.make_single_inference(audio_bytes, file_format)
 
-    if not prediction:
+    # Convert the in-memory bytes buffer to a base64-encoded string.
+    # Ensure the buffer's pointer is at the beginning
+    spectrogram_buf.seek(0)
+    spectrogram_image_bytes = spectrogram_buf.getvalue()
+    spectrogram_b64 = base64.b64encode(spectrogram_image_bytes).decode("utf-8")
+
+    if prediction is None:
         return JSONResponse(content={"error": "Audio file contained no cough."})
-
-    spectrogram_base64 = pil_to_base64(spectrogram_image)
 
     print(f"Prediction: {prediction}")
 
     # Return prediction directly to frontend
-    return JSONResponse(content={"prediction": prediction, "spectrogram_image": spectrogram_base64})
+    return JSONResponse(content={"prediction": prediction, "spectrogram_image": spectrogram_b64})
 
 @app.get("/")
 def read_root():

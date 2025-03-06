@@ -5,6 +5,7 @@ including loading, processing, and splitting datasets for training and inference
 
 """
 
+from matplotlib import pyplot as plt
 from .audio_processor import AudioProcessor
 from .image_processor import ImageProcessor
 
@@ -143,10 +144,21 @@ class DataPipeline:
             return None, None
 
         # just spectrograms for now
-        image_array = self.image_processor.process_single_image_for_inference(audio)
+        spectrogram_array = self.image_processor.process_single_image_for_inference(audio)
+        
+        # Create and format the matplotlib figure
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.imshow(spectrogram_array, aspect='auto', origin='lower', cmap='inferno')
+        ax.axis('off')
+
+        # Save the figure to an in-memory bytes buffer instead of a file
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", bbox_inches='tight', pad_inches=0)
+        plt.close(fig)
+        buf.seek(0)
 
         # Convert spectrogram (NumPy array) to PIL Image (needed for torchvision transforms)
-        image = Image.fromarray(image_array)
+        image = Image.fromarray(spectrogram_array)
 
         # Same transformations used in training
         transform = transforms.Compose(
@@ -162,7 +174,7 @@ class DataPipeline:
             0
         )  # Add batch dimension → (1, 3, 224, 224)
 
-        return image_tensor, image
+        return image_tensor, buf
 
     def create_dataloaders(
         self,
