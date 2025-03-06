@@ -2,14 +2,13 @@
 
 import React, { useState, useRef } from "react";
 import { Box, Button, Typography } from "@mui/material";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const UploadAudio = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
-  const [spectrogramImage, setSpectrogramImage] = useState(null);
   const fileInputRef = useRef(null);
-  //const router = useRouter();
+  const router = useRouter();
 
   const validTypes = ["audio/wav", "audio/mpeg", "audio/webm"];
 
@@ -30,19 +29,17 @@ const UploadAudio = () => {
           body: formData,
       });
 
-      /*router.push(
-        {
-          pathname: "/results",
-          query: { prediction: response.prediction, spectrogram_image: response.spectrogram_image}
-        }); */
 
 
-      const prediction = await response.json();
-      console.log("Server response:", prediction); 
+      const result = await response.json();
+      console.log("Server response:", result); 
 
+      localStorage.setItem("prediction", result.prediction);
+      localStorage.setItem("spectrogram_image", result.spectrogram_image);
+
+      // Redirect to the /results page (without query parameters)
+      router.push("/pages/results");
   
-      setSpectrogramImage(prediction.spectrogram_image);
-
       setFile(null);
       setError(null);
       console.log("Upload successful!");
@@ -129,16 +126,6 @@ const UploadAudio = () => {
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
-
-      {spectrogramImage && (
-        <Box mt={4} textAlign="center">
-          <img
-            src={`data:image/png;base64,${spectrogramImage}`}
-            alt="Spectrogram"
-            style={{ maxWidth: "100%", height: "auto" }}
-          />
-        </Box>
-      )}
     </div>
   );
 };

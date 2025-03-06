@@ -3,13 +3,13 @@
 import { React, useState, useRef } from "react";
 import { Box, Card, CardContent, Button } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
+import { useRouter } from "next/navigation";
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder
 
 const RecordAudio = () => {
-
-    const [spectrogramImage, setSpectrogramImage] = useState(null);
+    const router = useRouter();
     const [recording, setRecording] = useState(false);
     // keeps track of MediaRecorder object + audio chunks
     const mediaRecorderRef = useRef(null);
@@ -55,15 +55,16 @@ const RecordAudio = () => {
             body: formData,
         });
 
-        /*router.push(
-            {
-              pathname: "/results",
-              query: { prediction: response.prediction, spectrogram_image: response.spectrogram_image}
-            });*/
+        const result = await response.json();
+        console.log("Server response:", result); 
+
+        localStorage.setItem("prediction", result.prediction);
+        localStorage.setItem("spectrogram_image", result.spectrogram_image);
+
+        // Redirect to the /results page (without query parameters)
+        router.push("/pages/results");
     
-        const prediction = await response.json();
-        setSpectrogramImage(prediction.spectrogram_image);
-        console.log("Server response:", prediction); 
+    
     };
 
     const handleRecording = () => {
@@ -96,15 +97,6 @@ const RecordAudio = () => {
           </Box>
 
         </Button>
-        {spectrogramImage && (
-            <Box mt={4} textAlign="center">
-            <img
-                src={`data:image/png;base64,${spectrogramImage}`}
-                alt="Spectrogram"
-                style={{ maxWidth: "100%", height: "auto" }}
-            />
-            </Box>
-        )}
       </div>
     );
 }; 
