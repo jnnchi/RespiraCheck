@@ -27,7 +27,7 @@ const Results = () => {
     return (
         <div>
             <Navbar></Navbar>
-            <Stack direction="column" spacing={0} sx={{paddingLeft: "120px", paddingTop: "80px"}}>
+            <Stack direction="column" spacing={0} sx={{paddingLeft: "12vw", paddingTop: "80px"}}>
                 <Stack direction="row" spacing={12}>
                     <img
                         src={`data:image/png;base64,${spectrogramImage}`}
