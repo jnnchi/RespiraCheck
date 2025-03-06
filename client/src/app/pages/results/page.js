@@ -7,14 +7,16 @@ import Result from '@/app/components/results/result';
 import { Box, Stack, ThemeProvider, Typography } from "@mui/material";
 import Link from 'next/link';
 import Navbar from '../../components/navbar';
+import { useRouter } from 'next/router';
 
 const Results = () => {
+    const { prediction, spectrogram_image } = router.query;
     return (
         <div>
             <Navbar></Navbar>
             <Stack direction="column" spacing={0} sx={{paddingLeft: "120px", paddingTop: "80px"}}>
                 <Stack direction="row" spacing={12}>
-                    <Spectrogram/>
+                    <Spectrogram image={spectrogram_image}/>
                     
                     <Stack direction="column" spacing={2}>
                         <TextHeader/>
