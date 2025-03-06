@@ -37,6 +37,8 @@ app.add_middleware(
 
 def pil_to_base64(image):
     buffer = io.BytesIO()
+    if image.mode not in ("RGB", "L"):
+        image = image.convert("RGB")
     image.save(buffer, format="PNG")  # Convert to PNG 
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
@@ -63,7 +65,7 @@ async def upload_audio(file: UploadFile = File(...)):
     model_pipeline = ModelPipeline(data_pipeline, model_handler)
 
     # prediction = 0  # Mock prediction for now
-    prediction, spectrogram_image = model_pipeline.make_single_inference(audio_bytes)
+    prediction, spectrogram_image = model_pipeline.make_single_inference(audio)
 
     spectrogram_base64 = pil_to_base64(spectrogram_image)
 
