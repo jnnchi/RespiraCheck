@@ -1,16 +1,4 @@
-<<<<<<< Updated upstream
 "use client";
-=======
-import React from 'react';
-
-import Navbar from './components/navbar';
-import { Stack, Box } from '@mui/material';
-import Title from '@/app/components/home/title';
-import StartButton from '@/app/components/home/button';
-import InfoText from '@/app/components/home/info-text';
-import Image from 'next/image';
->>>>>>> Stashed changes
-
 import { React, useEffect, useState } from "react";
 import Navbar from "./components/navbar";
 import { Stack, Box } from "@mui/material";
