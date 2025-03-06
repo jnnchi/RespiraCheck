@@ -75,14 +75,25 @@ async def upload_audio(file: UploadFile = File(...)):
                                  lr_scheduler=None)
     model_pipeline = ModelPipeline(data_pipeline, model_handler)
 
+    spectrogram = data_pipeline.image_processor.conv_to_spectrogram()
+
     prediction = 0  # Mock prediction for now
     # prediction = model_pipeline.make_single_inference(audio_bytes)  # Uncomment this when ready
+
+    # spectrogram = image_processor.conv_to_spectrogram()
+    # spectrogram_image = Image.fromarray(spectrogram)
+    # buffer = BytesIO()
+    # plt.savefig(buffered, format="PNG")
+    # buffer.seek(0)
+    # base_image = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     print(f"Prediction: {prediction}")
 
     # Return prediction directly to frontend
-    return {"prediction": prediction}
+    return {"prediction": prediction, "spectrogram_image": base_image}
 
 @app.get("/")
 def read_root():
     return {"verification message": "This is respiracheck. No other endpoints currently available."}
+
+    

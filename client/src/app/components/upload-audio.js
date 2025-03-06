@@ -2,11 +2,13 @@
 
 import React, { useState, useRef } from "react";
 import { Box, Button, Typography } from "@mui/material";
+import { useRouter } from "next/router";
 
 const UploadAudio = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  const router = useRouter();
 
   const validTypes = ["audio/wav", "audio/mpeg", "audio/webm"];
 
@@ -26,6 +28,13 @@ const UploadAudio = () => {
           method: "POST",
           body: formData,
       });
+
+      router.push(
+        {
+          pathname: "/results",
+          query: { prediction: response.prediction, spectrogram_image: response.spectrogram_image}
+        }); 
+
 
       const prediction = await response.json();
       console.log("Server response:", prediction); 
