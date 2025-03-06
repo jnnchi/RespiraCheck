@@ -57,6 +57,9 @@ class ModelPipeline:
             audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=audio_format)
 
         image_tensor, image = self.data_pipeline.process_single_for_inference(audio)
+        if not image_tensor or not image:
+            return None, None
+        
         prediction = 0#self.model_handler.predict(image_tensor)
 
         return prediction, image # pil image

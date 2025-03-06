@@ -139,6 +139,8 @@ class DataPipeline:
         ).set_channels(1)
 
         audio = self.audio_processor.process_single_audio_for_inference(audio)
+        if not audio:
+            return None, None
 
         # just spectrograms for now
         image_array = self.image_processor.process_single_image_for_inference(audio)

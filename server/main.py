@@ -64,6 +64,9 @@ async def upload_audio(file: UploadFile = File(...)):
     # prediction = 0  # Mock prediction for now
     prediction, spectrogram_image = model_pipeline.make_single_inference(audio_bytes, file_format)
 
+    if not prediction:
+        return JSONResponse(content={"error": "Audio file contained no cough."})
+
     spectrogram_base64 = pil_to_base64(spectrogram_image)
 
     print(f"Prediction: {prediction}")
