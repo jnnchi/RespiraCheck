@@ -132,7 +132,6 @@ const UploadAudio = () => {
 
       {spectrogramImage && (
         <Box mt={4} textAlign="center">
-          <Typography variant="h6">Spectrogram</Typography>
           <img
             src={`data:image/png;base64,${spectrogramImage}`}
             alt="Spectrogram"

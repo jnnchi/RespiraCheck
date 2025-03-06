@@ -9,6 +9,7 @@ import MicIcon from '@mui/icons-material/Mic';
 
 const RecordAudio = () => {
 
+    const [spectrogramImage, setSpectrogramImage] = useState(null);
     const [recording, setRecording] = useState(false);
     // keeps track of MediaRecorder object + audio chunks
     const mediaRecorderRef = useRef(null);
@@ -61,6 +62,7 @@ const RecordAudio = () => {
             });*/
     
         const prediction = await response.json();
+        setSpectrogramImage(prediction.spectrogram_image);
         console.log("Server response:", prediction); 
     };
 
@@ -94,6 +96,15 @@ const RecordAudio = () => {
           </Box>
 
         </Button>
+        {spectrogramImage && (
+            <Box mt={4} textAlign="center">
+            <img
+                src={`data:image/png;base64,${spectrogramImage}`}
+                alt="Spectrogram"
+                style={{ maxWidth: "100%", height: "auto" }}
+            />
+            </Box>
+        )}
       </div>
     );
 }; 
