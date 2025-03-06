@@ -3,13 +3,12 @@
 import { React, useState, useRef } from "react";
 import { Box, Card, CardContent, Button } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder
 
 const RecordAudio = () => {
-    const router = useRouter();
     const [recording, setRecording] = useState(false);
     // keeps track of MediaRecorder object + audio chunks
     const mediaRecorderRef = useRef(null);
@@ -61,15 +60,16 @@ const RecordAudio = () => {
         localStorage.setItem("prediction", result.prediction);
         localStorage.setItem("spectrogram_image", result.spectrogram_image);
 
-        // Redirect to the /results page (without query parameters)
-        router.push("/pages/results");
-    
+        // Redirect to the /loading page
+        //router.push("/pages/results");
+        redirect("/pages/loading");
     
     };
 
     const handleRecording = () => {
         if (recording) {
             stopRecording();
+            
         } else {
             startRecording();
         }
