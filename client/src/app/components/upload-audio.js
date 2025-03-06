@@ -33,6 +33,9 @@ const UploadAudio = () => {
       setFile(null);
       setError(null);
       console.log("Upload successful!");
+
+      redirect('/pages/loading'); // redirect to loading screen
+      
     } catch (e) {
       console.error("Upload failed:", e);
       setError("Upload failed. Please try again.");

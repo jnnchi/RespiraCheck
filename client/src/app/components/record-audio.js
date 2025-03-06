@@ -3,6 +3,7 @@
 import { React, useState, useRef } from "react";
 import { Box, Card, CardContent, Button } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
+import { redirect } from "next/navigation";
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder
@@ -53,7 +54,7 @@ const RecordAudio = () => {
             method: "POST",
             body: formData,
         });
-    
+        console.log("beep");
         const prediction = await response.json();
         console.log("Server response:", prediction); 
     };
@@ -61,6 +62,7 @@ const RecordAudio = () => {
     const handleRecording = () => {
         if (recording) {
             stopRecording();
+            redirect('/pages/loading');
         } else {
             startRecording();
         }
