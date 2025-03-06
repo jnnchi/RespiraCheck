@@ -5,27 +5,10 @@ To run the server, you can use:
 
 View the app at: http://localhost:8000
 """
-import sys
-import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-import requests
-from pydub import AudioSegment
-import io
-from fastapi import FastAPI, File, UploadFile
-
-from ml.models.model_pipeline import ModelPipeline
-from ml.models.model_handler import ModelHandler
-from ml.models.cnn_model import CNNModel
-from ml.data_processing.data_pipeline import DataPipeline
-from ml.data_processing.audio_processor import AudioProcessor
-from ml.data_processing.spectrogram_processor import SpectrogramProcessor
-
-app = FastAPI()
-
+import base64
 from fastapi import FastAPI, File, UploadFile
 import io
+from fastapi.responses import JSONResponse
 from pydub import AudioSegment
 import sys
 import os
@@ -52,6 +35,10 @@ app.add_middleware(
     allow_headers=["*"], 
 )
 
+def pil_to_base64(image):
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")  # Convert to PNG 
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 @app.post("/upload_audio")
 async def upload_audio(file: UploadFile = File(...)):
@@ -75,22 +62,15 @@ async def upload_audio(file: UploadFile = File(...)):
                                  lr_scheduler=None)
     model_pipeline = ModelPipeline(data_pipeline, model_handler)
 
-    spectrogram = data_pipeline.image_processor.conv_to_spectrogram()
+    # prediction = 0  # Mock prediction for now
+    prediction, spectrogram_image = model_pipeline.make_single_inference(audio_bytes)
 
-    prediction = 0  # Mock prediction for now
-    # prediction = model_pipeline.make_single_inference(audio_bytes)  # Uncomment this when ready
-
-    # spectrogram = image_processor.conv_to_spectrogram()
-    # spectrogram_image = Image.fromarray(spectrogram)
-    # buffer = BytesIO()
-    # plt.savefig(buffered, format="PNG")
-    # buffer.seek(0)
-    # base_image = base64.b64encode(buffer.getvalue()).decode("utf-8")
+    spectrogram_base64 = pil_to_base64(spectrogram_image)
 
     print(f"Prediction: {prediction}")
 
     # Return prediction directly to frontend
-    return {"prediction": prediction, "spectrogram_image": base_image}
+    return JSONResponse(content={"prediction": prediction, "spectrogram_image": spectrogram_base64})
 
 @app.get("/")
 def read_root():

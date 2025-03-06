@@ -113,6 +113,10 @@ class DataPipeline:
 
         Args:
             audio: assume we receive audio in bytes
+        
+        Returns:
+            torch.Tensor: The processed instance for inference.
+            PIL image: The processed image for visualization.
         """
         # Convert AudioSegment to WAV format
         audio = audio.set_frame_rate(48000).set_channels(1)
@@ -135,7 +139,7 @@ class DataPipeline:
         image_tensor = transform(image)  # Shape: (1, 3, 224, 224)
         image_tensor = image_tensor.unsqueeze(0)  # Add batch dimension → (1, 3, 224, 224)
         
-        return image_tensor
+        return image_tensor, image
 
 
     def create_dataloaders(self,
