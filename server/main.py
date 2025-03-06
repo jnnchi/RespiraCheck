@@ -51,7 +51,7 @@ async def upload_audio(file: UploadFile = File(...)):
 
     # Read file bytes
     audio_bytes = await file.read()
-
+    
     # Call inference function
     data_pipeline = DataPipeline(test_size=0, val_size=0, audio_processor=AudioProcessor(), image_processor=SpectrogramProcessor())
     model_handler = ModelHandler(model=CNNModel(), 

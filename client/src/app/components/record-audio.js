@@ -54,11 +54,11 @@ const RecordAudio = () => {
             body: formData,
         });
 
-        router.push(
+        /*router.push(
             {
               pathname: "/results",
               query: { prediction: response.prediction, spectrogram_image: response.spectrogram_image}
-            });
+            });*/
     
         const prediction = await response.json();
         console.log("Server response:", prediction); 

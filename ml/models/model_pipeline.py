@@ -47,6 +47,7 @@ class ModelPipeline:
         """
         # Convert to WAV if needed
         if audio_format.lower() in ["webm", "mp3"]:
+            print(audio_format)
             temp_wav = io.BytesIO()
             audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=audio_format)
             audio.export(temp_wav, format="wav") 
@@ -56,6 +57,6 @@ class ModelPipeline:
             audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=audio_format)
 
         image_tensor, image = self.data_pipeline.process_single_for_inference(audio)
-        prediction = self.model_handler.predict(image_tensor)
+        prediction = 0#self.model_handler.predict(image_tensor)
 
-        return prediction, image
+        return prediction, image # pil image
