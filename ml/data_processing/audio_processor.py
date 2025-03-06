@@ -131,13 +131,13 @@ class AudioProcessor:
         audio = self.remove_no_cough(audio)
         if not audio:
             print("No cough detected. Skipping.")
-            return 1
+            return None
 
         # remove silences (may pass in non_silent_chunks into remove_silences)
         audio = self.remove_silences(audio)
         if not audio:
             print("Clip is silent. Skipping.")
-            return 1
+            return None
 
         # reduce noise
         audio = self.reduce_noise(audio)

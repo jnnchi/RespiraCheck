@@ -5,27 +5,10 @@ To run the server, you can use:
 
 View the app at: http://localhost:8000
 """
-import sys
-import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-import requests
-from pydub import AudioSegment
-import io
-from fastapi import FastAPI, File, UploadFile
-
-from ml.models.model_pipeline import ModelPipeline
-from ml.models.model_handler import ModelHandler
-from ml.models.cnn_model import CNNModel
-from ml.data_processing.data_pipeline import DataPipeline
-from ml.data_processing.audio_processor import AudioProcessor
-from ml.data_processing.spectrogram_processor import SpectrogramProcessor
-
-app = FastAPI()
-
+import base64
 from fastapi import FastAPI, File, UploadFile
 import io
+from fastapi.responses import JSONResponse
 from pydub import AudioSegment
 import sys
 import os
@@ -52,6 +35,12 @@ app.add_middleware(
     allow_headers=["*"], 
 )
 
+def pil_to_base64(image):
+    buffer = io.BytesIO()
+    if image.mode not in ("RGB", "L"):
+        image = image.convert("RGB")
+    image.save(buffer, format="PNG")  # Convert to PNG 
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 @app.post("/upload_audio")
 async def upload_audio(file: UploadFile = File(...)):
@@ -63,9 +52,6 @@ async def upload_audio(file: UploadFile = File(...)):
     # Read file bytes
     audio_bytes = await file.read()
     
-    # Convert UploadFile to AudioSegment
-    audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=file_format)
-
     # Call inference function
     data_pipeline = DataPipeline(test_size=0, val_size=0, audio_processor=AudioProcessor(), image_processor=SpectrogramProcessor())
     model_handler = ModelHandler(model=CNNModel(), 
@@ -75,14 +61,21 @@ async def upload_audio(file: UploadFile = File(...)):
                                  lr_scheduler=None)
     model_pipeline = ModelPipeline(data_pipeline, model_handler)
 
-    prediction = 0  # Mock prediction for now
-    # prediction = model_pipeline.make_single_inference(audio_bytes)  # Uncomment this when ready
+    # prediction = 0  # Mock prediction for now
+    prediction, spectrogram_image = model_pipeline.make_single_inference(audio_bytes, file_format)
+
+    if not prediction:
+        return JSONResponse(content={"error": "Audio file contained no cough."})
+
+    spectrogram_base64 = pil_to_base64(spectrogram_image)
 
     print(f"Prediction: {prediction}")
 
     # Return prediction directly to frontend
-    return {"prediction": prediction}
+    return JSONResponse(content={"prediction": prediction, "spectrogram_image": spectrogram_base64})
 
 @app.get("/")
 def read_root():
     return {"verification message": "This is respiracheck. No other endpoints currently available."}
+
+    

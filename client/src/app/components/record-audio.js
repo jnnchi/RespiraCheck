@@ -53,6 +53,12 @@ const RecordAudio = () => {
             method: "POST",
             body: formData,
         });
+
+        /*router.push(
+            {
+              pathname: "/results",
+              query: { prediction: response.prediction, spectrogram_image: response.spectrogram_image}
+            });*/
     
         const prediction = await response.json();
         console.log("Server response:", prediction); 
