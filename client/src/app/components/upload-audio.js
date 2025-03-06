@@ -3,6 +3,7 @@
 import React, { useState, useRef } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const UploadAudio = () => {
   const [file, setFile] = useState(null);
@@ -37,14 +38,13 @@ const UploadAudio = () => {
       localStorage.setItem("prediction", result.prediction);
       localStorage.setItem("spectrogram_image", result.spectrogram_image);
 
-      // Redirect to the /results page (without query parameters)
-      router.push("/pages/results");
+      // Redirect to the /results page
+      router.push("/pages/loading");
   
       setFile(null);
       setError(null);
       console.log("Upload successful!");
 
-      redirect('/pages/loading'); // redirect to loading screen
       
     } catch (e) {
       console.error("Upload failed:", e);

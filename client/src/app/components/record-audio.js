@@ -3,15 +3,12 @@
 import { React, useState, useRef } from "react";
 import { Box, Card, CardContent, Button } from "@mui/material";
 import MicIcon from '@mui/icons-material/Mic';
-
 import { redirect } from "next/navigation";
-import { useRouter } from "next/navigation";
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder
 
 const RecordAudio = () => {
-    const router = useRouter();
     const [recording, setRecording] = useState(false);
     // keeps track of MediaRecorder object + audio chunks
     const mediaRecorderRef = useRef(null);
