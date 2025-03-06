@@ -38,7 +38,7 @@ class AudioProcessor:
 
     def __init__(
         self,
-        target_sample_rate=48000,
+        target_sample_rate=22050,
         target_duration=5, # in seconds
         input_folder="ml/data/cough_data/original_data",
         output_folder="ml/data/cough_data/processed_audio",
@@ -131,13 +131,13 @@ class AudioProcessor:
         audio = self.remove_no_cough(audio)
         if not audio:
             print("No cough detected. Skipping.")
-            return 1
+            return None
 
         # remove silences (may pass in non_silent_chunks into remove_silences)
         audio = self.remove_silences(audio)
         if not audio:
             print("Clip is silent. Skipping.")
-            return 1
+            return None
 
         # reduce noise
         audio = self.reduce_noise(audio)
@@ -269,8 +269,12 @@ class AudioProcessor:
             normalized_reduced_noise = reduced_noise
 
         # Need to convert back to int format (required by wav) cuz normalization turns into float
-        # audio.sample_width == 4 -> scale to int32 range
-        int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
+        if audio.sample_width == 2:  # 16-bit audio
+            int_samples = (normalized_reduced_noise * 32767).astype(np.int16) 
+        elif audio.sample_width == 4:  # 32-bit audio
+            int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
+        else:
+            raise ValueError(f"Unsupported sample width: {audio.sample_width}")
 
 
         # Create a new AudioSegment with the processed audio data
