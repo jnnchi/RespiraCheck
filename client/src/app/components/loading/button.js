@@ -10,7 +10,7 @@ const ResultsButton = () => {
     const router = useRouter();
 
     const handleNavigate = () => {
-        router.push('/results'); 
+        router.push('/pages/results'); 
     };
 
     return (
