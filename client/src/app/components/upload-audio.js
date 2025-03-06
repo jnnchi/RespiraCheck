@@ -8,7 +8,7 @@ const UploadAudio = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
-  const router = useRouter();
+  //const router = useRouter();
 
   const validTypes = ["audio/wav", "audio/mpeg", "audio/webm"];
 
@@ -29,11 +29,11 @@ const UploadAudio = () => {
           body: formData,
       });
 
-      router.push(
+      /*router.push(
         {
           pathname: "/results",
           query: { prediction: response.prediction, spectrogram_image: response.spectrogram_image}
-        }); 
+        }); */
 
 
       const prediction = await response.json();

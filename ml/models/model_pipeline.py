@@ -47,7 +47,7 @@ class ModelPipeline:
         """
         # Convert WebM bytes to AudioSegment (Requires FFmpeg installed)
         audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="webm")
-        image_tensor = self.data_pipeline.process_single_for_inference(audio)
-        prediction = self.model_handler.predict(image_tensor)
+        image_tensor, image = self.data_pipeline.process_single_for_inference(audio)
+        prediction = 0 # self.model_handler.predict(image_tensor)
 
-        return prediction
+        return prediction, image
