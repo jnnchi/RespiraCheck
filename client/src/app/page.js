@@ -22,7 +22,7 @@ const Home = () => {
           <Stack
             direction="row"
             spacing={0}
-            sx={{ paddingLeft: "120px", paddingTop: "50px" }}
+            sx={{ paddingLeft: "10vw", paddingTop: "4vw" }}
           >
             <Stack direction="column" spacing={5}>
               <Title />
@@ -31,8 +31,8 @@ const Home = () => {
             </Stack>
             <Box
               sx={{
-                paddingRight: "120px",
-                paddingTop: "50px",
+                paddingRight: "10vw",
+                paddingTop: "4vw",
                 alignItems: "flex-start",
               }}
             >

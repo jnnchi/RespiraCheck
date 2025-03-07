@@ -6,7 +6,7 @@ import { Box, Typography } from "@mui/material";
 import React from "react";
 import Image from "next/image";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const Navbar = () => {
 
@@ -39,9 +39,9 @@ const Navbar = () => {
           }}
         >
           <Link href="/"> 
-            <span style={{ textDecoration: "none", color: pathname === "/" ? "#3D70EC" : "black" }}
-              onMouseEnter={(e) => e.target.style.color = "#3D70EC"}
-              onMouseLeave={(e) => e.target.style.color = "black"}
+            <span style={{ textDecoration: "none", color: pathname === "/" ? "#3D70EC" : "black" }} 
+              onMouseEnter={(e) => e.target.style.color = "#3D70EC"} // Hover color change
+              onMouseLeave={(e) => e.target.style.color = pathname === "/pages/use-the-tool" ? "#3D70EC" : "black"}
             >Home</span>
           </Link>
           
@@ -56,8 +56,8 @@ const Navbar = () => {
         >
           <Link href="/pages/about"> 
             <span style={{ textDecoration: "none", color: pathname === "/pages/about" ? "#3D70EC" : "black" }}
-              onMouseEnter={(e) => e.target.style.color = "#3D70EC"}
-              onMouseLeave={(e) => e.target.style.color = "black"}
+              onMouseEnter={(e) => e.target.style.color = "#3D70EC"} 
+              onMouseLeave={(e) => e.target.style.color = pathname === "/pages/use-the-tool" ? "#3D70EC" : "black"}
             >About</span>
           </Link>
           
@@ -72,8 +72,8 @@ const Navbar = () => {
         > 
           <Link href="/pages/use-the-tool"> 
             <span style={{ textDecoration: "none", color: pathname === "/pages/use-the-tool" ? "#3D70EC" : "black" }}
-              onMouseEnter={(e) => e.target.style.color = "#3D70EC"}
-              onMouseLeave={(e) => e.target.style.color = "black"}
+            onMouseEnter={(e) => e.target.style.color = "#3D70EC"} // Hover color change
+            onMouseLeave={(e) => e.target.style.color = pathname === "/pages/use-the-tool" ? "#3D70EC" : "black"}
             >Use The Tool</span>
           </Link>
           

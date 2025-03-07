@@ -22,10 +22,6 @@ export default function Action() {
           </Stack>
 
         </Stack>
-
-      <Link href="/pages/results"> 
-        <span style={{ textDecoration: "underline"}}>Results</span>
-      </Link>
       
     </ThemeProvider>
   );
