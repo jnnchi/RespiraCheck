@@ -2,7 +2,30 @@ import { Box, Typography } from "@mui/material";
 import React from "react";
 
 const Result = () => {
+    const prediction = localStorage.getItem("prediction");
+    const results = {
+        0: "No COVID-19",
+        1: "COVID-19"
+    }
     return (
+        <>
+        <Box sx={{ width: 616, height: 120 }}>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontFamily: "'Spartan', sans-serif",
+                  fontWeight: 300,
+                  WebkitTextStroke: "0.5px black", 
+                  color: "black",
+                  fontSize: 40,
+                  letterSpacing: 0.15,
+                  lineHeight: "60px",
+                }}
+              >
+                RespiraCheck has detected:
+              </Typography>
+        </Box>
+
         <Box position="relative" width={352} height={75}>
             <Typography
                 variant="h1"
@@ -21,10 +44,12 @@ const Result = () => {
                     whiteSpace: "nowrap",
                 }}
             >
-                COVID-19
+                {results[prediction]}
             </Typography>
         </Box>
+        </>
     );
+ 
 };
 
 export default Result;
