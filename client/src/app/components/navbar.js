@@ -41,7 +41,7 @@ const Navbar = () => {
           <Link href="/"> 
             <span style={{ textDecoration: "none", color: pathname === "/" ? "#3D70EC" : "black" }} 
               onMouseEnter={(e) => e.target.style.color = "#3D70EC"} // Hover color change
-              onMouseLeave={(e) => e.target.style.color = pathname === "/pages/use-the-tool" ? "#3D70EC" : "black"}
+              onMouseLeave={(e) => e.target.style.color = pathname === "/" ? "#3D70EC" : "black"}
             >Home</span>
           </Link>
           
@@ -57,7 +57,7 @@ const Navbar = () => {
           <Link href="/pages/about"> 
             <span style={{ textDecoration: "none", color: pathname === "/pages/about" ? "#3D70EC" : "black" }}
               onMouseEnter={(e) => e.target.style.color = "#3D70EC"} 
-              onMouseLeave={(e) => e.target.style.color = pathname === "/pages/use-the-tool" ? "#3D70EC" : "black"}
+              onMouseLeave={(e) => e.target.style.color = pathname === "/pages/about" ? "#3D70EC" : "black"}
             >About</span>
           </Link>
           
