@@ -3,21 +3,22 @@ import React from 'react';
 import Navbar from '../../components/navbar';
 import TextBoxes from '@/app/components/about/text-boxes';
 import Image from 'next/image';
-import { Box} from "@mui/material";
-
-
+import { Box, Stack } from "@mui/material";
+import AboutHeader from '@/app/components/about/header';
 
 const Info = () => {
     return (
         <div>
             <Navbar></Navbar>
-            <Box sx={{paddingTop: "100px", paddingLeft: "120px"}}>
+
+            <Stack direction="column" spacing={4} sx={{paddingTop: "4.5vw", paddingLeft: "9vw"}}>
+                <AboutHeader></AboutHeader>
                 <TextBoxes/>
-            </Box>
+            </Stack>
 
             <Box sx={{ 
-                paddingTop: "100px", 
-                paddingLeft: "120px", 
+                paddingTop: "12vw", 
+                paddingLeft: "9vw", 
                 position: "absolute", 
                 width: 1300, 
                 height: 400, 
