@@ -38,7 +38,7 @@ const UploadAudio = () => {
       localStorage.setItem("prediction", result.prediction);
       localStorage.setItem("spectrogram_image", result.spectrogram_image);
 
-      // Redirect to the /results page
+      // Redirect to the /loading page
       router.push("/pages/loading");
   
       setFile(null);
