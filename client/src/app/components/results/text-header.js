@@ -9,7 +9,7 @@ const TextHeader = ({ detected_message }) => {
         sx={{
           fontFamily: "'Spartan', sans-serif",
           fontWeight: 300,
-          WebkitTextStroke: "0.5px black", 
+          WebkitTextStroke: "0.5px black",
           color: "black",
           fontSize: 40,
           letterSpacing: 0.15,

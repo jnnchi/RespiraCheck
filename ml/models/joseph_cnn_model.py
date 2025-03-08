@@ -1,6 +1,6 @@
 """CNN Model Module.
 
-This module provides the `CNNModel` class, which is a convolutional neural network 
+This module provides the `CNNModel` class, which is a convolutional neural network
 model built on top of a ResNet architecture for processing spectrogram data.
 
 Dependencies:
@@ -27,16 +27,15 @@ class CNNModel(nn.Module):
     """
 
     def __init__(self, dropout: float = 0.5):
-        """Initializes the CNNModel.
-        """
+        """Initializes the CNNModel."""
         super(CNNModel, self).__init__()
-        self.resnet = models.resnet18(weights='IMAGENET1K_V1')
+        self.resnet = models.resnet18(weights="IMAGENET1K_V1")
         num_features = self.resnet.fc.in_features  # Get input size of original FC layer
 
         # Remove the last FC layer and replace it with a binary classifier
         self.resnet.fc = nn.Sequential(
             nn.Dropout(p=dropout),  # Apply dropout before the final layer
-            nn.Linear(num_features, 1)  # Binary classification output
+            nn.Linear(num_features, 1),  # Binary classification output
         )
 
         # Freeze all the pre-trained layers

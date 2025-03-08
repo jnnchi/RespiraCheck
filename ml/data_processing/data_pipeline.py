@@ -135,22 +135,26 @@ class DataPipeline:
             BytesIO: The in-memory spectrogram image (for visualization).
         """
         # Convert AudioSegment to WAV format with desired sample rate/channels
-        audio = audio.set_frame_rate(self.audio_processor.target_sample_rate).set_channels(1)
+        audio = audio.set_frame_rate(
+            self.audio_processor.target_sample_rate
+        ).set_channels(1)
         audio = self.audio_processor.process_single_audio_for_inference(audio)
         if not audio:
             return None, None
 
         # Create a spectrogram from the audio
-        spectrogram_array = self.image_processor.process_single_image_for_inference(audio)
-        
+        spectrogram_array = self.image_processor.process_single_image_for_inference(
+            audio
+        )
+
         # Create and format the matplotlib figure
         fig, ax = plt.subplots(figsize=(10, 4))
-        ax.imshow(spectrogram_array, aspect='auto', origin='lower', cmap='inferno')
-        ax.axis('off')
+        ax.imshow(spectrogram_array, aspect="auto", origin="lower", cmap="inferno")
+        ax.axis("off")
 
         # Save the figure to an in-memory bytes buffer instead of a file
         buf = io.BytesIO()
-        plt.savefig(buf, format="png", bbox_inches='tight', pad_inches=0)
+        plt.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
         plt.close(fig)
         buf.seek(0)
 
@@ -168,11 +172,11 @@ class DataPipeline:
                 ),  # Normalize as per ResNet18
             ]
         )
-        
+
         # Apply transformations
         image_tensor = transform(image)  # Expected shape: (C, H, W)
         print("Processed image into image tensor.")
-        # Only add a batch dimension if necessary        
+        # Only add a batch dimension if necessary
         return image_tensor, buf
 
     def create_dataloaders(

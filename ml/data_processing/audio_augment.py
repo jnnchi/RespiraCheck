@@ -61,9 +61,11 @@ class DataAugmentProcessor:
         for label in folders_to_augment:
             dir = os.listdir(os.path.join(input_folder, label))
             save_directory = os.path.join(
-                    output_folder + "_" + "_".join([augmentation for augmentation in augmentations_to_perform]),
-                    label
-                )
+                output_folder
+                + "_"
+                + "_".join([augmentation for augmentation in augmentations_to_perform]),
+                label,
+            )
             os.makedirs(save_directory, exist_ok=True)
             for filepath in dir[0 : round(len(dir) * percent)]:
 
@@ -72,7 +74,7 @@ class DataAugmentProcessor:
 
                 # Augmentation Audio
                 # took out change in volume for now
-                #if "CV" in augmentations_to_perform:
+                # if "CV" in augmentations_to_perform:
                 #    audio = self.change_volume(audio, sr, vol_shift)
                 if "TS" in augmentations_to_perform:
                     audio = self.time_shift(audio, sr, time_shift)

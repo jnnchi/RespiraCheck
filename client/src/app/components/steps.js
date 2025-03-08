@@ -9,7 +9,14 @@ const steps = [
 
 const Steps = () => {
   return (
-    <Box sx={{ position: "relative", width: 565, height: 300, verticalAlign: "center"}}>
+    <Box
+      sx={{
+        position: "relative",
+        width: 565,
+        height: 300,
+        verticalAlign: "center",
+      }}
+    >
       {steps.map((step, index) => (
         <Box
           key={index}
