@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 import Navbar from '../../components/navbar';
@@ -11,14 +12,14 @@ const Info = () => {
         <div>
             <Navbar></Navbar>
 
-            <Stack direction="column" spacing={4} sx={{paddingTop: "4.5vw", paddingLeft: "9vw"}}>
+            <Stack direction="column" spacing={4} sx={{paddingTop: "4vw", paddingLeft: "20vw"}}>
                 <AboutHeader></AboutHeader>
                 <TextBoxes/>
             </Stack>
 
             <Box sx={{ 
-                paddingTop: "12vw", 
-                paddingLeft: "9vw", 
+                paddingTop: "16vw", 
+                paddingLeft: "22vw", 
                 position: "absolute", 
                 width: 1300, 
                 height: 400, 

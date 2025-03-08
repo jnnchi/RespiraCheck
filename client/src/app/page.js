@@ -22,7 +22,7 @@ const Home = () => {
           <Stack
             direction="row"
             spacing={0}
-            sx={{ paddingLeft: "10vw", paddingTop: "4vw" }}
+            sx={{ paddingLeft: "14vw", paddingTop: "4vw" }}
           >
             <Stack direction="column" spacing={5}>
               <Title />

@@ -24,10 +24,18 @@ const Results = () => {
         }
     }, []);
 
+    console.log("Prediction:", prediction);
+    console.log("Prediction type:", typeof prediction);
+    const detected_message =
+        prediction === "1"
+        ? "RespiraCheck has detected a potential for:"
+        : "Based on your cough, RespiraCheck has detected that you:";
+  
     return (
         <div>
             <Navbar></Navbar>
-            <Stack direction="column" spacing={0} sx={{paddingLeft: "12vw", paddingTop: "80px"}}>
+            <Stack direction="column" spacing={0} sx={{paddingLeft: "15vw", paddingTop: "80px"}}>
+                <p><i>A Mel Spectrogram of Your Cough:</i></p>
                 <Stack direction="row" spacing={12}>
                     <img
                         src={`data:image/png;base64,${spectrogramImage}`}
@@ -36,8 +44,8 @@ const Results = () => {
                     />
                     
                     <Stack direction="column" spacing={2}>
-                        <TextHeader/>
-                        <Result/>
+                        <TextHeader detected_message={detected_message} />
+                        <Result prediction={prediction}/>
                             <Typography 
                                 sx={{
                                     position: "relative", 
@@ -56,7 +64,7 @@ const Results = () => {
                     </Stack>
                 </Stack>
                 <Box sx={{ marginTop: "40px !important"}}>
-                    <NextSteps sx={{ marginTop: "0px !important"}}/>
+                    <NextSteps prediction={prediction} sx={{ marginTop: "0px !important"}}/>
                 </Box>
                 
             </Stack>

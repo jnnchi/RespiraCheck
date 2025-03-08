@@ -6,7 +6,7 @@ const FileStatus = () => {
         <div className="flex flex-col items-center w-[643px] h-[71px]">
             <p className="w-[643px] top-0 left-0 font-normal [font-family:'Spartan-Bold',Helvetica] text-black text-xl text-center tracking-[0.15px] leading-[30px] transition ease-in-out delay-100 duration-200 hover:scale-110">
                 <span className="tracking-[0.03px]">
-                    recording.mp3 or uploaded.mp3
+                    Your audio file has been 
                 </span>
                 <span className="[font-family:'Spartan-Bold',Helvetica] font-bold tracking-[0.03px]">
                     {" "}
