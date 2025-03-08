@@ -13,7 +13,7 @@ const LoadingDots = () => {
       }, []);
 
     return (
-      <button>
+      <div>
         {
           isProcessing ? (
             <div className="flex items-center gap-10 max-w-[597px]">
@@ -25,6 +25,6 @@ const LoadingDots = () => {
             <ResultsButton className="transition delay-100 duration-200 ease-in-out"></ResultsButton>
           )
         }
-      </button>
+      </div>
     );
 }; export default LoadingDots;
