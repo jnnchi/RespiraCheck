@@ -22,30 +22,26 @@ const UploadAudio = () => {
         extension = "mp3";
       }
       formData.append("file", audioBlob, `upload.${extension}`);
-      
+
       console.log(`Uploading: upload.${extension}`);
 
       const response = await fetch("http://localhost:8000/upload_audio", {
-          method: "POST",
-          body: formData,
+        method: "POST",
+        body: formData,
       });
 
-
-
       const result = await response.json();
-      console.log("Server response:", result); 
+      console.log("Server response:", result);
 
       localStorage.setItem("prediction", result.prediction);
       localStorage.setItem("spectrogram_image", result.spectrogram_image);
 
       // Redirect to the /results page
       router.push("/pages/loading");
-  
+
       setFile(null);
       setError(null);
       console.log("Upload successful!");
-
-      
     } catch (e) {
       console.error("Upload failed:", e);
       setError("Upload failed. Please try again.");
@@ -57,7 +53,9 @@ const UploadAudio = () => {
 
     if (selectedFile) {
       if (!validTypes.includes(selectedFile.type)) {
-        setError("Invalid file type. Only .wav, .mp3, and .webm files are allowed.");
+        setError(
+          "Invalid file type. Only .wav, .mp3, and .webm files are allowed."
+        );
         return;
       }
 
@@ -67,7 +65,9 @@ const UploadAudio = () => {
       const reader = new FileReader();
       reader.readAsArrayBuffer(selectedFile);
       reader.onloadend = () => {
-        const audioBlob = new Blob([reader.result], { type: selectedFile.type });
+        const audioBlob = new Blob([reader.result], {
+          type: selectedFile.type,
+        });
         uploadFile(audioBlob, selectedFile.type);
       };
     }
