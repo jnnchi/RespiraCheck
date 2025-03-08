@@ -31,22 +31,30 @@ RespiraCheck uses transfer learning to maximize prediction accuracy on limited a
 - To prevent overfitting and improve our model’s ability to generalize, we also utilized dropout, learning rate scheduling, and early stopping.
 
 ## Usage
+Ensure you have a virtual environment set up.
+
 Run the frontend using:
 ```sh
 cd client
 npm install
 npm run dev
-
-pip install -r requirements.txt
-
-./venv/bin/uvicorn server.main:app --reload
 ```
-Then run the backend using:
 
+To install backend requirements:
 ```sh
+cd server
 pip install -r requirements.txt
+```
 
-./venv/bin/uvicorn server.main:app --reload
+To install model requirements:
+```sh
+cd ml
+pip install -r requirements.txt
+```
+
+To run the backend server: (ensure you are in the root directory)
+```sh
+./[your virtual environment name]/bin/uvicorn server.main:app --reload
 ```
 
 ## Results
