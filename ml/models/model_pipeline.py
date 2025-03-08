@@ -62,6 +62,6 @@ class ModelPipeline:
             
             return None, None
         
-        prediction = 1#self.model_handler.predict(image_tensor)
+        prediction = self.model_handler.predict(image_tensor)
 
         return prediction, spectrogram_image_bytes
