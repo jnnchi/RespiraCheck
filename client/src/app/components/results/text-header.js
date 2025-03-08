@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
 
-const TextHeader = () => {
+const TextHeader = ({ detected_message }) => {
   return (
     <Box sx={{ width: 616, height: 120 }}>
       <Typography
@@ -16,7 +16,7 @@ const TextHeader = () => {
           lineHeight: "60px",
         }}
       >
-        RespiraCheck has detected a potential for:
+        {detected_message}
       </Typography>
     </Box>
   );
