@@ -6,6 +6,7 @@ from data_processing.spectrogram_processor import SpectrogramProcessor
 from data_processing.extracted_features_processor import ExtractedFeaturesProcessor
 from data_processing.audio_augment import DataAugmentProcessor
 from multiprocessing import freeze_support
+from data_processing.data_pipeline import DataPipeline
 
 if __name__ == "__main__":
     freeze_support()
@@ -17,10 +18,10 @@ if __name__ == "__main__":
     ####      you only run function one at a time, and comment out the rest.
     
     audio_proc = AudioProcessor()
-    audio_proc.process_all_audio()
+    #audio_proc.process_all_audio()
 
     spectroproc = SpectrogramProcessor(stft=False)
-    spectroproc.process_all_images()
+    #spectroproc.process_all_images()
 
     # extractproc = ExtractedFeaturesProcessor(feature_type="fbank")
     #extractproc.process_all_images()
@@ -28,6 +29,9 @@ if __name__ == "__main__":
 
     # augment_proc = DataAugmentProcessor()
 
+    dp = DataPipeline(test_size=0.2, val_size=0.2, audio_processor=audio_proc, image_processor=spectroproc)
+
+    dp.load_and_save_dataset("/Users/jennifer/IdeaProjects/RespiraCheck/ml/data/cough_data/spectrograms", "tensor_dataset.pt")
     # Parameters
     percent = 0.5
     vol_shift = 0

@@ -26,7 +26,7 @@ class CNNModel(nn.Module):
         resnet (torchvision.models.resnet.ResNet): The ResNet backbone used for feature extraction.
     """
 
-    def __init__(self, dropout: float = 0.0):
+    def __init__(self, dropout: float = 0.5):
         """Initializes the CNNModel.
         """
         super(CNNModel, self).__init__()
