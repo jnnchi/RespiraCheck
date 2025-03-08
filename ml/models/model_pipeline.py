@@ -1,7 +1,7 @@
 """Model Pipeline Module.
 
-This module provides the `ModelPipeline` class for handling the complete 
-machine learning pipeline, including data preparation, model training, 
+This module provides the `ModelPipeline` class for handling the complete
+machine learning pipeline, including data preparation, model training,
 saving, and inference.
 
 Dependencies:
@@ -10,14 +10,16 @@ Dependencies:
 TODO: - Implement data pipeline integration.
       - Define model training and inference logic.
 """
+
 import io
 
 from pydub import AudioSegment
 
+
 class ModelPipeline:
     """Handles the machine learning pipeline from training to inference.
 
-    This class provides methods for training a model, saving it, and 
+    This class provides methods for training a model, saving it, and
     making single inferences.
 
     Attributes:
@@ -50,18 +52,20 @@ class ModelPipeline:
             print(f"Converting {audio_format} to WAV...")
             temp_wav = io.BytesIO()
             audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=audio_format)
-            audio.export(temp_wav, format="wav") 
+            audio.export(temp_wav, format="wav")
             temp_wav.seek(0)
             audio = AudioSegment.from_file(temp_wav, format="wav")
         else:
             audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=audio_format)
 
-        image_tensor, spectrogram_image_bytes = self.data_pipeline.process_single_for_inference(audio)
+        image_tensor, spectrogram_image_bytes = (
+            self.data_pipeline.process_single_for_inference(audio)
+        )
 
         if spectrogram_image_bytes is None:
-            
+
             return None, None
-        
+
         prediction = self.model_handler.predict(image_tensor)
 
         return prediction, spectrogram_image_bytes
