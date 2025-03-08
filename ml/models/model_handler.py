@@ -287,7 +287,7 @@ class ModelHandler:
             probability = torch.sigmoid(logits)
 
             prediction = (probability > 0.5).float() # Turn probability into binary classificaiton
-
+        print("Performed prediction on image.")
         return prediction.item()
 
 

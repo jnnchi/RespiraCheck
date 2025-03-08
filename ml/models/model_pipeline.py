@@ -57,7 +57,7 @@ class ModelPipeline:
             audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=audio_format)
 
         image_tensor, spectrogram_image_bytes = self.data_pipeline.process_single_for_inference(audio)
-        
+
         if spectrogram_image_bytes is None:
             
             return None, None
