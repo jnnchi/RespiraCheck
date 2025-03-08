@@ -47,7 +47,7 @@ class ModelPipeline:
         """
         # Convert to WAV if needed
         if audio_format.lower() in ["webm", "mp3"]:
-            print(audio_format)
+            print(f"Converting {audio_format} to WAV...")
             temp_wav = io.BytesIO()
             audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=audio_format)
             audio.export(temp_wav, format="wav") 

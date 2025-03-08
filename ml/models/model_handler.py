@@ -285,6 +285,7 @@ class ModelHandler:
             logits = self.model(spectrogram)
 
             probability = torch.sigmoid(logits)
+            print(probability)
 
             prediction = (probability > 0.5).float() # Turn probability into binary classificaiton
         print("Performed prediction on image.")
