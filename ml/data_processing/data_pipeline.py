@@ -132,18 +132,15 @@ class DataPipeline:
             audio: assume we receive audio in bytes
         Returns:
             torch.Tensor: The processed instance for inference.
-            PIL image: The processed image for visualization.
+            BytesIO: The in-memory spectrogram image (for visualization).
         """
-        # Convert AudioSegment to WAV format
-        audio = audio.set_frame_rate(
-            self.audio_processor.target_sample_rate
-        ).set_channels(1)
-
+        # Convert AudioSegment to WAV format with desired sample rate/channels
+        audio = audio.set_frame_rate(self.audio_processor.target_sample_rate).set_channels(1)
         audio = self.audio_processor.process_single_audio_for_inference(audio)
         if not audio:
             return None, None
 
-        # just spectrograms for now
+        # Create a spectrogram from the audio
         spectrogram_array = self.image_processor.process_single_image_for_inference(audio)
         
         # Create and format the matplotlib figure
@@ -157,23 +154,25 @@ class DataPipeline:
         plt.close(fig)
         buf.seek(0)
 
-        # Convert spectrogram (NumPy array) to PIL Image (needed for torchvision transforms)
+        # Convert spectrogram array to a PIL Image (for transformations)
         image = Image.fromarray(spectrogram_array)
+        image = image.convert("RGB")
 
         # Same transformations used in training
         transform = transforms.Compose(
             [
-                transforms.Resize((224, 224)),
-                transforms.ToTensor(),
+                transforms.Resize((224, 224)),  # Resize to ResNet18 input size
+                transforms.ToTensor(),  # Convert image to tensor
+                transforms.Normalize(
+                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                ),  # Normalize as per ResNet18
             ]
         )
-
+        
         # Apply transformations
-        image_tensor = transform(image)  # Shape: (1, 3, 224, 224)
-        image_tensor = image_tensor.unsqueeze(
-            0
-        )  # Add batch dimension → (1, 3, 224, 224)
-
+        image_tensor = transform(image)  # Expected shape: (C, H, W)
+        print("Processed image into image tensor.")
+        # Only add a batch dimension if necessary        
         return image_tensor, buf
 
     def create_dataloaders(

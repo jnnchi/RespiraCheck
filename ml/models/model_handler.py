@@ -274,7 +274,8 @@ class ModelHandler:
         Returns:
             torch.Tensor: The predicted output from the model.
         """
-        self.model.load_state_dict(torch.load(self.model_path))
+        
+        self.model.load_state_dict(torch.load(self.model_path, map_location=torch.device('cpu')))
         self.model.to(self.device)
         self.model.eval()
 
@@ -284,9 +285,10 @@ class ModelHandler:
             logits = self.model(spectrogram)
 
             probability = torch.sigmoid(logits)
+            print(probability)
 
             prediction = (probability > 0.5).float() # Turn probability into binary classificaiton
-
+        print("Performed prediction on image.")
         return prediction.item()
 
 
