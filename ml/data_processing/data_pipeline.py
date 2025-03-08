@@ -159,11 +159,16 @@ class DataPipeline:
         image = image.convert("RGB")
 
         # Same transformations used in training
-        transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-        ])
-
+        transform = transforms.Compose(
+            [
+                transforms.Resize((224, 224)),  # Resize to ResNet18 input size
+                transforms.ToTensor(),  # Convert image to tensor
+                transforms.Normalize(
+                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                ),  # Normalize as per ResNet18
+            ]
+        )
+        
         # Apply transformations
         image_tensor = transform(image)  # Expected shape: (C, H, W)
         print("Processed image into image tensor.")
