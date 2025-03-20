@@ -366,25 +366,12 @@ if __name__ == "__main__":
     loss_function = nn.BCEWithLogitsLoss()
 
     # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=0.01, momentum=0.9) ###SDG
-    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01)  ### ADAM
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
 
-    model_handler = ModelHandler(
-        model=cnn_model,
-        model_path="ml/models",
-        optimizer=optimizer,
-        loss_function=loss_function,
-        lr_scheduler=lr_scheduler,
-    )
+    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01, weight_decay=0.0001) ### ADAM
 
-    train_loader, val_loader, test_loader = data_pipeline.create_dataloaders(
-        batch_size=32,
-        dataset_path="ml/data/cough_data/tensor_dataset",
-        spectro_dir_path=None,
-        upsample=True,
-        aug_spectro_dir_path=None,
-        aug_dataset_path=None,
-    )
+    model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
+
+    train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
 
     # Train the model
     epochs = 1
@@ -411,7 +398,8 @@ if __name__ == "__main__":
 
         cnn_model = CNNModel()
         # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=hyperparams["learning_rate"], momentum=0.9) ###SDG
-        optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01)  ### ADAM
+        
+        optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01, weight_decay=0.0001) ### ADAM
 
         # Create new ModelHandler for each hyperparameter set
         model_handler = ModelHandler(
