@@ -1,9 +1,11 @@
 """Dataset Processing Module.
 
-This module provides the `DataPipeline` class for handling dataset operations, 
+This module provides the `DataPipeline` class for handling dataset operations,
 including loading, processing, and splitting datasets for training and inference.
 
 """
+
+from matplotlib import pyplot as plt
 from .audio_processor import AudioProcessor
 from .image_processor import ImageProcessor
 
@@ -11,7 +13,12 @@ import os
 from PIL import Image
 
 import torch
-from torch.utils.data import random_split, DataLoader, TensorDataset, WeightedRandomSampler
+from torch.utils.data import (
+    random_split,
+    DataLoader,
+    TensorDataset,
+    WeightedRandomSampler,
+)
 from torchvision import transforms
 from pydub import AudioSegment
 import io
@@ -30,11 +37,16 @@ class DataPipeline:
         image_processor: ImageProcessor instance for handling spectrogram or extracted features processing.
     """
 
-    def __init__(self, test_size: float, val_size: float, audio_processor: AudioProcessor,  
-                image_processor: ImageProcessor):
+    def __init__(
+        self,
+        test_size: float,
+        val_size: float,
+        audio_processor: AudioProcessor,
+        image_processor: ImageProcessor,
+    ):
         """Initializes the DatasetProcessor.
 
-        Args: 
+        Args:
             data_path (str): Path to the dataset file.
             test_size (float): Proportion of the dataset to include in the test split.
             audio_processor (AudioProcessor): Instance for handling audio processing.
@@ -46,42 +58,48 @@ class DataPipeline:
         self.image_processor = image_processor
 
     def process_all(self) -> None:
-        """Processes the entire dataset for training or analysis. 
+        """Processes the entire dataset for training or analysis.
         Creates folders of labeled audio and spectrograms
         """
         self.audio_processor.process_all_audio()
         self.image_processor.process_all_images()
-        
-    def load_and_save_dataset(self, dataset_path: str) -> TensorDataset:
+
+    def load_and_save_dataset(
+        self, image_dir_path: str, tensor_path: str
+    ) -> TensorDataset:
         """
         Loads the dataset from the specified file path and saves it, returns TensorDataset.
-        dataset_path (str): path to save the TensorDataset
+        image_dir_path (str): path to the folder containing the images
+        tensor_path (str): path to save the TensorDataset
         """
         tensors = []
-        labels = []  
+        labels = []
 
-        for label_folder, label_value in zip(["positive", "negative"], [1, 0]): 
-            output_dir = os.path.join(self.image_processor.output_folder, label_folder)
+        for label_folder, label_value in zip(["positive", "negative"], [1, 0]):
+            output_dir = os.path.join(image_dir_path, label_folder)
+            print(f"Processing folder: {output_dir}")
 
+            if not os.path.exists(output_dir):
+                print(f"Folder not found: {output_dir}. Skipping...")
+                continue
             for image_name in os.listdir(output_dir):
                 image_path = os.path.join(output_dir, image_name)
                 image_tensor = self.image_to_tensor(image_path)
-                
+
                 tensors.append(image_tensor)
                 labels.append(label_value)
 
         # Tensor of all features (N x D) - N is number of samples (377), D is feature dimension (3,224,224)
-        X = torch.stack(tensors)  
+        X = torch.stack(tensors)
         # Tensor of all labels (N x 1) - 377x1
-        y = torch.tensor(labels, dtype=torch.long) 
-        
+        y = torch.tensor(labels, dtype=torch.long)
+
         dataset = TensorDataset(X, y)
-        if dataset_path:
-            torch.save(dataset, dataset_path)
-            print(f"Dataset saved at {dataset_path}")
+        if tensor_path:
+            torch.save(dataset, tensor_path)
+            print(f"Dataset saved at {tensor_path}")
 
         return dataset
-
 
     def image_to_tensor(self, image_path: str) -> torch.Tensor:
         """Converts a spectrogram image to a PyTorch tensor.
@@ -92,92 +110,188 @@ class DataPipeline:
         Returns:
             torch.Tensor: The PyTorch tensor representation of the image.
         """
-        transform = transforms.Compose([
-            transforms.Resize((224, 224)),  # Resize to ResNet18 input size
-            transforms.ToTensor(),  # Convert image to tensor
-        ])
+        transform = transforms.Compose(
+            [
+                transforms.Resize((224, 224)),  # Resize to ResNet18 input size
+                transforms.ToTensor(),  # Convert image to tensor
+                transforms.Normalize(
+                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                ),  # Normalize as per ResNet18
+            ]
+        )
 
-        image = Image.open(image_path).convert("RGB") # Convert from RGBA to RGB
+        image = Image.open(image_path).convert("RGB")  # Convert from RGBA to RGB
         tensor_image = transform(image)
 
         return tensor_image  # shape will be 3, 224, 224
 
-    def process_single_for_inference(self, audio_bytes: bytes) -> torch.Tensor:
+    def process_single_for_inference(self, audio: AudioSegment) -> torch.Tensor:
         """Processes a single instance for inference.
 
         Args:
             audio: assume we receive audio in bytes
+        Returns:
+            torch.Tensor: The processed instance for inference.
+            BytesIO: The in-memory spectrogram image (for visualization).
         """
-        # Convert WebM bytes to AudioSegment (Requires FFmpeg installed)
-        audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format="webm")
-        # Convert AudioSegment to WAV format
-        audio = audio.set_frame_rate(48000).set_channels(1)
-
+        # Convert AudioSegment to WAV format with desired sample rate/channels
+        audio = audio.set_frame_rate(
+            self.audio_processor.target_sample_rate
+        ).set_channels(1)
         audio = self.audio_processor.process_single_audio_for_inference(audio)
+        if not audio:
+            return None, None
 
-        # just spectrograms for now
-        image_array = self.image_processor.process_single_image_for_inference()
+        # Create a spectrogram from the audio
+        spectrogram_array = self.image_processor.process_single_image_for_inference(
+            audio
+        )
 
-        # Convert spectrogram (NumPy array) to PIL Image (needed for torchvision transforms)
-        image = Image.fromarray(image_array)
+        # Create and format the matplotlib figure
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.imshow(spectrogram_array, aspect="auto", origin="lower", cmap="inferno")
+        ax.axis("off")
+
+        # Save the figure to an in-memory bytes buffer instead of a file
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", bbox_inches="tight", pad_inches=0)
+        plt.close(fig)
+        buf.seek(0)
+
+        # Convert spectrogram array to a PIL Image (for transformations)
+        image = Image.fromarray(spectrogram_array)
+        image = image.convert("RGB")
 
         # Same transformations used in training
-        transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(), 
-        ])
+        transform = transforms.Compose(
+            [
+                transforms.Resize((224, 224)),  # Resize to ResNet18 input size
+                transforms.ToTensor(),  # Convert image to tensor
+                transforms.Normalize(
+                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                ),  # Normalize as per ResNet18
+            ]
+        )
 
         # Apply transformations
-        image_tensor = transform(image)  # Shape: (1, 3, 224, 224)
-        image_tensor = image_tensor.unsqueeze(0)  # Add batch dimension → (1, 3, 224, 224)
-        
-        return image_tensor
+        image_tensor = transform(image)  # Expected shape: (C, H, W)
+        print("Processed image into image tensor.")
+        # Only add a batch dimension if necessary
+        return image_tensor, buf
 
-
-    def create_dataloaders(self, batch_size, dataset_path = None, upsample = True) -> tuple[DataLoader, DataLoader, DataLoader]:
+    def create_dataloaders(
+        self,
+        batch_size,
+        dataset_path,
+        spectro_dir_path=None,
+        upsample=True,
+        aug_spectro_dir_path=None,
+        aug_dataset_path=None,
+    ) -> tuple[DataLoader, DataLoader, DataLoader]:
         """Splits the dataset into training and test sets.
+
+        Usage:
+
+        The first time you train on the dataset, this function will process the images into tensors
+        and save them to the location `dataset_path` specifically for the tensor dataset.
+        In subsequent runs, this function will detect that the augmented tensor data has already been created
+        and will skip image processing.
+
+        The first time you are training on augmented data, provide the path to the augmented spectrograms
+        and the path you would like to save the augmented tensor data to.
+        This function will convert the spectrograms into tensors and save them to the indicated location.
+        In subsequent runs, this function will detect that the augmented tensor data has already been created
+        and will skip image processing.
 
         Args:
             batch_size (int): The batch size for the DataLoader.
-            dataset_path (str | None): Path to the TensorDataset file.
+            spectro_dir_path (str | None): Path to the spectrogram directory.
+            dataset_path (str | None): Path to the TensorDataset file (created by this function)
+            upsample (bool): Whether to upsample the positive class.
+            aug_spectro_dir_path (str | None): Path to the augmented spectrogram directory.
+            aug_dataset_path (str | None): Path to the augmented tensor dataset file (created by this function).
 
         Returns:
             tuple: (train_df, test_df) - The training and testing DataFrames.
         """
-        if dataset_path:
+        if not spectro_dir_path:
+            spectro_dir_path = self.image_processor.output_folder
+
+        if os.path.exists(dataset_path):  # Tensor dataset created already
             print(f"Loading dataset from {dataset_path}")
             dataset = torch.load(dataset_path, weights_only=False)
+        else:  # Folder is empty or does not exist
+            print(f"Processing and loading dataset from {spectro_dir_path}")
+            dataset = self.load_and_save_dataset(
+                image_dir_path=spectro_dir_path, tensor_path=dataset_path
+            )
+
+        if aug_dataset_path is not None:
+            if os.path.exists(
+                aug_dataset_path
+            ):  # Augmented tensor dataset created already
+                print(f"Loading augmented dataset from {aug_dataset_path}")
+                aug_dataset = torch.load(aug_dataset_path, weights_only=False)
+            elif aug_spectro_dir_path:
+                print(
+                    f"Adding augmented spectrogram data to training dataset from {aug_spectro_dir_path}"
+                )
+                aug_dataset = self.load_and_save_dataset(
+                    image_dir_path=aug_spectro_dir_path, tensor_path=aug_dataset_path
+                )
+            else:
+                print(
+                    "No augmented spectrogram data found. Proceeding without augmented data..."
+                )
+                aug_dataset = TensorDataset(torch.tensor([]), torch.tensor([]))
         else:
-            print("Processing and loading dataset")
-            dataset = self.load_and_save_dataset(dataset_path)
+            print(
+                "No augmented dataset path provided. Proceeding without augmented data..."
+            )
+            aug_dataset = TensorDataset(torch.tensor([]), torch.tensor([]))
 
         # Calculate sizes
         test_size = round(self.test_size * len(dataset))
         val_size = round(self.val_size * len(dataset))
-        train_size = round(len(dataset) - test_size - val_size)  # Remaining for training
+        train_size = round(
+            len(dataset) - test_size - val_size
+        )  # Remaining for training
 
         # Perform split
-        train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+        train_dataset, val_dataset, test_dataset = random_split(
+            dataset, [train_size, val_size, test_size]
+        )
+        print(f"Train dataset size: {len(train_dataset)}")
+        print(f"Augmented dataset size: {len(aug_dataset)}")
+        # Combine train and augmented datasets
+        train_dataset = torch.utils.data.ConcatDataset([train_dataset, aug_dataset])
+        print(f"Train + augmented dataset size: {len(train_dataset)}")
 
         # Upsample positive class
         if upsample:
             print("Upsampling data")
             labels = [label.item() for _, label in train_dataset]
-            train_counts = {}
+            train_counts = {0: 0, 1: 0}
             for label in labels:
-                train_counts[label] = train_counts.get(label, 0) + 1
+                train_counts[label] = train_counts[label] + 1
             # print(train_counts)
 
-            weights = torch.where(torch.tensor(labels) == 0, 1 / train_counts[0], 1 / train_counts[1])
+            weights = torch.where(
+                torch.tensor(labels) == 0, 1 / train_counts[0], 1 / train_counts[1]
+            )
             # print(labels[:5], weights[:5])
 
             wr_sampler = WeightedRandomSampler(weights, int(len(train_dataset) * 1.5))
 
-            train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=wr_sampler)
-        
+            train_loader = DataLoader(
+                train_dataset, batch_size=batch_size, sampler=wr_sampler
+            )
+
         else:
             print("No upsampling")
-            train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+            train_loader = DataLoader(
+                train_dataset, batch_size=batch_size, shuffle=True
+            )
 
         # Create DataLoaders
         val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
@@ -189,9 +303,9 @@ class DataPipeline:
             for label in labels:
                 train_counts[label.item()] = train_counts.get(label.item(), 0) + 1
 
-        # print(train_counts)
-
-        # Reduce memory footprint
+        # Reduce memory footprint (only matters on JupyterNotebook)
         dataset, train_dataset, val_dataset, test_dataset = None, None, None, None
+
+        print("Done.")
 
         return train_loader, val_loader, test_loader

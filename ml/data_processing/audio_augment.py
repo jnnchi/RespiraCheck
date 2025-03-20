@@ -13,7 +13,7 @@ import torch
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-from spectrogram_processor import SpectrogramProcessor
+from .spectrogram_processor import SpectrogramProcessor
 
 
 class DataAugmentProcessor:
@@ -29,13 +29,10 @@ class DataAugmentProcessor:
       audio_path: Stores the path to audio file to be augmented
     """
 
-    def __init__(self, audio_path):
-        # Store path to audio file
-        self.audio_path = audio_path
-
     def augment_all_audio(
         self,
         augmentations_to_perform: list[str],
+        folders_to_augment: list[str],
         percent: float,
         vol_shift: int,
         time_shift: float,
@@ -59,15 +56,16 @@ class DataAugmentProcessor:
         processor = SpectrogramProcessor(
             audio_folder=input_folder, output_folder=output_folder
         )
-        processor.process_all_images()
 
         # Augment dataset and generate images:
-        for label in "positive", "negative":
+        for label in folders_to_augment:
             dir = os.listdir(os.path.join(input_folder, label))
             save_directory = os.path.join(
-                    output_folder + "_" + "_".join([augmentation for augmentation in augmentations_to_perform]),
-                    label
-                )
+                output_folder
+                + "_"
+                + "_".join([augmentation for augmentation in augmentations_to_perform]),
+                label,
+            )
             os.makedirs(save_directory, exist_ok=True)
             for filepath in dir[0 : round(len(dir) * percent)]:
 
@@ -76,7 +74,7 @@ class DataAugmentProcessor:
 
                 # Augmentation Audio
                 # took out change in volume for now
-                #if "CV" in augmentations_to_perform:
+                # if "CV" in augmentations_to_perform:
                 #    audio = self.change_volume(audio, sr, vol_shift)
                 if "TS" in augmentations_to_perform:
                     audio = self.time_shift(audio, sr, time_shift)
@@ -286,6 +284,7 @@ if __name__ == "__main__":
 
     augment_proc.augment_all_audio(
         ["TS", "PS", "FM", "TM"],
+        ["positive", "negative"],
         percent,
         vol_shift,
         time_shift,

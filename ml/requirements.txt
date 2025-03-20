@@ -19,7 +19,7 @@ pandas==2.2.3
 pydub==0.25.1
 pytest==8.3.4
 scikit-learn==1.6.0
-torch==2.5.1
-torchvision==0.20.1
+torch==2.6.0
+torchvision==0.21.0
 uvicorn==0.24.0.post1
-torchaudio==2.5.1
+torchaudio==2.6.0

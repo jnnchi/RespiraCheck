@@ -1,7 +1,7 @@
 """Model Pipeline Module.
 
-This module provides the `ModelPipeline` class for handling the complete 
-machine learning pipeline, including data preparation, model training, 
+This module provides the `ModelPipeline` class for handling the complete
+machine learning pipeline, including data preparation, model training,
 saving, and inference.
 
 Dependencies:
@@ -11,12 +11,15 @@ TODO: - Implement data pipeline integration.
       - Define model training and inference logic.
 """
 
+import io
+
 from pydub import AudioSegment
+
 
 class ModelPipeline:
     """Handles the machine learning pipeline from training to inference.
 
-    This class provides methods for training a model, saving it, and 
+    This class provides methods for training a model, saving it, and
     making single inferences.
 
     Attributes:
@@ -25,28 +28,44 @@ class ModelPipeline:
         model_path (str): Path to save or load the model.
     """
 
-    def __init__(self, data_pipeline, model_handler, model_path):
+    def __init__(self, data_pipeline, model_handler):
         """Initializes the ModelPipeline.
 
         Args:
             data_pipeline (DataPipeline): The data pipeline instance.
             model_handler (ModelHandler): The model handler instance.
-            model_path (str): Path to save or load the model.
         """
         self.data_pipeline = data_pipeline
         self.model_handler = model_handler
-        self.model_path = model_path
 
-    def make_single_inference(self, audio_bytes: bytes, model_name: str) -> str:
+    def make_single_inference(self, audio_bytes: bytes, audio_format: str) -> int:
         """Performs inference on a single audio file.
 
         Args:
             webm_audio (str): Path to the webm audio file.
 
         Returns:
-            str: The final classification result.
+            int: 0 or 1 for the predicted class.
         """
-        image_tensor = self.data_pipeline.process_single_for_inference(audio_bytes)
+        # Convert to WAV if needed
+        if audio_format.lower() in ["webm", "mp3"]:
+            print(f"Converting {audio_format} to WAV...")
+            temp_wav = io.BytesIO()
+            audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=audio_format)
+            audio.export(temp_wav, format="wav")
+            temp_wav.seek(0)
+            audio = AudioSegment.from_file(temp_wav, format="wav")
+        else:
+            audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=audio_format)
 
-        # todo
-        self.model_handler.predict(image_tensor, model_name)
+        image_tensor, spectrogram_image_bytes = (
+            self.data_pipeline.process_single_for_inference(audio)
+        )
+
+        if spectrogram_image_bytes is None:
+
+            return None, None
+
+        prediction = self.model_handler.predict(image_tensor)
+
+        return prediction, spectrogram_image_bytes

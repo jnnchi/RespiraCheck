@@ -1,6 +1,6 @@
 """CNN Model Module.
 
-This module provides the `CNNModel` class, which is a convolutional neural network 
+This module provides the `CNNModel` class, which is a convolutional neural network
 model built on top of a ResNet architecture for processing spectrogram data.
 
 Dependencies:
@@ -26,10 +26,10 @@ class CNNModel(nn.Module):
         resnet (torchvision.models.resnet.ResNet): The ResNet backbone used for feature extraction.
     """
 
-    def __init__(self):
-        """Initializes the CNNModel.
-        """
+    def __init__(self, dropout: float = 0.0):
+        """Initializes the CNNModel."""
         super(CNNModel, self).__init__()
+
         self.resnet = models.resnet18(weights='IMAGENET1K_V1')
         
         # Remove the last FC layer and replace it with a binary classifier
@@ -39,8 +39,8 @@ class CNNModel(nn.Module):
         self.efficientnet = models.efficientnet_b0(weights='IMAGENET1K_V1')
         num_features_efficientNet = self.efficientnet.classifier[1].in_features
         self.efficientnet.classifier = nn.Identity()
+        
         # Initialize weights and biases for the new FC layer
-
         self.fc = nn.Linear(num_features_resnet+num_features_efficientNet, 1)
         nn.init.normal_(self.resnet.fc.weight, mean=0.0, std=0.01)
         nn.init.zeros_(self.resnet.fc.bias)

@@ -6,6 +6,9 @@ WORKDIR /app
 
 # Copy FastAPI backend code into container
 COPY ./server /app
+# Install ml module from the ml service folder
+COPY ./ml /app/ml  
+RUN pip install -e /app/ml  
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt

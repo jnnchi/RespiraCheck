@@ -19,6 +19,8 @@ import soundfile as sf
 from scipy.signal import butter, lfilter
 import json
 import librosa.feature
+import multiprocessing
+from concurrent.futures import ProcessPoolExecutor
 
 
 class AudioProcessor:
@@ -36,8 +38,8 @@ class AudioProcessor:
 
     def __init__(
         self,
-        target_sample_rate=48000,
-        target_duration=5, # in seconds
+        target_sample_rate=22050,
+        target_duration=5,  # in seconds
         input_folder="ml/data/cough_data/original_data",
         output_folder="ml/data/cough_data/processed_audio",
     ):
@@ -56,39 +58,38 @@ class AudioProcessor:
 
         # create metadata dataframe
         self.metadata_df = pd.DataFrame(
-            columns=[
-                "filename",
-                "duration",
-                "sample_rate",
-                "channels",
-            ]
+            {
+                "filename": pd.Series(dtype="str"),
+                "duration": pd.Series(dtype="float"),
+                "sample_rate": pd.Series(dtype="int"),
+                "channels": pd.Series(dtype="int"),
+            }
         )
-
 
     def process_all_audio(self) -> None:
         """Processes all audio files in a given directory."""
-        for label in ["positive", "negative"]:
-            labeled_input_dir = os.path.join(self.input_folder, label)
-            labeled_output_dir = os.path.join(self.output_folder, label)
-
-            # Create labeled output folder if it doesn't exist
-            os.makedirs(labeled_output_dir, exist_ok=True)
-
-            for filename in os.listdir(labeled_input_dir):
-                if filename.endswith((".wav", ".mp3")):
-                    audio_path = os.path.join(labeled_input_dir, filename)
-                    output_audio_path = os.path.join(self.output_folder, label, filename)
-
-                    print(f"Processing: {audio_path}")
-                    self.process_single_audio(audio_path, output_audio_path)
-
+        with ProcessPoolExecutor(max_workers=multiprocessing.cpu_count()) as p:
+            for label in ["positive", "negative"]:
+                labeled_input_dir = os.path.join(self.input_folder, label)
+                labeled_output_dir = os.path.join(self.output_folder, label)
+                os.makedirs(labeled_output_dir, exist_ok=True)
+                for filename in os.listdir(labeled_input_dir):
+                    if filename.endswith((".wav", ".mp3")):
+                        audio_path = os.path.join(labeled_input_dir, filename)
+                        output_audio_path = os.path.join(labeled_output_dir, filename)
+                        p.submit(self.process_a, audio_path, output_audio_path)
 
         # Save metadata to a CSV file
         metadata_path = os.path.join(self.output_folder, "metadata.csv")
         self.metadata_df.to_csv(metadata_path, index=False)
 
+    def process_a(self, audio_path: str, output_audio_path: str) -> None:
+        self.process_single_audio(audio_path, output_audio_path)
+        print(f"Processing: {audio_path}")
 
-    def process_single_audio(self, input_audio_path, output_audio_path, fbank=False) -> None:
+    def process_single_audio(
+        self, input_audio_path, output_audio_path, fbank=False
+    ) -> None:
         """Processes a single audio file."""
 
         filename = os.path.splitext(os.path.basename(input_audio_path))[0]
@@ -132,13 +133,13 @@ class AudioProcessor:
         audio = self.remove_no_cough(audio)
         if not audio:
             print("No cough detected. Skipping.")
-            return 1
+            return None
 
         # remove silences (may pass in non_silent_chunks into remove_silences)
         audio = self.remove_silences(audio)
         if not audio:
             print("Clip is silent. Skipping.")
-            return 1
+            return None
 
         # reduce noise
         audio = self.reduce_noise(audio)
@@ -146,7 +147,6 @@ class AudioProcessor:
         audio = self.standardize_duration(audio)
 
         return audio
-
 
     def save_metadata(self, audio_path, filename) -> None:
         """
@@ -166,7 +166,6 @@ class AudioProcessor:
             ],
         )
         self.metadata_df = pd.concat([self.metadata_df, new_row], ignore_index=True)
-
 
     def get_labeled_path(self, filename: str) -> str:
         """
@@ -196,13 +195,13 @@ class AudioProcessor:
                         return positive_folder
                     elif status == "healthy":
                         return negative_folder
-                    else: return "none"
+                    else:
+                        return "none"
                 except json.JSONDecodeError:
                     print(f"Error reading JSON file: {json_path}")
                     return "none"
         else:
             return "none"
-
 
     def conv_to_wav(self, audio_path: str, wav_path: str, file_type: str) -> None:
         """Converts an audio file to WAV format.
@@ -222,7 +221,6 @@ class AudioProcessor:
         # save wav file to output folder
         audio.export(wav_path, format="wav")
 
-
     def remove_silences(self, audio: AudioSegment) -> AudioSegment | None:
         """Removes silences from an audio file.
 
@@ -241,7 +239,6 @@ class AudioProcessor:
             return processed_audio
         else:
             return None
-
 
     def reduce_noise(self, audio: AudioSegment) -> AudioSegment:
         """Reduces background noise in an audio file.
@@ -270,9 +267,12 @@ class AudioProcessor:
             normalized_reduced_noise = reduced_noise
 
         # Need to convert back to int format (required by wav) cuz normalization turns into float
-        # audio.sample_width == 4 -> scale to int32 range
-        int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
-
+        if audio.sample_width == 2:  # 16-bit audio
+            int_samples = (normalized_reduced_noise * 32767).astype(np.int16)
+        elif audio.sample_width == 4:  # 32-bit audio
+            int_samples = (normalized_reduced_noise * 2147483647).astype(np.int32)
+        else:
+            raise ValueError(f"Unsupported sample width: {audio.sample_width}")
 
         # Create a new AudioSegment with the processed audio data
         processed_audio = AudioSegment(
@@ -283,7 +283,6 @@ class AudioProcessor:
         )
 
         return processed_audio
-
 
     def remove_no_cough(self, audio: AudioSegment) -> AudioSegment | None:
         """Removes non-cough segments from an audio file.
@@ -296,7 +295,7 @@ class AudioProcessor:
 
         non_silent_chunks = detect_nonsilent(audio, min_silence_len, silence_thresh)
 
-        if not non_silent_chunks: # all chunks are nonsilent, no cough detected
+        if not non_silent_chunks:  # all chunks are nonsilent, no cough detected
             return None
         else:
             return audio
@@ -366,37 +365,37 @@ class AudioProcessor:
 
     def highpass_filter(self, y, sr, cutoff=800):
         """
-            Applies a high-pass Butterworth filter to remove low-frequency noise from the audio signal.
+        Applies a high-pass Butterworth filter to remove low-frequency noise from the audio signal.
 
-            This filter helps enhance clarity by eliminating frequencies below the specified cutoff,
-            which is useful for reducing muffling and preserving important speech or cough frequencies.
+        This filter helps enhance clarity by eliminating frequencies below the specified cutoff,
+        which is useful for reducing muffling and preserving important speech or cough frequencies.
 
-            Args:
-                y (np.ndarray): The input audio signal.
-                sr (int): The sampling rate of the audio.
-                cutoff (float, optional): The cutoff frequency in Hz. Default is 800 Hz.
+        Args:
+            y (np.ndarray): The input audio signal.
+            sr (int): The sampling rate of the audio.
+            cutoff (float, optional): The cutoff frequency in Hz. Default is 800 Hz.
 
-            Returns:
-                np.ndarray: The high-pass filtered audio signal.
+        Returns:
+            np.ndarray: The high-pass filtered audio signal.
         """
 
-        b, a, c = butter(6, cutoff / (0.5 * sr), btype='high')
+        b, a, c = butter(6, cutoff / (0.5 * sr), btype="high")
         return lfilter(b, a, y)
 
     def demuffle_audio(self, y, sr):
         """
-           Reduces muffling in an audio signal by applying a bandpass filter
-           and a high-pass filter.
+        Reduces muffling in an audio signal by applying a bandpass filter
+        and a high-pass filter.
 
-           This method helps enhance clarity by removing low-frequency noise
-           and preserving cough frequencies.
+        This method helps enhance clarity by removing low-frequency noise
+        and preserving cough frequencies.
 
-           Args:
-               y (np.ndarray): The input audio signal.
-               sr (int): The sampling rate of the audio.
+        Args:
+            y (np.ndarray): The input audio signal.
+            sr (int): The sampling rate of the audio.
 
-           Returns:
-               np.ndarray: The filtered audio signal with reduced muffling.
+        Returns:
+            np.ndarray: The filtered audio signal with reduced muffling.
         """
 
         y_filtered, sr = self.bandpass_filter(y, sr, lowcut=800)
@@ -404,7 +403,12 @@ class AudioProcessor:
 
         return y_filtered
 
-    def minimize_speech(self ,audio_path, output_path="isolated_cough.wav (subject to change)", duration=None):
+    def minimize_speech(
+        self,
+        audio_path,
+        output_path="isolated_cough.wav (subject to change)",
+        duration=None,
+    ):
         """
         Minimizes speech while preserving cough sounds using HPSS, soft masking, and bandpass filtering.
         """
@@ -416,23 +420,25 @@ class AudioProcessor:
 
         S_full, phase = librosa.magphase(librosa.stft(y_cough_filtered))
 
-        S_filter = librosa.decompose.nn_filter(S_full,
-                                            aggregate=np.median,
-                                            metric='cosine',
-                                            width=int(librosa.time_to_frames(2, sr=sr)))
+        S_filter = librosa.decompose.nn_filter(
+            S_full,
+            aggregate=np.median,
+            metric="cosine",
+            width=int(librosa.time_to_frames(2, sr=sr)),
+        )
 
         S_filter = np.minimum(S_full, S_filter)
 
         margin_speech, margin_cough = 2, 10
         power = 2
 
-        mask_speech = librosa.util.softmask(S_filter,
-                                            margin_speech * (S_full - S_filter),
-                                            power=power)
+        mask_speech = librosa.util.softmask(
+            S_filter, margin_speech * (S_full - S_filter), power=power
+        )
 
-        mask_cough = librosa.util.softmask(S_full - S_filter,
-                                        margin_cough * S_filter,
-                                        power=power)
+        mask_cough = librosa.util.softmask(
+            S_full - S_filter, margin_cough * S_filter, power=power
+        )
 
         S_cough = mask_cough * S_full
 
@@ -445,19 +451,34 @@ class AudioProcessor:
 
         idx = slice(*librosa.time_to_frames([0, min(5, len(y) / sr)], sr=sr))
 
-        img = librosa.display.specshow(librosa.amplitude_to_db(S_full[:, idx], ref=np.max),
-                                    y_axis='log', x_axis='time', sr=sr, ax=ax[0])
-        ax[0].set(title='Full Percussive Spectrum')
+        img = librosa.display.specshow(
+            librosa.amplitude_to_db(S_full[:, idx], ref=np.max),
+            y_axis="log",
+            x_axis="time",
+            sr=sr,
+            ax=ax[0],
+        )
+        ax[0].set(title="Full Percussive Spectrum")
         ax[0].label_outer()
 
-        librosa.display.specshow(librosa.amplitude_to_db(S_filter[:, idx], ref=np.max),
-                                y_axis='log', x_axis='time', sr=sr, ax=ax[1])
-        ax[1].set(title='Background Speech Estimate')
+        librosa.display.specshow(
+            librosa.amplitude_to_db(S_filter[:, idx], ref=np.max),
+            y_axis="log",
+            x_axis="time",
+            sr=sr,
+            ax=ax[1],
+        )
+        ax[1].set(title="Background Speech Estimate")
         ax[1].label_outer()
 
-        librosa.display.specshow(librosa.amplitude_to_db(S_cough[:, idx], ref=np.max),
-                                y_axis='log', x_axis='time', sr=sr, ax=ax[2])
-        ax[2].set(title='Isolated Cough (Speech Reduced)')
+        librosa.display.specshow(
+            librosa.amplitude_to_db(S_cough[:, idx], ref=np.max),
+            y_axis="log",
+            x_axis="time",
+            sr=sr,
+            ax=ax[2],
+        )
+        ax[2].set(title="Isolated Cough (Speech Reduced)")
 
         fig.colorbar(img, ax=ax)
         plt.show()
