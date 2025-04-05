@@ -1,9 +1,0 @@
-__pycache__/
-*.pyc
-*.pyo
-*.swp
-.DS_Store
-
-data/stethoscope_data/
-*/data/stethoscope_data/
-data/stethoscope_data/*

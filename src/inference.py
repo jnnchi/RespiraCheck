@@ -1,24 +1,25 @@
 """
-single inference testing
+Single inference for AWS Gateway API HTTP endpoint
 """
 
 import sys
 import os
+import json
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from ml.models.model_pipeline import ModelPipeline
 from ml.models.model_handler import ModelHandler
-from ml.models.cnn_model import CNNModel
+from ml.models.cnnLSTM_model import CNNLSTM as CNNModel
 from ml.data_processing.data_pipeline import DataPipeline
 from ml.data_processing.audio_processor import AudioProcessor
 from ml.data_processing.spectrogram_processor import SpectrogramProcessor
 import torch.optim as opt
 import torch.nn as nn
 
-if __name__ == "__main__":
+def lambda_handler():
     audio_bytes = open(
-        "/Users/jennifer/IdeaProjects/RespiraCheck/ml/data/cough_data/processed_audio/negative/ecy0t93dh8TS3yPI4YJZDSuDFAi2_1.wav",
+        "src/cough-heavy.wav",
         "rb",
     ).read()
 
@@ -29,9 +30,7 @@ if __name__ == "__main__":
     STEPS_PER_LR_DECAY = 20
     LR_DECAY = 0.5
 
-    # Model parameters
-    DROPOUT = 0.5
-    cnn_model = CNNModel(DROPOUT)
+    cnn_model = CNNModel()
     # Training
     LOSS_FN = nn.BCEWithLogitsLoss()
     optimizer = opt.SGD(params=cnn_model.parameters())
@@ -45,7 +44,7 @@ if __name__ == "__main__":
     )
     model_handler = ModelHandler(
         model=cnn_model,
-        model_path="/Users/jennifer/IdeaProjects/RespiraCheck/ml/models/model__2025-03-06 19_47_09.488171.pth",
+        model_path="ml/models/krish_TEMP_model.pth",
         optimizer=optimizer,
         loss_function=LOSS_FN,
         lr_scheduler=None,
@@ -55,4 +54,14 @@ if __name__ == "__main__":
     prediction, spectrogram_buf = model_pipeline.make_single_inference(
         audio_bytes, "wav"
     )
-    print(prediction)
+    return {
+        'status code': 200,
+        'body': json.dumps(prediction, spectrogram_buf)
+
+    }
+
+if __name__ == "__main__":
+    # Test run
+    print(lambda_handler())
+
+

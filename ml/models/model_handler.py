@@ -20,8 +20,6 @@ from torch.utils.data import DataLoader
 import torch.nn as nn
 import torch.optim as opt
 
-from .cnn_model import CNNModel
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from data_processing.audio_processor import AudioProcessor
@@ -200,7 +198,6 @@ class ModelHandler:
             print(
                 f"VLoss - {validation_data['avg_loss_per_batch']:.5f} | VAccuracy - {validation_data['avg_acc_per_batch']:.2f}%\n"
             )
-
         self.save_model(model_state_dict=self.model.state_dict(), model_name=model_name)
         return training_results, validation_results
 
@@ -278,26 +275,27 @@ class ModelHandler:
         self.model.eval()
         batch_sizes, accs = [], []
         with torch.no_grad():
-            for (
-                X_test,
-                y_test,
-            ) in test_loader:
-                X_test = X_test.to(self.device)
-                y_test = y_test.to(self.device)
+          for (
+              X_test,
+              y_test,
+          ) in test_loader:
+              X_test = X_test.to(self.device)
+              y_test = y_test.to(self.device).float().unsqueeze(1)
 
-                prediction = self.model(X_test)
-                batch_sizes.append(X_test.shape[0])
+              prediction = self.model(X_test)
+              batch_sizes.append(X_test.shape[0])
 
-                prediction = torch.sigmoid(prediction)
-                prediction_classes = (
-                    prediction > 0.5
-                ).float()  # This converts to binary classes 0 and 1
+              prediction = torch.round(torch.sigmoid(prediction))
+              # prediction_classes = (
+              #     prediction > 0.5
+              # ).float()  # This converts to binary classes 0 and 1
 
-                acc = torch.mean((prediction_classes == y_test).float()).item()
-                accs.append(acc)
+              acc = torch.mean((prediction == y_test).float()).item()
+              accs.append(acc)
 
         # Return average accuracy
-        return 0.0 if not accs else np.average(accs, weights=batch_sizes)
+        print(accs)
+        return np.average(accs, weights=batch_sizes)
 
     def predict(self, spectrogram: torch.Tensor) -> int:
         """Performs inference on a single spectrogram.
@@ -349,80 +347,3 @@ class ModelHandler:
         self.model.load_state_dict(torch.load(path))
         self.model.to(self.device)
         self.model.eval()
-
-
-if __name__ == "__main__":
-    audioproccessor = AudioProcessor()
-    spectroproccessor = SpectrogramProcessor()
-
-    data_pipeline = DataPipeline(
-        test_size=0.15,
-        val_size=0.15,
-        audio_processor=audioproccessor,
-        image_processor=spectroproccessor,
-    )
-
-    cnn_model = CNNModel()
-    loss_function = nn.BCEWithLogitsLoss()
-
-    # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=0.01, momentum=0.9) ###SDG
-
-    optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01, weight_decay=0.0001) ### ADAM
-
-    model_handler = ModelHandler(model=cnn_model, model_path="ml/models", optimizer=optimizer, loss_function=loss_function)
-
-    train_loader, val_loader, test_loader = datapipline.create_dataloaders(batch_size=32)
-
-    # Train the model
-    epochs = 1
-
-    model_handler.train(
-        train_loader=train_loader,
-        val_loader=val_loader,
-        epochs=epochs,
-        model_name="g1_model",
-    )
-
-    best_model = None
-    best_acc = 0.0
-
-    # Hyperparameters for validation
-    hyperparameter_options = [
-        {"learning_rate": 0.01},
-        {"learning_rate": 0.001},
-        {"learning_rate": 0.0001},
-    ]
-
-    for hyperparams in hyperparameter_options:
-        print(f"Validating model with hyperparameters: {hyperparams}")
-
-        cnn_model = CNNModel()
-        # optimizer = torch.optim.SGD(params=cnn_model.parameters(), lr=hyperparams["learning_rate"], momentum=0.9) ###SDG
-        
-        optimizer = torch.optim.Adam(params=cnn_model.parameters(), lr=0.01, weight_decay=0.0001) ### ADAM
-
-        # Create new ModelHandler for each hyperparameter set
-        model_handler = ModelHandler(
-            model=cnn_model,
-            model_path="ml/models",
-            optimizer=optimizer,
-            loss_function=loss_function,
-            lr_scheduler=lr_scheduler,
-        )
-
-        # Perform validation
-        val_acc, val_loss = model_handler.validate(val_loader, hyperparams)
-
-        # Save the best model based on accuracy
-        if val_acc > best_acc:
-            best_acc = val_acc
-            best_model = model_handler
-
-        print(
-            f"Validation accuracy: {val_acc*100:.2f}% | Validation loss: {val_loss:.4f}"
-        )
-
-    # Final testing with the best model
-    if best_model:
-        test_acc = best_model.evaluate(test_loader)
-        print(f"Test accuracy: {test_acc*100:.2f}%. Awesome!")
