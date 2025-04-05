@@ -4,6 +4,7 @@ Spectrogram Processing Module.
 This module provides the `SpectrogramProcessor` class for converting audio files
 into spectrograms, normalizing them, and extracting features.
 """
+import random
 
 import numpy as np
 import librosa
@@ -13,6 +14,8 @@ from .image_processor import ImageProcessor
 from pydub import AudioSegment
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor
+import cv2
+
 
 
 class SpectrogramProcessor(ImageProcessor):
@@ -218,6 +221,23 @@ class SpectrogramProcessor(ImageProcessor):
         log_spectro = librosa.amplitude_to_db(audio_stft)
 
         return log_spectro
+
+    def augment_hue(self, spectrogram: np.ndarray) -> np.ndarray:
+        # Randomly choose a hue shift from the range [-0.2, 0.2]
+        hue_shift = random.uniform(-0.2, 0.2)
+        augmented_spectrogram = self.change_hue(spectrogram, hue_shift)
+        return augmented_spectrogram
+
+    def change_hue(self, image: np.ndarray, hue_shift: float) -> np.ndarray:
+        # Convert to HSV color space
+        hsv_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+
+        # Apply hue shift
+        hsv_image[..., 0] = (hsv_image[..., 0].astype(np.float32) + hue_shift * 180) % 180
+
+        # Convert back to RGB
+        augmented_image = cv2.cvtColor(hsv_image.astype(np.uint8), cv2.COLOR_HSV2RGB)
+        return augmented_image
 
     def plot_spectrogram(self, filename, spectrogram) -> None:
         """Plots the spectrogram using Matplotlib
