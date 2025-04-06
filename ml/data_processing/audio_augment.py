@@ -95,6 +95,9 @@ class DataAugmentProcessor:
                 if "TM" in augmentations_to_perform:
                     spectrogram = self.time_mask(spectrogram, time_mask)
 
+                #TODO Uncomment this and run
+                #spectrogram = processor.augment_hue(spectrogram);
+
                 # Save image file
                 save_path = os.path.join(save_directory, filepath[:-4] + "_aug.png")
                 print(save_path)
